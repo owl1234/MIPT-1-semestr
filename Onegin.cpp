@@ -17,9 +17,9 @@ int main (int argc, char* argv[]) {
     // Begin to count the length of the string
     //printf("%s\n", argv[1]);
 
-    if(argv[1] == "t") {
+    if(argv[1][0] == 't') {
         testing();
-    } else if(argv[1] == "s") {
+    } else if(argv[1][0] == 's') {
         sorting(argv);
     } else {
         printf("Bad agruments. t - if you want to testing, s - if you want to sorting\n");
@@ -71,9 +71,9 @@ int number_of_lines(FILE* file, int* max_length) {
 FILE* open_file(FILE** file, char* file_name) {
     *file = fopen(file_name, "r");
 
-    if(*file == nullptr) {
-        return nullptr;
-    }
+    //if(file == nullptr) {
+    //    return nullptr;
+    //}
 
     return *file;
 }
