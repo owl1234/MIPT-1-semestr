@@ -59,6 +59,28 @@ void testing_close_file(FILE** file, char* file_name, bool status, int* number_o
     (*number_of_test)++;
 }
 
+void testing_number_of_lines(char* file_name, int correct_lines, int correct_max_length, int* number_of_test) {
+    FILE* file;
+    file = open_file(&file, file_name);
+
+    int max_length = 0;
+    int lines = number_of_lines(file, &max_length);
+
+    if(max_length == correct_max_length && lines == correct_lines) {
+        printf("est #%d OK\n", *number_of_test);
+    } else if(max_length == correct_max_length) {
+        printf("Test #%d BAD: max_length found correctly, lines (program count): %d, correct_lines: %d\n", *number_of_test, lines, correct_lines);
+    } else if(lines == correct_lines) {
+        printf("Test #%d BAD: lines found correctly, max_length (program count): %d, correctmax_length: %d\n", *number_of_test, max_length, correct_max_length);
+    } else {
+        printf("Test #%d BAD: max_length (program count): %d, correct_max_length: %d\nlines (program count): %d, correct_lines: %d\n", *number_of_test, max_length, correct_max_length, lines, correct_lines);
+    }
+
+    close_file(&file);
+
+    (*number_of_test)++;
+}
+
 void testing() {
     int number_of_test = 1;
 
@@ -74,12 +96,13 @@ void testing() {
     testing_comparator("a", "fa", -1, &number_of_test);
     testing_comparator("www", "www", 0, &number_of_test);
 
-    printf("\nBegin testing the function open_file and close_file\n");
+    printf("\nBegin testing the functions open_file and close_file\n");
     FILE* file;
     testing_open_file(&file, "Onegin.txt", true, &number_of_test);
     testing_close_file(&file, "Onegin.txt", true, &number_of_test);
     testing_open_file(&file, "wtgwrgwergf.txt", false, &number_of_test);
     testing_close_file(&file, "wtgwrgwergf.txt", false, &number_of_test);
 
-
+    printf("\nBegin testing the function number_of_lines\n");
+    testing_number_of_lines("Onegin.txt", 5244, 68,  &number_of_test);
 }
