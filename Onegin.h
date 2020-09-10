@@ -54,3 +54,6 @@ FILE* open_file(FILE** file, char* file_name);
 */
 
 int close_file(FILE** file);
+
+
+void sorting(char* argv[]);

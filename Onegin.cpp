@@ -15,71 +15,16 @@
 
 int main (int argc, char* argv[]) {
     // Begin to count the length of the string
+    //printf("%s\n", argv[1]);
 
-    testing();
-    return 0;
-
-    FILE* poem;
-    //printf("%c\n", argv[1][0]);
-    //return 0;
-    poem = open_file(&poem, argv[1]);
-    if(poem == nullptr) {
-        printf("File %s wasn't opened\n", argv[1]);
+    if(argv[1] == "t") {
+        testing();
+    } else if(argv[1] == "s") {
+        sorting(argv);
+    } else {
+        printf("Bad agruments. t - if you want to testing, s - if you want to sorting\n");
         return 3802;
     }
-
-    int max_length = 0;
-    int lines = number_of_lines(poem, &max_length);
-
-    char** text = (char**)calloc(lines + 1, sizeof(char*));
-    for(int i=0; i<lines; ++i) {
-        text[i] = (char*)calloc(max_length + 1, sizeof(char));
-    }
-
-    int close_file_result = close_file(&poem);
-    if(close_file_result == -1) {
-        printf("There were problems with the file %s. Run the program again.\n", argv[1]);
-        return 3802;
-    }
-
-    // End to count the length of the string
-
-
-    // Begin to read the string
-
-    poem = open_file(&poem, argv[1]);
-    if(poem == nullptr) {
-        return 3802;
-    }
-
-    int line = 0;
-
-    while (line < lines) {
-        int i = 0;
-        char symbol = '!';
-
-        while(symbol != '\n') {
-            fscanf(poem, "%c", &symbol);
-            text[line][i] = symbol;
-            ++i;
-        }
-
-        line++;
-    }
-
-    close_file(&poem);
-
-    // End to read the string
-
-    qsort(text, line, sizeof(text[0]), comparator);
-
-    printf("%s %s\n", argv[1], argv[2]);
-    FILE *fdout = fopen(argv[2], "w");
-
-    for (int i = 0; i < line; ++i)
-        fputs(text[i], fdout);
-
-    fclose(fdout);
 
     return 0;
 }
@@ -142,3 +87,64 @@ int close_file(FILE** file) {
     return result;
 }
 
+void sorting(char* argv[]) {
+    FILE* poem;
+    poem = open_file(&poem, argv[2]);
+    if(poem == nullptr) {
+        printf("File %s wasn't opened\n", argv[2]);
+        return;
+    }
+
+    int max_length = 0;
+    int lines = number_of_lines(poem, &max_length);
+
+    char** text = (char**)calloc(lines + 1, sizeof(char*));
+    for(int i=0; i<lines; ++i) {
+        text[i] = (char*)calloc(max_length + 1, sizeof(char));
+    }
+
+    int close_file_result = close_file(&poem);
+    if(close_file_result == -1) {
+        printf("There were problems with the file %s. Run the program again.\n", argv[1]);
+        return;
+    }
+
+    // End to count the length of the string
+
+
+    // Begin to read the string
+
+    poem = open_file(&poem, argv[2]);
+    if(poem == nullptr) {
+        return;
+    }
+
+    int line = 0;
+
+    while (line < lines) {
+        int i = 0;
+        char symbol = '!';
+
+        while(symbol != '\n') {
+            fscanf(poem, "%c", &symbol);
+            text[line][i] = symbol;
+            ++i;
+        }
+
+        line++;
+    }
+
+    close_file(&poem);
+
+    // End to read the string
+
+    qsort(text, line, sizeof(text[0]), comparator);
+
+    printf("%s %s\n", argv[2], argv[3]);
+    FILE *fdout = fopen(argv[3], "w");
+
+    for (int i = 0; i < line; ++i)
+        fputs(text[i], fdout);
+
+    fclose(fdout);
+}
