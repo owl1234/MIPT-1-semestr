@@ -27,9 +27,7 @@ void testing_strcmp(const char* first_string, const char* second_string, int rig
 
 void testing_open_file(FILE** file, char* file_name, bool status, int* number_of_test) {
     *file = open_file(file, file_name);
-    if(file == nullptr) {
-        printf("PANICCC\n");
-    }
+
     if(file != nullptr && status == true || file == nullptr && status == false) {
         printf("Test #%d OK\n", *number_of_test);
     } else {
