@@ -7,6 +7,7 @@
 // #include "TXLib.h"
 #include <stdio.h>
 #include "Onegin.h"
+#include "testing.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -14,7 +15,12 @@
 int main (int argc, char* argv[]) {
     // Begin to count the length of the string
 
+    //testing();
+    //return 0;
+
     FILE* poem;
+    //printf("%c\n", argv[1][0]);
+    //return 0;
     poem = open_file(&poem, argv[1]);
     if(poem == nullptr) {
         return 3802;
@@ -79,7 +85,7 @@ int comparator(const void* first_string, const void* second_string) {
     return strcmp(first, second);
 }
 
-int strcmp (const unsigned char* str1, const unsigned char* str2) {
+int strcmp (const unsigned char* str1, const unsigned char* str2) { //
     while(*str1 == *str2) {
         if(*str1 == '\0') {
             return 0;
