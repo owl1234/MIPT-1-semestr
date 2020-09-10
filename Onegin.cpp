@@ -10,19 +10,21 @@
 #include "testing.h"
 #include <stdlib.h>
 #include <string.h>
+#include <typeinfo>
 #include <assert.h>
 
 int main (int argc, char* argv[]) {
     // Begin to count the length of the string
 
-    //testing();
-    //return 0;
+    testing();
+    return 0;
 
     FILE* poem;
     //printf("%c\n", argv[1][0]);
     //return 0;
     poem = open_file(&poem, argv[1]);
     if(poem == nullptr) {
+        printf("File %s wasn't opened\n", argv[1]);
         return 3802;
     }
 
@@ -34,7 +36,11 @@ int main (int argc, char* argv[]) {
         text[i] = (char*)calloc(max_length + 1, sizeof(char));
     }
 
-    close_file(&poem);
+    int close_file_result = close_file(&poem);
+    if(close_file_result == -1) {
+        printf("There were problems with the file %s. Run the program again.\n", argv[1]);
+        return 3802;
+    }
 
     // End to count the length of the string
 
@@ -78,14 +84,7 @@ int main (int argc, char* argv[]) {
     return 0;
 }
 
-int comparator(const void* first_string, const void* second_string) {
-    const char* first  =  *(const char**)first_string;
-    const char* second = *(const char**)second_string;
-
-    return strcmp(first, second);
-}
-
-int strcmp (const unsigned char* str1, const unsigned char* str2) { //
+int strcmp(unsigned char* str1, unsigned char* str2) {
     while(*str1 == *str2) {
         if(*str1 == '\0') {
             return 0;
@@ -95,6 +94,13 @@ int strcmp (const unsigned char* str1, const unsigned char* str2) { //
     }
 
     return *str1 - *str2;
+}
+
+int comparator(const void* first_string, const void* second_string) {
+    const char* first  =  (const char*)first_string;
+    const char* second = (const char*)second_string;
+
+    return strcmp(first, second);
 }
 
 int number_of_lines(FILE* file, int* max_length) {
@@ -121,14 +127,18 @@ FILE* open_file(FILE** file, char* file_name) {
     *file = fopen(file_name, "r");
 
     if(*file == nullptr) {
-        printf("File Onegin.txt wasn't opened\n");
         return nullptr;
     }
 
     return *file;
 }
 
-void close_file(FILE** file) {
-    fclose(*file);
+int close_file(FILE** file) {
+    if(*file == nullptr) {
+        return -1;
+    }
+    int result = fclose(*file);
+
+    return result;
 }
 
