@@ -13,8 +13,8 @@ void testing_comparator(const void* first_string, const void* second_string, int
     (*number_of_test)++;
 }
 
-void testing_strcmp(const char* first_string, const char* second_string, int right_answer, int* number_of_test) {
-    int result = strcmp((unsigned char*)first_string, (unsigned char*)second_string);
+void testing_strcmpp(const char* first_string, const char* second_string, int right_answer, int* number_of_test) {
+    int result = strcmpp((char*)first_string, (char*)second_string); // unsigned
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
@@ -83,10 +83,10 @@ void testing() {
     int number_of_test = 1;
 
     printf("Begin testing the function strcmp\n");
-    testing_strcmp("abcde", "abcdf", -1, &number_of_test);
-    testing_strcmp("abcde", "abc", 1, &number_of_test);
-    testing_strcmp("a", "fa", -1, &number_of_test);
-    testing_strcmp("www", "www", 0, &number_of_test);
+    testing_strcmpp("abcde", "abcdf", -1, &number_of_test);
+    testing_strcmpp("abcde", "abc", 1, &number_of_test);
+    testing_strcmpp("a", "fa", -1, &number_of_test);
+    testing_strcmpp("www", "www", 0, &number_of_test);
 
     printf("\nBegin testing the function comparator\n");
     testing_comparator("abcde", "abcdf", -1, &number_of_test);

@@ -19,7 +19,7 @@ void testing_comparator(const void* first_string, const void* second_string, int
 *   @return Nothing
 */
 
-void testing_strcmp(const unsigned char* first_string, const unsigned char* second_string, int* number_of_test);
+void testing_strcmpp(const unsigned char* first_string, const unsigned char* second_string, int* number_of_test);
 
 /**
 *   \brief This function tests function open_file()
