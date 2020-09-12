@@ -15,8 +15,6 @@
 
 int main (int argc, char* argv[]) {
     // Begin to count the length of the string
-    //printf("%s\n", argv[1]);
-
     if(argv[1][0] == 't') {
         testing();
     } else if(argv[1][0] == 's') {
@@ -57,17 +55,16 @@ int strcmpp(char* str1, char* str2) { // unsigned
         }
     }
 
-    //printf("%d\n\n", *str1-*str2);
-
     return *str1 - *str2;
 }
 
 int comparator(const void* first_string, const void* second_string) {
-    char* first  =  (char*)first_string;
-    char* second = (char*)second_string;
+    char* first  =  *(char**)first_string;
+    char* second = *(char**)second_string;
 
     return strcmpp(first, second);
 }
+
 
 int number_of_lines(FILE* file, int* max_length) {
     int lines = 0, now_length = 0;
@@ -89,15 +86,36 @@ int number_of_lines(FILE* file, int* max_length) {
     return lines;
 }
 
+void qsorting(char** array, int left, int right) {
+    if(left < right) {
+        int now_left = left, now_right = right;
+        int middle = (left + right) / 2;
+        do {
+            while(strcmpp(array[now_left], array[middle]) < 0) {
+                ++now_left;
+            }
+            while(strcmpp(array[now_right], array[middle]) > 0) {
+                --now_right;
+            }
+            if(now_left <= now_right) {
+                char* temp = array[now_left];
+                array[now_left] = array[now_right];
+                array[now_right] = temp;
+                ++now_left;
+                --now_right;
+            }
+        } while(now_left <= now_right);
+        qsorting(array, left, now_right);
+        qsorting(array, now_left, right);
+    }
+}
+
 int sorting(int argc, char* argv[]) {
     if(argc > 4) {
         printf("Bad count of agruments.\n");
         return 3802;
     }
-    /*printf("%d arguments:", argc);
-    for(int i=0; i<argc; ++i)
-        printf(" %s", argv[i]);
-    printf("\n");*/
+
     FILE* poem = fopen(argv[2], "r");
     if(poem == nullptr) {
         printf("File %s wasn't opened\n", argv[2]);
@@ -112,8 +130,6 @@ int sorting(int argc, char* argv[]) {
     for(int i=0; i<lines; ++i) {
         text[i] = (char*)calloc(max_length + 1, sizeof(char));
     }
-
-    //printf("lines: %d, max_length: %d\n", lines, max_length);
 
     fclose(poem);
     /*if(close_file_result == -1) {
@@ -143,22 +159,26 @@ int sorting(int argc, char* argv[]) {
 
     fclose(poem);
 
-    printf("----------------- read file ---------------- \n");
+    /*printf("----------------- read file ---------------- \n");
     for(int i=0; i<lines; ++i) {
         for(int j=0; j<max_length; ++j) {
             printf("%c", text[i][j]);
         }
     }
-    printf("\n----------------- end read file ---------------- \n");
+    printf("\n----------------- end read file ---------------- \n");*/
 
     // End to read the string
 
-    qsort(text, lines, sizeof(text[0]), comparator);
+    qsorting(text, 0, lines - 1);
+
+    //qsort(text, lines, sizeof(text[0]), comparator);
+
+    //printf("%d\n", comparator(text[0], text[1]));
 
     FILE *fdout = fopen(argv[3], "w");
 
     for (int i=0; i<lines; ++i) {
-        fprintf(poem, "%s", text[i]);
+        fprintf(fdout, "%s", text[i]);
     }
 
     fclose(fdout);

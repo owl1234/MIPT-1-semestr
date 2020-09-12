@@ -46,3 +46,5 @@ int close_file(FILE** file);
 
 
 int sorting(int argc, char* argv[]);
+
+void qsorting(char** array, int left, int right);
