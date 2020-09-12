@@ -35,17 +35,6 @@ int strcmpp (char* str1, char* str2); // unsigned
 int number_of_lines(FILE* file, int* max_length);
 
 /**
-*   \brief This function open the file
-*
-*   @param file The file we want to open
-*   @param file_name Name of file
-*
-*   @return Pointer to an open file
-*/
-
-FILE* open_file(FILE** file, char* file_name);
-
-/**
 *   \brief This function close the file
 *
 *   @param file The file we want to close

@@ -21,29 +21,6 @@ void testing_comparator(const void* first_string, const void* second_string, int
 
 void testing_strcmpp(const unsigned char* first_string, const unsigned char* second_string, int* number_of_test);
 
-/**
-*   \brief This function tests function open_file()
-*
-*   @param file_name Name of the file
-*   @param status false, if file doesn't exist, else true
-*   @param number_of_test Test number
-*
-*   @return Nothing
-*/
-
-void testing_open_file(char* file_name, bool status, int* number_of_test);
-
-/**
-*   \brief This function tests function close_file()
-*
-*   @param file_name Name of the file
-*   @param status false, if file doesn't exist, else true
-*   @param number_of_test Test number
-*
-*   @return Nothing
-*/
-
-void testing_close_file(char* file_name, bool status, int* number_of_test);
 
 /**
 *   \brief This function tests function number_of_lines()
