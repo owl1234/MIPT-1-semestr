@@ -6,7 +6,6 @@
 
 // #include "TXLib.h"
 #include <stdio.h>
-#include <locale.h>
 #include "Onegin.h"
 #include "testing.h"
 #include <stdlib.h>
@@ -14,14 +13,9 @@
 #include <typeinfo>
 #include <assert.h>
 
-struct pointer {
-    char* ptr;
-    int len;
-    int pos;
-};
+
 
 int main (int argc, char* argv[]) {
-    setlocale(LC_ALL, "Russian");
     // Begin to count the length of the string
     if(argv[1][0] == 't') {
         testing();
@@ -104,7 +98,7 @@ int strcmp_reverse(char* str1, char* str2, int len1, int len2) { // unsigned
     }
 
     if(*str1 == *str2) {
-        if(pos1 - 1 >= 0 && pos2 - 1 >= 0) {
+        if(pos1 - 1 >= 0 && pos2 - 1 >= 0 || pos1 == pos2 && pos1 == 0) {
             return 0;
         } else if(pos1 - 1 >= 0) {
             return 1;
@@ -146,7 +140,9 @@ int number_of_lines(FILE* file, int* max_length) {
         }
     }
 
-    --lines;
+    if(lines > 0) {
+        --lines;
+    }
 
     return lines;
 }
@@ -187,7 +183,6 @@ void my_qsort(char** array, int len, struct pointer* index, int (*compare)(char*
         struct pointer temp = index[i];
         index[i] = index[min_ind];
         index[min_ind] = temp;
-        //printf("min %d: %s\n", i, array[min_ind]);
     }
 }
 
@@ -212,11 +207,11 @@ int sorting(int argc, char* argv[]) {
         text[i] = (char*)calloc(max_length + 1, sizeof(char));
     }
 
-    fclose(poem);
-    /*if(close_file_result == -1) {
+    int close_file_result = fclose(poem);
+    if(close_file_result == -1) {
         printf("There were problems with the file %s. Run the program again.\n", argv[1]);
         return 3802;
-    }*/
+    }
 
     // End to count the length of the string
 
@@ -246,10 +241,6 @@ int sorting(int argc, char* argv[]) {
     fclose(poem);
 
     // End to read the string
-
-    /*for(int i=0; i<lines; ++i) {
-        printf("%s %d --------- %d\n", index[i].ptr, index[i].len, *index[i].ptr);
-    }*/
 
     //qsorting(text, 0, lines - 1, index);
 

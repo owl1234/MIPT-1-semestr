@@ -1,3 +1,10 @@
+
+struct pointer {
+    char* ptr;
+    int len;
+    int pos;
+};
+
 /**
 *   \brief This function returns result of the comparing strings
 *
@@ -41,8 +48,6 @@ int number_of_lines(FILE* file, int* max_length);
 *
 *   @return Nothing
 */
-
-int close_file(FILE** file);
 
 void my_qsort(char** array, int len, struct pointer* index, int (*compare)(char*, char*));
 
