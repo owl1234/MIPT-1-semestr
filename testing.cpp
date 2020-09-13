@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "Onegin.h"
 
-void testing_comparator(const void* first_string, const void* second_string, int right_answer, int* number_of_test) {
+/*void testing_comparator(const void* first_string, const void* second_string, int right_answer, int* number_of_test) {
     int result = comparator(first_string, second_string);
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
@@ -11,10 +11,10 @@ void testing_comparator(const void* first_string, const void* second_string, int
     }
 
     (*number_of_test)++;
-}
+}*/
 
-void testing_strcmpp(const char* first_string, const char* second_string, int right_answer, int* number_of_test) {
-    int result = strcmpp((char*)first_string, (char*)second_string); // unsigned
+void testing_strcmp_forward(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test) {
+    int result = strcmp_forward((char*)first_string, (char*)second_string, len1, len2); // unsigned
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
@@ -50,14 +50,14 @@ void testing() {
     int number_of_test = 1;
 
     printf("Begin testing the function strcmp\n");
-    testing_strcmpp("abcde", "abcdf", -1, &number_of_test);
-    testing_strcmpp("abcde", "abc", 1, &number_of_test);
-    testing_strcmpp("a", "fa", -1, &number_of_test);
-    testing_strcmpp("www", "www", 0, &number_of_test);
+    testing_strcmp_forward("abcde", "abcdf", 5, 5, -1, &number_of_test);
+    testing_strcmp_forward("abcde", "abc", 5, 3, 1, &number_of_test);
+    testing_strcmp_forward("a", "fa", 1, 2, -1, &number_of_test);
+    testing_strcmp_forward("www", "www", 3, 3, 0, &number_of_test);
 
-    printf("\nBegin testing the function comparator\n");
+    /*printf("\nBegin testing the function comparator\n");
     testing_comparator("abcde", "abcdf", -1, &number_of_test);
     testing_comparator("abcde", "abc", 1, &number_of_test);
     testing_comparator("a", "fa", -1, &number_of_test);
-    testing_comparator("www", "www", 0, &number_of_test);
+    testing_comparator("www", "www", 0, &number_of_test);*/
 }

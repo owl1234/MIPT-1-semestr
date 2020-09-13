@@ -21,7 +21,7 @@ int comparator(const void* first_string, const void* second_string);
 *           Positive number, if str1 is greater than str2
 */
 
-int strcmpp (char* str1, char* str2); // unsigned
+int strcmp_forward(char* str1, char* str2, int len1, int len2); // unsigned
 
 /**
 *   \brief This function calculates number of lines in the file
@@ -44,7 +44,12 @@ int number_of_lines(FILE* file, int* max_length);
 
 int close_file(FILE** file);
 
+void my_qsort(char** array, int len, struct pointer* index, int (*compare)(char*, char*));
 
 int sorting(int argc, char* argv[]);
 
-void qsorting(char** array, int left, int right);
+void qsorting(char** array, int left, int right, struct pointer* index);
+
+int strcmp_reverse(char* str1, char* str2, int len1, int len2);
+
+int int_comparator(const void* first, const void* second);
