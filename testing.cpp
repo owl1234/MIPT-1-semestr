@@ -37,11 +37,11 @@ void testing_strcmp_reverse(const char* first_string, const char* second_string,
     (*number_of_test)++;
 }
 
-void testing_number_of_lines(char* file_name, int correct_lines, int correct_max_length, int* number_of_test) {
+void testing_number_of_lines(char* file_name, int correct_lines, int correct_max_length, char separator, int* number_of_test) {
     FILE* file = fopen(file_name, "r");
 
     int max_length = 0;
-    int lines = number_of_lines(file, &max_length);
+    int lines = number_of_lines(file, &max_length, separator);
 
     if(max_length == correct_max_length && lines == correct_lines) {
         printf("Test #%d OK\n", *number_of_test);
@@ -86,10 +86,10 @@ void testing() {
     testing_strcmp_reverse("www", "www", 3, 3, 0, &number_of_test);
 
     printf("\nBegin testing the function number_of_lines\n");
-    testing_number_of_lines("testing/1.txt", 1, 1, &number_of_test);
-    testing_number_of_lines("testing/2.txt", 0, 0, &number_of_test);
-    testing_number_of_lines("testing/3.txt", 4, 6, &number_of_test);
-    testing_number_of_lines("testing/4.txt", 3802, 1000, &number_of_test);
+    testing_number_of_lines("testing/1.txt", 1, 1, '\n', &number_of_test);
+    testing_number_of_lines("testing/2.txt", 0, 0, '\n', &number_of_test);
+    testing_number_of_lines("testing/3.txt", 4, 6, '\n',  &number_of_test);
+    testing_number_of_lines("testing/4.txt", 3802, 1000, '\n', &number_of_test);
 
     printf("\nBegin testing the function int_comparator\n");
     struct pointer test1, test2;

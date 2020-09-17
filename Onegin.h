@@ -39,7 +39,7 @@ int strcmp_forward(char* str1, char* str2, int len1, int len2); // unsigned
 *   @return Number of lines in the file
 */
 
-int number_of_lines(FILE* file, int* max_length);
+int number_of_lines(FILE* file, int* max_length, char separator);
 
 /**
 *   \brief This function close the file
@@ -58,3 +58,5 @@ void qsorting(char** array, int left, int right, struct pointer* index);
 int strcmp_reverse(char* str1, char* str2, int len1, int len2);
 
 int int_comparator(const void* first, const void* second);
+
+int writing_to_file(char* name_in, char* name_out, char** text, int lines, struct pointer* index);

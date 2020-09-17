@@ -34,7 +34,7 @@ void testing_strcmp_forward(const char* first_string, const char* second_string,
 *   @return Nothing
 */
 
-void testing_strcmp_reverse(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test););
+void testing_strcmp_reverse(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test);
 
 /**
 *   \brief This function tests function number_of_lines()

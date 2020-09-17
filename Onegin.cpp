@@ -125,13 +125,13 @@ int int_comparator(const void* first, const void* second) {
 }
 
 
-int number_of_lines(FILE* file, int* max_length) {
+int number_of_lines(FILE* file, int* max_length, char separator) {
     int lines = 0, now_length = 0;
     char symbol = '!';
 
     while(!feof(file)) {
         fscanf(file,"%c", &symbol);
-        if(symbol == '\n') {
+        if(symbol == separator) {
             ++lines;
             *max_length = ((*max_length) < now_length ? now_length : (*max_length));
             now_length = 0;
@@ -186,21 +186,65 @@ void my_qsort(char** array, int len, struct pointer* index, int (*compare)(char*
     }
 }
 
+int writing_to_file(char* name_in, char* name_out, char** text, int lines, struct pointer* index) {
+    FILE* file_result = fopen(name_out, "w");
+
+    fprintf(file_result, "-------------------------------------- BEGIN DO PART I ---------------------------------------\n");
+
+    my_qsort(text, lines, index, strcmp_forward);
+
+    for (int i=0; i<lines; ++i) {
+        fprintf(file_result, "%s", index[i].ptr);
+    }
+    fprintf(file_result, "--------------------------------------- END DO PART I ----------------------------------------\n");
+
+
+    qsort(index, lines, sizeof(index[0]), int_comparator);
+
+
+    fprintf(file_result, "-------------------------------------- BEGIN DO PART II --------------------------------------\n");
+
+    my_qsort(text, lines, index, strcmp_reverse);
+    for (int i=0; i<lines; ++i) {
+        fprintf(file_result, "%s", index[i].ptr);
+    }
+    fprintf(file_result, "--------------------------------------- END DO PART II ---------------------------------------\n");
+
+
+
+    fprintf(file_result, "-------------------------------------- BEGIN DO PART III -------------------------------------\n");
+    for (int i=0; i<lines; ++i) {
+        fprintf(file_result, "%s", text[i]);
+    }
+    fprintf(file_result, "-------------------------------------- END DO PART III ---------------------------------------\n");
+
+
+    fclose(file_result);
+
+    for(int i=0; i<lines; ++i) {
+        free(text[i]);
+    }
+
+    free(text);
+}
+
 int sorting(int argc, char* argv[]) {
-    if(argc > 4) {
+    if(argc != 4) {
         printf("Bad count of agruments.\n");
         return 3802;
     }
 
-    FILE* poem = fopen(argv[2], "r");
+    char* name_in = argv[2];
+    char* name_out = argv[3];
+
+    FILE* poem = fopen(name_in, "r");
     if(poem == nullptr) {
-        printf("File %s wasn't opened\n", argv[2]);
+        printf("File %s don't open\n", name_in);
         return 3802;
     }
 
     int max_length = 0;
-    int lines = number_of_lines(poem, &max_length);
-    ++max_length;
+    int lines = number_of_lines(poem, &max_length, '\n');
 
     char** text = (char**)calloc(lines + 1, sizeof(char*));
     for(int i=0; i<lines; ++i) {
@@ -213,13 +257,9 @@ int sorting(int argc, char* argv[]) {
         return 3802;
     }
 
-    // End to count the length of the string
-
-
-    // Begin to read the string
-
-    poem = fopen(argv[2], "r");
+    poem = fopen(name_in, "rb");
     if(poem == nullptr) {
+        printf("There were problems with the file %s. Run the program again.\n", argv[1]);
         return 3802;
     }
 
@@ -241,42 +281,7 @@ int sorting(int argc, char* argv[]) {
     fclose(poem);
 
     // End to read the string
-
-    //qsorting(text, 0, lines - 1, index);
-
-    //qsort(text, lines, sizeof(text[0]), comparator);
-
-    FILE* file_result = fopen(argv[3], "w");
-
-    fprintf(file_result, "-------------------------------------- BEGIN DO PART I --------------------------------------\n");
-
-    my_qsort(text, lines, index, strcmp_forward);
-
-    for (int i=0; i<lines; ++i) {
-        fprintf(file_result, "%s", index[i].ptr);
-    }
-    fprintf(file_result, "-------------------------------------- END DO PART I --------------------------------------\n");
-
-    qsort(index, lines, sizeof(index[0]), int_comparator);
-
-    fprintf(file_result, "-------------------------------------- BEGIN DO PART II --------------------------------------\n");
-
-    my_qsort(text, lines, index, strcmp_reverse);
-    for (int i=0; i<lines; ++i) {
-        fprintf(file_result, "%s", index[i].ptr);
-    }
-    fprintf(file_result, "-------------------------------------- END DO PART II --------------------------------------\n");
-
-    fprintf(file_result, "-------------------------------------- BEGIN DO PART III --------------------------------------\n");
-    for (int i=0; i<lines; ++i) {
-        fprintf(file_result, "%s", text[i]);
-    }
-    fprintf(file_result, "-------------------------------------- END DO PART III --------------------------------------\n");
-
-
-    fclose(file_result);
-
-    // ...............................PART II..............................
+    writing_to_file(name_in, name_out, text, lines, index);
 
     return 0;
 }
