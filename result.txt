@@ -1,4 +1,4 @@
--------------------------------------- BEGIN DO PART I --------------------------------------
+-------------------------------------- BEGIN DO PART 1 ---------------------------------------
 A Follower. Away Tybalt.
  A Street.
 'A bears him like a portly gentleman,
@@ -3301,8 +3301,9 @@ world. A plague o' both your houses! Zounds, a dog, a rat, a
 would spy out such a quarrel? Thy head is as full of quarrels as
 young lady ask'd for, the nurse curs'd in the pantry, and
 your mother?
--------------------------------------- END DO PART I --------------------------------------
--------------------------------------- BEGIN DO PART II --------------------------------------
+--------------------------------------- END DO PART 1 ----------------------------------------
+
+-------------------------------------- BEGIN DO PART 2 ---------------------------------------
 THE END
 DRAMATIS PERSONAE
 Enter another Whatchman with FRIAR LAURENCE.
@@ -4791,8 +4792,8 @@ Romeo. And stay, good nurse, behind the abbey wall.
 [He leaps the orchad-wall.]
 thou loves me, let the porter let in Susan Grindstone and Nell.
 Lady Cap. O me! this sight of death is as a bell
-FRIAR LAURENCE'S cell.
 FRIAR LAURENCE'S  cell.
+FRIAR LAURENCE'S cell.
 FRIAR LAURENCE'S cell.
 Verona. FRIAR LAURENCE'S cell.
 Friar LAURENCE'S cell.
@@ -5170,8 +5171,8 @@ In what I farther shall intend to do,
 Romeo. O, then, dear saint, let lips do what hands do!
 Put up your swords. You know not what you do.
 Mer. Come, sir, your passado!
-Romeo?
 Romeo!
+Romeo?
 Friar L. Romeo!
 That runaway eyes may wink, and Romeo
 Nurse. Hie to your chamber. I'll find Romeo
@@ -6605,8 +6606,9 @@ Who, even in pure and vestal modesty,
 Hath had no power yet upon thy beauty.
 Ben. An I were so apt to quarrel as thou art, any man should buy
 Farewell, my coz.
--------------------------------------- END DO PART II --------------------------------------
--------------------------------------- BEGIN DO PART III --------------------------------------
+--------------------------------------- END DO PART 2 ----------------------------------------
+
+-------------------------------------- BEGIN DO PART 3 ---------------------------------------
 Romeo and Juliet
 DRAMATIS PERSONAE
 ESCALUS, Prince of Verona.
@@ -9909,4 +9911,5 @@ For never was a story of more woe
 Than this of Juliet and her Romeo.
 [Exeunt.]
 THE END
--------------------------------------- END DO PART III --------------------------------------
+--------------------------------------- END DO PART 3 ----------------------------------------
+

@@ -1,19 +1,7 @@
 #include <stdio.h>
 #include "Onegin.h"
 
-/*void testing_comparator(const void* first_string, const void* second_string, int right_answer, int* number_of_test) {
-    int result = comparator(first_string, second_string);
-
-    if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
-        printf("Test #%d OK\n", *number_of_test);
-    } else {
-        printf("Test #%d BAD: comparator(%s, %s) == %d, should be %d\n", *number_of_test, (const char*)first_string, (const char*)second_string, result, right_answer);
-    }
-
-    (*number_of_test)++;
-}*/
-
-void testing_strcmp_forward(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test) {
+void testing_strcmp_forward(const char* first_string, const char* second_string, const int len1, const int len2, const int right_answer, int* number_of_test) {
     int result = strcmp_forward((char*)first_string, (char*)second_string, len1, len2); // unsigned
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
@@ -25,7 +13,7 @@ void testing_strcmp_forward(const char* first_string, const char* second_string,
     (*number_of_test)++;
 }
 
-void testing_strcmp_reverse(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test) {
+void testing_strcmp_reverse(const char* first_string, const char* second_string, const int len1, const int len2, const int right_answer, int* number_of_test) {
     int result = strcmp_reverse((char*)first_string, (char*)second_string, len1, len2); // unsigned
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
@@ -37,8 +25,12 @@ void testing_strcmp_reverse(const char* first_string, const char* second_string,
     (*number_of_test)++;
 }
 
-void testing_number_of_lines(char* file_name, int correct_lines, int correct_max_length, char separator, int* number_of_test) {
+void testing_number_of_lines(const char* file_name, const int correct_lines, const int correct_max_length, const char separator, int* number_of_test) {
     FILE* file = fopen(file_name, "r");
+    if(file == nullptr) {
+        printf("Test #%d BAD: file %s don't open\n", *number_of_test, file_name);
+        return;
+    }
 
     int max_length = 0;
     int lines = number_of_lines(file, &max_length, separator);
@@ -53,13 +45,17 @@ void testing_number_of_lines(char* file_name, int correct_lines, int correct_max
         printf("Test #%d BAD: max_length (program count): %d, correct_max_length: %d\nlines (program count): %d, correct_lines: %d\n", *number_of_test, max_length, correct_max_length, lines, correct_lines);
     }
 
-    fclose(file);
+    int status = fclose(file);
+    if(status == -1) {
+        printf("Test #%d BAD: file %s don't close\n", *number_of_test, file_name);
+        return;
+    }
 
     (*number_of_test)++;
 }
 
-void testing_int_comparator(struct pointer first, struct pointer second, int right_answer, int* number_of_test) {
-    int result = int_comparator(&first, &second); // unsigned
+void testing_comparator_struct_pos(const struct pointer first, const struct pointer second, const int right_answer, int* number_of_test) {
+    int result = comparator_struct_pos(&first, &second); // unsigned
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
@@ -92,39 +88,15 @@ void testing() {
     testing_number_of_lines("testing/4.txt", 3802, 1000, '\n', &number_of_test);
 
     printf("\nBegin testing the function int_comparator\n");
-    struct pointer test1, test2;
-    test1.ptr = "a";
-    test1.len = 1;
-    test1.pos = 4;
+    struct pointer test1 = {"a",    1,   4};
+    struct pointer test2 = {"ertg", 4, 239};
+    testing_comparator_struct_pos(test1, test2, -1, &number_of_test);
 
-    test2.ptr = "ertg";
-    test2.len = 4;
-    test2.pos = 239;
-    testing_int_comparator(test1, test2, -1, &number_of_test);
+    test1 = {"adfg", 4, 66};
+    test2 = {"dd",   2,  1};
+    testing_comparator_struct_pos(test1, test2, 1, &number_of_test);
 
-    test1.ptr = "adfg";
-    test1.len = 4;
-    test1.pos = 66;
-
-    test2.ptr = "dd";
-    test2.len = 2;
-    test2.pos = 1;
-    testing_int_comparator(test1, test2, 1, &number_of_test);
-
-    test1.ptr = "efdds32";
-    test1.len = 7;
-    test1.pos = 666;
-
-    test2.ptr = "213r43r";
-    test2.len = 7;
-    test2.pos = 666;
-    testing_int_comparator(test1, test2, 0, &number_of_test);
-
-
-    //testing_number_of_lines("testing/5.txt", 1, 1, &number_of_test);
-    /*printf("\nBegin testing the function comparator\n");
-    testing_comparator("abcde", "abcdf", -1, &number_of_test);
-    testing_comparator("abcde", "abc", 1, &number_of_test);
-    testing_comparator("a", "fa", -1, &number_of_test);
-    testing_comparator("www", "www", 0, &number_of_test);*/
+    test1 = {"efdds32", 7, 666};
+    test2 = {"213r43r", 7, 666};
+    testing_comparator_struct_pos(test1, test2, 0, &number_of_test);
 }

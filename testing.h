@@ -21,7 +21,7 @@ void testing_comparator(const void* first_string, const void* second_string, int
 *   @return Nothing
 */
 
-void testing_strcmp_forward(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test);
+void testing_strcmp_forward(const char* first_string, const char* second_string, const int len1, const int len2, const int right_answer, int* number_of_test);
 
 /**
 *   \brief This function tests function strcmp_reverse()
@@ -34,7 +34,7 @@ void testing_strcmp_forward(const char* first_string, const char* second_string,
 *   @return Nothing
 */
 
-void testing_strcmp_reverse(const char* first_string, const char* second_string, int len1, int len2, int right_answer, int* number_of_test);
+void testing_strcmp_reverse(const char* first_string, const char* second_string, const int len1, const int len2, const int right_answer, int* number_of_test);
 
 /**
 *   \brief This function tests function number_of_lines()
@@ -47,7 +47,7 @@ void testing_strcmp_reverse(const char* first_string, const char* second_string,
 *   @return Nothing
 */
 
-void testing_number_of_lines(char* file_name, int correct_lines, int correct_max_length, int* number_of_test);
+void testing_number_of_lines(const char* file_name, const int correct_lines, const int correct_max_length, int* number_of_test);
 
 /**
 *   \brief This function tests function int_comparator()
@@ -60,7 +60,7 @@ void testing_number_of_lines(char* file_name, int correct_lines, int correct_max
 */
 
 
-void testing_int_comparator(struct pointer first, struct pointer second, int right_answer, int* number_of_test);
+void testing_int_comparator(const struct pointer first, const struct pointer second, const int right_answer, int* number_of_test);
 
 /**
 *   \brief This function starts testing functions
