@@ -2,7 +2,7 @@
 #include "Onegin.h"
 
 void testing_strcmp_forward(const char* first_string, const char* second_string, const int len1, const int len2, const int right_answer, int* number_of_test) {
-    int result = strcmp_forward((char*)first_string, (char*)second_string, len1, len2); // unsigned
+    int result = strcmp_forward((char*)first_string, (char*)second_string, len1, len2);
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
@@ -14,7 +14,7 @@ void testing_strcmp_forward(const char* first_string, const char* second_string,
 }
 
 void testing_strcmp_reverse(const char* first_string, const char* second_string, const int len1, const int len2, const int right_answer, int* number_of_test) {
-    int result = strcmp_reverse((char*)first_string, (char*)second_string, len1, len2); // unsigned
+    int result = strcmp_reverse((char*)first_string, (char*)second_string, len1, len2);
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
@@ -55,7 +55,7 @@ void testing_number_of_lines(const char* file_name, const int correct_lines, con
 }
 
 void testing_comparator_struct_pos(const struct pointer first, const struct pointer second, const int right_answer, int* number_of_test) {
-    int result = comparator_struct_pos(&first, &second); // unsigned
+    int result = comparator_struct_pos(&first, &second);
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
@@ -70,10 +70,10 @@ void testing() {
     int number_of_test = 1;
 
     printf("Begin testing the function strcmp_forward\n");
-    testing_strcmp_forward("abcde", "abcdf", 5, 5, -1, &number_of_test);
-    testing_strcmp_forward("abcde", "abc", 5, 3, 1, &number_of_test);
-    testing_strcmp_forward("a", "fa", 1, 2, -1, &number_of_test);
-    testing_strcmp_forward("www", "www", 3, 3, 0, &number_of_test);
+    testing_strcmp_forward("abcde\n", "abcdf\n", 5, 5, -1, &number_of_test);
+    testing_strcmp_forward("abcde\n", "abc\n", 5, 3, 1, &number_of_test);
+    testing_strcmp_forward("qwe\n", "qwe\n", 3, 3, 0, &number_of_test);
+    testing_strcmp_forward("a\n", "fa\n", 1, 2, -1, &number_of_test);
 
     printf("\nBegin testing the function strcmp_reverse\n");
     testing_strcmp_reverse("edcba", "fdcba", 5, 5, -1, &number_of_test);

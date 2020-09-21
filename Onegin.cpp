@@ -27,16 +27,16 @@ int main (const int argc, const char* argv[]) {
     const int args_for_sorting = 4;
 
     if(argc == args_for_testing || argc == args_for_sorting) {
-        if(argv[1][0] == 't' && argc == args_for_testing) {
+        if(argv[1][0] == '-' && argv[1][1] == 't' && argc == args_for_testing) {
             testing();
-        } else if(argv[1][0] == 's' && argc == args_for_sorting) {
+        } else if(argv[1][0] == '-' && argv[1][1] == 's' && argc == args_for_sorting) {
             return sorting(argc, argv);
         } else {
-            printf("%s\n", help);
+            //printf("%s\n", help);
             return error_number;
         }
     } else {
-        printf("%s\n", help);
+        //printf("%s\n", help);
         return error_number;
     }
 
@@ -220,6 +220,7 @@ int strcmp_forward(char* str1, char* str2, int len1, int len2) {
     while(*(str2 + 1) != '\n' && !('a' <= *str2 && *str2 <= 'z' || 'A' <= *str2 && *str2 <= 'Z')) {
         str2++;
     }
+
     while(*(str1 + 1) != '\n' && *(str2 + 1) != '\n' && *str1 == *str2) {
         while(*(str1 + 1) != '\n' && !('a' <= *str1 && *str1 <= 'z' || 'A' <= *str1 && *str1 <= 'Z')) {
             str1++;
