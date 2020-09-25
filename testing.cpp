@@ -71,20 +71,20 @@ void testing() {
 
     printf("Begin testing the function strcmp_forward\n");
     testing_strcmp_forward("abcde\n", "abcdf\n", 5, 5, -1, &number_of_test);
-    testing_strcmp_forward("abcde\n", "abc\n", 5, 3, 1, &number_of_test);
-    testing_strcmp_forward("qwe\n", "qwe\n", 3, 3, 0, &number_of_test);
-    testing_strcmp_forward("a\n", "fa\n", 1, 2, -1, &number_of_test);
+    testing_strcmp_forward("abcde\n", "abc\n",   5, 3,  1, &number_of_test);
+    testing_strcmp_forward("qwe\n",   "qwe\n",   3, 3,  0, &number_of_test);
+    testing_strcmp_forward("a\n",     "fa\n",    1, 2, -1, &number_of_test);
 
     printf("\nBegin testing the function strcmp_reverse\n");
     testing_strcmp_reverse("edcba", "fdcba", 5, 5, -1, &number_of_test);
-    testing_strcmp_reverse("edcba", "cba", 5, 3, 1, &number_of_test);
-    testing_strcmp_reverse("a", "af", 1, 2, -1, &number_of_test);
-    testing_strcmp_reverse("www", "www", 3, 3, 0, &number_of_test);
+    testing_strcmp_reverse("edcba", "cba",   5, 3,  1, &number_of_test);
+    testing_strcmp_reverse("a",     "af",    1, 2, -1, &number_of_test);
+    testing_strcmp_reverse("www",   "www",   3, 3,  0, &number_of_test);
 
     printf("\nBegin testing the function number_of_lines\n");
-    testing_number_of_lines("testing/1.txt", 1, 1, '\n', &number_of_test);
-    testing_number_of_lines("testing/2.txt", 0, 0, '\n', &number_of_test);
-    testing_number_of_lines("testing/3.txt", 4, 6, '\n',  &number_of_test);
+    testing_number_of_lines("testing/1.txt",    1,    1, '\n', &number_of_test);
+    testing_number_of_lines("testing/2.txt",    0,    0, '\n', &number_of_test);
+    testing_number_of_lines("testing/3.txt",    4,    6, '\n',  &number_of_test);
     testing_number_of_lines("testing/4.txt", 3802, 1000, '\n', &number_of_test);
 
     printf("\nBegin testing the function int_comparator\n");

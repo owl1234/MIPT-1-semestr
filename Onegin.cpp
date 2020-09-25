@@ -14,33 +14,13 @@
 #include <assert.h>
 #include <math.h>
 
-const char* help = "This program sorts strings from file in alphabetical order (without taking into account the signs of pre).\n"
-                    "The required parameters look like this:\n"
-                        "[-h]                                  - if you want to read this help again\n"
-                        "[-s name_input_file name_output_file] - if you want to sorts strings\n"
-                        "[-t]                                  - if you want to test this program";
-const int error_number = 3802; // Not magic!
-
-
-int main (const int argc, const char* argv[]) {
-    const int args_for_testing = 2;
-    const int args_for_sorting = 4;
-
-    if(argc == args_for_testing || argc == args_for_sorting) {
-        if(argv[1][0] == '-' && argv[1][1] == 't' && argc == args_for_testing) {
-            testing();
-        } else if(argv[1][0] == '-' && argv[1][1] == 's' && argc == args_for_sorting) {
-            return sorting(argc, argv);
-        } else {
-            //printf("%s\n", help);
-            return error_number;
-        }
-    } else {
-        //printf("%s\n", help);
-        return error_number;
-    }
-
-    return 0;
+void help() {
+    printf("This program sorts strings from file in alphabetical order (without taking into account the signs of pre).\n"
+            "The required parameters look like this:\n"
+                    "[-h]                                  - if you want to read this help again\n"
+                    "[-s name_input_file name_output_file] - if you want to sorts strings\n"
+                    "[-t]                                  - if you want to test this program.\n"
+                    "For more information, go here: https://github.com/owl1234/String-sorter\n");
 }
 
 int sorting(const int argc, const char* argv[]) {
@@ -50,7 +30,7 @@ int sorting(const int argc, const char* argv[]) {
     const char* name_in  = argv[2];
     const char* name_out = argv[3];
 
-    FILE* poem = fopen(name_in, "rb");
+    FILE* poem = fopen(name_in, "r");
     if(poem == nullptr) {
         printf("File %s don't open\n", name_in);
         return error_number;
@@ -65,7 +45,7 @@ int sorting(const int argc, const char* argv[]) {
         return error_number;
     }
 
-    poem = fopen(name_in, "rb");
+    poem = fopen(name_in, "r");
     if(poem == nullptr) {
         printf("There were problems with the file %s. Run the program again.\n", name_in);
         return error_number;
@@ -103,7 +83,9 @@ int number_of_lines(FILE* file, int* max_length, char separator) {
         fscanf(file,"%c", &symbol);
         if(symbol == separator) {
             ++lines;
-            *max_length = ((*max_length) < now_length ? now_length : (*max_length));
+            if((*max_length) < now_length) {
+                *max_length = now_length;
+            }
             now_length = 0;
         } else {
             ++now_length;
@@ -125,7 +107,7 @@ void initialization(struct pointer* index, const int lines,  const int max_lengt
     for(int i=0; i<lines; ++i) {
         index[i].len = 0;
         index[i].pos = 0;
-        index[i].ptr = (char*)calloc(max_length, sizeof(char));
+        index[i].ptr = (char*)calloc(max_length + 3, sizeof(char));
     }
 }
 
@@ -136,7 +118,7 @@ void fill_index_array(FILE* file, struct pointer* index, int lines, int max_leng
 
     char** text = (char**)calloc(lines + 1, sizeof(char*));
     for(int i=0; i<lines; ++i) {
-        text[i] = (char*)calloc(max_length + 1, sizeof(char));
+        text[i] = (char*)calloc(max_length + 3, sizeof(char));
     }
 
     for(int line=0; line<lines; ++line) {
@@ -170,7 +152,7 @@ int write_and_sort(const char* name_in, const char* name_out, int lines, struct 
     assert(name_out != NULL);
     assert(index    != NULL);
 
-    FILE* file_result = fopen(name_out, "wb");
+    FILE* file_result = fopen(name_out, "w");
     if(file_result == nullptr) {
         return error_number;
     }
@@ -214,18 +196,18 @@ int strcmp_forward(char* str1, char* str2, int len1, int len2) {
     assert(str1 != NULL);
     assert(str2 != NULL);
 
-    while(*(str1 + 1) != '\n' && !('a' <= *str1 && *str1 <= 'z' || 'A' <= *str1 && *str1 <= 'Z')) {
+    while(*(str1 + 1) != '\n' && !is_alpha_EN(*str1)) {
         str1++;
     }
-    while(*(str2 + 1) != '\n' && !('a' <= *str2 && *str2 <= 'z' || 'A' <= *str2 && *str2 <= 'Z')) {
+    while(*(str2 + 1) != '\n' && !is_alpha_EN(*str2)) {
         str2++;
     }
 
     while(*(str1 + 1) != '\n' && *(str2 + 1) != '\n' && *str1 == *str2) {
-        while(*(str1 + 1) != '\n' && !('a' <= *str1 && *str1 <= 'z' || 'A' <= *str1 && *str1 <= 'Z')) {
+        while(*(str1 + 1) != '\n' && !is_alpha_EN(*str1)) {
             str1++;
         }
-        while(*(str2 + 1) != '\n' && !('a' <= *str2 && *str2 <= 'z' || 'A' <= *str2 && *str2 <= 'Z')) {
+        while(*(str2 + 1) != '\n' && !is_alpha_EN(*str2)) {
             str2++;
         }
 
@@ -250,10 +232,14 @@ int strcmp_forward(char* str1, char* str2, int len1, int len2) {
     return *str1 - *str2;
 }
 
+bool is_alpha_EN(char symbol) {
+    return ('a' <= symbol && symbol <= 'z' || 'A' <= symbol && symbol <= 'Z');
+}
+
 void print_array(FILE* file, const struct pointer* index, const int lines, int* number_of_out) {
     assert(isfinite(lines));
-    assert(file != NULL);
-    assert(index != NULL);
+    assert(file          != NULL);
+    assert(index         != NULL);
     assert(number_of_out != NULL);
 
     fprintf(file, "-------------------------------------- BEGIN DO PART %d ---------------------------------------\n", *number_of_out);
@@ -273,7 +259,6 @@ int comparator_struct_ptr(const void* first, const void* second) {
     return strcmp_reverse(first_struct.ptr, second_struct.ptr, first_struct.len, second_struct.len);
 }
 
-
 int strcmp_reverse(char* str1, char* str2, int len1, int len2) {
     assert(isfinite(len1));
     assert(isfinite(len2));
@@ -282,33 +267,21 @@ int strcmp_reverse(char* str1, char* str2, int len1, int len2) {
 
     str1 += len1 - 1;
     str2 += len2 - 1;
-    int pos1 = len1 - 1, pos2 = len2 - 1;
-    while(pos1 - 1 >= 0 && !('a' <= *str1 && *str1 <= 'z' || 'A' <= *str1 && *str1 <= 'Z')) {
-        str1--;
-        pos1--;
-    }
-    while(pos2 - 1 >= 0 && !('a' <= *str2 && *str2 <= 'z' || 'A' <= *str2 && *str2 <= 'Z')) {
-        str2--;
-        pos2--;
-    }
+    int pos1 = len1 - 1;
+    int pos2 = len2 - 1;
+    while(pos1 - 1 >= 0 && !is_alpha_EN(*str1)) { str1--, pos1--; }
+    while(pos2 - 1 >= 0 && !is_alpha_EN(*str2)) { str2--; pos2--; }
+
     while(pos1 - 1 >= 0 && pos2 - 1 >= 0 && *str1 == *str2) {
-        while(pos1 - 1 >= 0 && !('a' <= *str1 && *str1 <= 'z' || 'A' <= *str1 && *str1 <= 'Z')) {
-            str1--;
-            pos1--;
-        }
-        while(pos2 - 1 >= 0 && !('a' <= *str2 && *str2 <= 'z' || 'A' <= *str2 && *str2 <= 'Z')) {
-            str2--;
-            pos2--;
-        }
+        while(pos1 - 1 >= 0 && !is_alpha_EN(*str1)) { str1--; pos1--; }
+        while(pos2 - 1 >= 0 && !is_alpha_EN(*str2)) { str2--; pos2--; }
 
         if(*str1 != *str2) {
             break;
         }
 
-        str1--;
-        str2--;
-        pos1--;
-        pos2--;
+        str1--, pos1--;
+        str2--, pos2--;
     }
 
     if(*str1 == *str2) {
@@ -328,7 +301,7 @@ int comparator_struct_pos(const void* first, const void* second) {
     assert(first  != NULL);
     assert(second != NULL);
 
-    struct pointer* first_number  =  (struct pointer*)first;
+    struct pointer* first_number  = (struct pointer*)first;
     struct pointer* second_number = (struct pointer*)second;
 
     return (*first_number).pos - (*second_number).pos;
