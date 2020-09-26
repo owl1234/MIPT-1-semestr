@@ -6608,7 +6608,7 @@ Ben. An I were so apt to quarrel as thou art, any man should buy
 Farewell, my coz.
 --------------------------------------- END DO PART 2 ----------------------------------------
 
--------------------------------------- BEGIN DO PART 3 ---------------------------------------
+--------------------------------------- BEGIN DO END PART  ----------------------------------------
 Romeo and Juliet
 DRAMATIS PERSONAE
 ESCALUS, Prince of Verona.
@@ -9911,5 +9911,4 @@ For never was a story of more woe
 Than this of Juliet and her Romeo.
 [Exeunt.]
 THE END
---------------------------------------- END DO PART 3 ----------------------------------------
-
+--------------------------------------- END DO END PART  ----------------------------------------

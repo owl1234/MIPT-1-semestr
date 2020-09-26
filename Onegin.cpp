@@ -13,15 +13,7 @@
 #include <typeinfo>
 #include <assert.h>
 #include <math.h>
-
-void help() {
-    printf("This program sorts strings from file in alphabetical order (without taking into account the signs of pre).\n"
-            "The required parameters look like this:\n"
-                    "[-h]                                  - if you want to read this help again\n"
-                    "[-s name_input_file name_output_file] - if you want to sorts strings\n"
-                    "[-t]                                  - if you want to test this program.\n"
-                    "For more information, go here: https://github.com/owl1234/String-sorter\n");
-}
+#include "main.h"
 
 int sorting(const int argc, const char* argv[]) {
     assert(isfinite(argc));
@@ -37,116 +29,86 @@ int sorting(const int argc, const char* argv[]) {
     }
 
     int max_length = 0;
-    int lines = number_of_lines(poem, &max_length, '\n');
+    int size_buffer = size_of_buffer(poem);
 
-    int close_file_result = fclose(poem);
-    if(close_file_result == -1) {
-        printf("There were problems with the file %s. Run the program again.\n", name_in);
-        return error_number;
-    }
+    char* buffer = (char*)calloc(size_buffer + 5, sizeof(char));
+    int lines = 0;
+    struct pointer* index = read_buffer(poem, buffer, size_buffer, &lines);
 
-    poem = fopen(name_in, "r");
-    if(poem == nullptr) {
-        printf("There were problems with the file %s. Run the program again.\n", name_in);
-        return error_number;
-    }
-
-    struct pointer* index = (struct pointer*)calloc(lines, sizeof(struct pointer));
-    initialization(index, lines, max_length);
-    fill_index_array(poem, index, lines, max_length, '\n');
-
-    close_file_result = fclose(poem);
-    if(close_file_result == -1) {
-        printf("There were problems with the file %s. Run the program again.\n", name_in);
-        return error_number;
-    }
-
-    int status = write_and_sort(name_in, name_out, lines, index);
+    int status = write_and_sort(name_in, name_out, lines, index, buffer);
     if(status == error_number) {
         printf("File %s don't open\n", name_in);
     }
 
+    free(index);
+    free(buffer);
+
     return status;
 }
 
-int number_of_lines(FILE* file, int* max_length, char separator) {
-    assert(file       != NULL);
-    assert(max_length != NULL);
+int size_of_buffer(FILE* file) {
+    int length = 0;
+    if (!fseek(file, 0, SEEK_END)) {
+        length = ftell(file);
+    }
+    fseek(file, 0, SEEK_SET);
 
-    int lines = 0, now_length = 0;
-    char symbol = '!';
-    if(separator == '!') {
-        symbol = '@';
+    return length;
+}
+
+struct pointer* read_buffer(FILE* file, char* buffer, int size_buffer, int* lines) {
+    int status = fread(buffer, sizeof(char), size_buffer, file);
+
+    if(status != size_buffer) {
+        printf("Error in read file\n");
+        return nullptr;
     }
 
-    while(!feof(file)) {
-        fscanf(file,"%c", &symbol);
-        if(symbol == separator) {
-            ++lines;
-            if((*max_length) < now_length) {
-                *max_length = now_length;
-            }
+    *lines = number_of_symbols(buffer, '\n');
+
+    struct pointer* index = (struct pointer*)calloc(*lines, sizeof(struct pointer));
+    fill_index_array(buffer, index, size_buffer, '\n');
+
+    return index;
+}
+
+void fill_index_array(char* buffer, struct pointer* index, int size_buffer, char separator) {
+    int now_line = 0, now_length = 0;
+    (*index).ptr = buffer;
+    char now_symbol = *buffer;
+
+    while(now_symbol != '\0') {
+        now_symbol = *buffer;
+        if(now_symbol == separator) {
+            (*index).len = now_length + 1;
+            ++index;
+            ++buffer;
+            (*index).ptr = buffer;
             now_length = 0;
         } else {
+            ++buffer;
             ++now_length;
         }
     }
-
-    if(lines > 0) {
-        --lines;
-    }
-
-    return lines;
 }
 
-void initialization(struct pointer* index, const int lines,  const int max_length) {
-    assert(isfinite(lines));
-    assert(isfinite(max_length));
-    assert(index != NULL);
+int number_of_symbols(char* buffer, char separator) {
+    char now_symbol = *buffer;
+    int number = 0;
 
-    for(int i=0; i<lines; ++i) {
-        index[i].len = 0;
-        index[i].pos = 0;
-        index[i].ptr = (char*)calloc(max_length + 3, sizeof(char));
-    }
-}
-
-void fill_index_array(FILE* file, struct pointer* index, int lines, int max_length, char separator) {
-    assert(isfinite(lines));
-    assert(file  != NULL);
-    assert(index != NULL);
-
-    char** text = (char**)calloc(lines + 1, sizeof(char*));
-    for(int i=0; i<lines; ++i) {
-        text[i] = (char*)calloc(max_length + 3, sizeof(char));
-    }
-
-    for(int line=0; line<lines; ++line) {
-        int i = 0;
-        char symbol = '!';
-        if(separator == '!') {
-            symbol = '@';
+    while(now_symbol != '\0') {
+        now_symbol = *buffer;
+        if(now_symbol == separator) {
+            ++number;
         }
 
-        while(symbol != separator) {
-            fscanf(file, "%c", &symbol);
-            text[line][i] = symbol;
-            ++i;
-        }
-
-        strcpy(index[line].ptr, text[line]);
-        index[line].len = i;
-        index[line].pos = line;
+        ++buffer;
     }
 
-    for(int i=0; i<lines; ++i) {
-        free(text[i]);
-    }
-
-    free(text);
+    return number;
 }
 
-int write_and_sort(const char* name_in, const char* name_out, int lines, struct pointer* index) {
+int write_and_sort(const char* name_in, const char* name_out, int lines, struct pointer* index, char* buffer) {
     assert(isfinite(lines));
     assert(name_in  != NULL);
     assert(name_out != NULL);
@@ -165,8 +127,7 @@ int write_and_sort(const char* name_in, const char* name_out, int lines, struct 
     qsort(index, lines, sizeof(index[0]), comparator_struct_ptr);
     print_array(file_result, index, lines, &number_of_out);
 
-    qsort(index, lines, sizeof(index[0]), comparator_struct_pos);
-    print_array(file_result, index, lines, &number_of_out);
+    print_line(file_result, buffer, "buffer");
 
     fclose(file_result);
 
@@ -243,14 +204,41 @@ void print_array(FILE* file, const struct pointer* index, const int lines, int* 
     assert(number_of_out != NULL);
 
     fprintf(file, "-------------------------------------- BEGIN DO PART %d ---------------------------------------\n", *number_of_out);
+
     for (int i=0; i<lines; ++i) {
-        fprintf(file, "%s", index[i].ptr);
+        print_line(file, index[i].ptr, "struct_pointer");
     }
+
     fprintf(file, "--------------------------------------- END DO PART %d ----------------------------------------\n\n", *number_of_out);
 
     (*number_of_out)++;
 }
 
+void print_line(FILE* file, char* line, char* flag_print) {
+    assert(file != NULL);
+    assert(line != NULL);
+
+    char separator = '\n';
+
+    if(flag_print == "buffer") {
+        fprintf(file, "--------------------------------------- BEGIN DO END PART  ----------------------------------------\n");
+        separator = '\0';
+    }
+
+    char* pt = line;
+    while(*pt != separator) {
+        fputc(*pt, file);
+        ++pt;
+    }
+
+    if(separator != '\0') {
+        fputc(*pt, file);
+    }
+
+    if(flag_print == "buffer") {
+        fprintf(file, "--------------------------------------- END DO END PART  ----------------------------------------\n");
+    }
+}
 
 int comparator_struct_ptr(const void* first, const void* second) {
     struct pointer first_struct  = *(struct pointer*)first;
@@ -295,14 +283,4 @@ int strcmp_reverse(char* str1, char* str2, int len1, int len2) {
     }
 
     return *str1 - *str2;
-}
-
-int comparator_struct_pos(const void* first, const void* second) {
-    assert(first  != NULL);
-    assert(second != NULL);
-
-    struct pointer* first_number  = (struct pointer*)first;
-    struct pointer* second_number = (struct pointer*)second;
-
-    return (*first_number).pos - (*second_number).pos;
 }

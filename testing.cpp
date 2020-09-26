@@ -33,7 +33,7 @@ void testing_number_of_lines(const char* file_name, const int correct_lines, con
     }
 
     int max_length = 0;
-    int lines = number_of_lines(file, &max_length, separator);
+    int lines = 0; //number_of_lines(file, &max_length, separator);
 
     if(max_length == correct_max_length && lines == correct_lines) {
         printf("Test #%d OK\n", *number_of_test);
@@ -54,17 +54,17 @@ void testing_number_of_lines(const char* file_name, const int correct_lines, con
     (*number_of_test)++;
 }
 
-void testing_comparator_struct_pos(const struct pointer first, const struct pointer second, const int right_answer, int* number_of_test) {
+/*void testing_comparator_struct_pos(const struct pointer first, const struct pointer second, const int right_answer, int* number_of_test) {
     int result = comparator_struct_pos(&first, &second);
 
     if(result < 0 && right_answer < 0 || result > 0 && right_answer > 0 || right_answer == 0 && result == 0) {
         printf("Test #%d OK\n", *number_of_test);
     } else {
-        printf("Test #%d BAD: int_comparator({%s, %d, %d}, {%s, %d, %d}) == %d, should be %d\n", *number_of_test, first.ptr, first.len, first.pos, second.ptr, second.len, second.pos, result, right_answer);
+        printf("Test #%d BAD: int_comparator({%s, %d}, {%s, %d}) == %d, should be %d\n", *number_of_test, first.ptr, first.len, second.ptr, second.len, result, right_answer);
     }
 
     (*number_of_test)++;
-}
+}*/
 
 void testing() {
     int number_of_test = 1;
@@ -88,15 +88,15 @@ void testing() {
     testing_number_of_lines("testing/4.txt", 3802, 1000, '\n', &number_of_test);
 
     printf("\nBegin testing the function int_comparator\n");
-    struct pointer test1 = {"a",    1,   4};
-    struct pointer test2 = {"ertg", 4, 239};
-    testing_comparator_struct_pos(test1, test2, -1, &number_of_test);
+    struct pointer test1 = {"a",    1};
+    struct pointer test2 = {"ertg", 4};
+    /*testing_comparator_struct_pos(test1, test2, -1, &number_of_test);
 
-    test1 = {"adfg", 4, 66};
-    test2 = {"dd",   2,  1};
+    test1 = {"adfg", 4};
+    test2 = {"dd",   2};
     testing_comparator_struct_pos(test1, test2, 1, &number_of_test);
 
-    test1 = {"efdds32", 7, 666};
-    test2 = {"213r43r", 7, 666};
-    testing_comparator_struct_pos(test1, test2, 0, &number_of_test);
+    test1 = {"efdds32", 7};
+    test2 = {"213r43r", 7};
+    testing_comparator_struct_pos(test1, test2, 0, &number_of_test);*/
 }

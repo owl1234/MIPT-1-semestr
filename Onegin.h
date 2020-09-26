@@ -2,7 +2,6 @@
 struct pointer {
     char* ptr;
     int len;
-    int pos;
 };
 
 /**
@@ -14,6 +13,10 @@ struct pointer {
 */
 
 int sorting(const int argc, const char* argv[]);
+
+int size_of_buffer(FILE* file);
+
+struct pointer* read_buffer(FILE* file, char* buffer, int size_buffer, int* lines);
 
 /**
 *   \brief This function calculates number of lines in the file
@@ -51,7 +54,11 @@ void initialization(struct pointer* index, const int lines,  const int max_lengt
 *   @return Nothing
 */
 
-void fill_index_array(FILE* file, struct pointer* index, int lines, int max_length, char separator);
+void fill_index_array(char* buffer, struct pointer* index, int size_buffer, char separator);
+
+int number_of_symbols(char* buffer, char separator);
+
+//void fill_index_array(FILE* file, struct pointer* index, int lines, int max_length, char separator);
 
 /**
 *   \brief This function starts sorting
@@ -63,7 +70,7 @@ void fill_index_array(FILE* file, struct pointer* index, int lines, int max_leng
 *   @return Nothing
 */
 
-int write_and_sort(const char* name_in, const char* name_out, int lines, struct pointer* index);
+int write_and_sort(const char* name_in, const char* name_out, int lines, struct pointer* index, char* buffer);
 
 /**
 *   \brief This function sorts text
@@ -89,6 +96,8 @@ void my_qsort(int len, struct pointer* index, int (*compare)(char*, char*, int, 
 
 int strcmp_forward(char* str1, char* str2, int len1, int len2);
 
+bool is_alpha_EN(char symbol);
+
 /**
 *   \brief This function fills the index array with data from the file
 *
@@ -100,6 +109,8 @@ int strcmp_forward(char* str1, char* str2, int len1, int len2);
 *   @return Nothing
 */
 void print_array(FILE* file, const struct pointer* index, const int lines, int* number_of_out);
+
+void print_line(FILE* file, char* line, char* flag_print);
 
 /**
 *   \brief This function compares two strings which are structure fields
