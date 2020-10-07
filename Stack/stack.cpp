@@ -24,7 +24,7 @@ const char* text_stack_t_status[] = {
 };
 
 HASH_PROTECTION(
-int GetHash(Stack_t* node) {
+int get_hash(Stack_t* node) {
     long long hash_st = 0;
     int size_stack = node->size_stack;
     if(node->stack_status != STACK_EMPTY) {
@@ -46,23 +46,23 @@ int GetHash(Stack_t* node) {
 }
 )
 
-void PrintElem_T(int value, FILE* file) {
+void print_Elem_T(int value, FILE* file) {
     fprintf(file, "%d", value);
 }
 
-void PrintElem_T(double value, FILE* file) {
+void print_Elem_T(double value, FILE* file) {
     fprintf(file, "%g", value);
 }
 
-void PrintElem_T(char value, FILE* file) {
+void print_Elem_T(char value, FILE* file) {
     fprintf(file, "%c", value);
 }
 
-bool IsCanary(Elem_t value) {
+bool is_canary(Elem_t value) {
     return (value == CANARY);
 }
 
-void ErrorPrintData(Stack_t* node, FILE* file) {
+void error_print_data(Stack_t* node, FILE* file) {
     int stack_size = node->capacity;
     int len_indent = get_len_indent(node->capacity);
     const int base_indent = 2 * tabulation_in_probels;
@@ -82,7 +82,7 @@ void ErrorPrintData(Stack_t* node, FILE* file) {
                 fprintf(file, " [%d] - [%p] - !!! POISON !!!", i, &(node->data[i]));
             } else {
                 fprintf(file, "*[%d] - [%p] - ", i, &(node->data[i]));
-                PrintElem_T(node->data[i], file);
+                print_Elem_T(node->data[i], file);
             }
         }
     }
@@ -114,7 +114,7 @@ void write_indent(FILE* file, int count_indent) {
     }
 }
 
-void StackDump(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
+void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
     FILE* log_errors = fopen(name_log_file, "a");
 
     fprintf(log_errors, "Stack_t [%p]\n", node);
@@ -142,7 +142,7 @@ void StackDump(Stack_t* node, struct call_of_dump arguments_of_call = base_argum
     HASH_PROTECTION(fprintf(log_errors, "\tHash: %d\n", node->stack_hash);)
     fprintf(log_errors, "\tdata [%p]\n", node->data);
     fprintf(log_errors, "\t{");
-    ErrorPrintData(node, log_errors);
+    error_print_data(node, log_errors);
     fprintf(log_errors, "\n\t}");
     fprintf(log_errors, "\n}\n");
     fprintf(log_errors, "\n\n");
@@ -157,50 +157,50 @@ struct call_of_dump create_struct(const char* file_name, int number, const char*
     return tmp;
 }
 
-void StackErr(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
+void stack_err(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
     if(node == nullptr) {
         node->stack_status = STACK_ERROR;
-        StackDump(node, create_struct(name_file, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(name_file, __LINE__, __FUNCTION__));
     }
     if(node->data == nullptr && node->stack_status != STACK_EMPTY) {
         node->stack_status = STACK_EMPTY;
-        StackDump(node, create_struct(name_file, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(name_file, __LINE__, __FUNCTION__));
     }
     if(node->size_stack > node->capacity) {
         node->stack_status = STACK_OVERFLOW;
-        StackDump(node, create_struct(name_file, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(name_file, __LINE__, __FUNCTION__));
     }
     if(node->size_stack > node->capacity) {
         node->stack_status = STACK_SMALL_CAPACITY;
-        StackDump(node, create_struct(name_file, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(name_file, __LINE__, __FUNCTION__));
     }
 
     HASH_PROTECTION(
-    if(node != nullptr && node->data != nullptr && GetHash(node) != node->stack_hash) {
+    if(node != nullptr && node->data != nullptr && get_hash(node) != node->stack_hash) {
         node->stack_status = STACK_BAD_HASH;
-        StackDump(node, create_struct(name_file, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(name_file, __LINE__, __FUNCTION__));
     }
     )
 
     CANARY_PROTECTION(
     if(node->canary_left[0] != CANARY || node->canary_right[0] != CANARY) {
         node->stack_status = STACK_BAD_CANARY;
-        StackDump(node, create_struct(name_file, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(name_file, __LINE__, __FUNCTION__));
     }
     )
 }
 
-int StackSize(Stack_t* node) {
+int stack_size(Stack_t* node) {
     return node->size_stack;
 }
 
-int StackCapacity(Stack_t* node) {
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+int stack_capacity(Stack_t* node) {
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
     return node->capacity;
 }
 
-void StackConstruct(Stack_t* node) {
+void stack_construct(Stack_t* node) {
     assert(dimension > 0);
     assert(node != nullptr);
 
@@ -210,13 +210,13 @@ void StackConstruct(Stack_t* node) {
     fill_stack_stuff(node);
 
     node->stack_status = STACK_IS_CREATED;
-    HASH_PROTECTION(node->stack_hash = GetHash(node);)
+    HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 }
 
-void StackDestruct(Stack_t* node) {
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+void stack_destruct(Stack_t* node) {
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
     free(node->data);
     node->size_stack = POISON;
@@ -225,33 +225,33 @@ void StackDestruct(Stack_t* node) {
     free(node);
 }
 
-bool StackIsEmpty(Stack_t* node){
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+bool stack_is_empty(Stack_t* node){
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
-    int size_of_stack = StackSize(node);
+    int size_of_stack = stack_size(node);
     if(size_of_stack == 0) {
         node->stack_status = STACK_EMPTY;
     }
 
-    HASH_PROTECTION(node->stack_hash = GetHash(node);)
+    HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
     return (size_of_stack == 0);
 }
 
-void StackResize(Stack_t* node) {
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
-    assert(node->capacity >= StackSize(node));
+void stack_resize(Stack_t* node) {
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
+    assert(node->capacity >= stack_size(node));
 
-    Elem_t* new_data = (Elem_t*)realloc(node->data, StackCapacity(node) * 2 * sizeof(Elem_t) + 1);
+    Elem_t* new_data = (Elem_t*)realloc(node->data, stack_capacity(node) * 2 * sizeof(Elem_t) + 1);
     node->capacity *= 2;
     fill_stack_stuff(node);
 
     assert(new_data != nullptr);
     node->data = new_data;
 
-    HASH_PROTECTION(node->stack_hash = GetHash(node);)
+    HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 }
 
 void fill_stack_stuff(Stack_t* node) {
@@ -265,11 +265,11 @@ void fill_stack_stuff(Stack_t* node) {
     }
 }
 
-void StackPush(Stack_t* node, Elem_t value) { //////////////////////////// STACK ELEM T VALUE
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+void stack_push(Stack_t* node, Elem_t value) { //////////////////////////// STACK ELEM T VALUE
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
-    if(StackSize(node) >= StackCapacity(node)) {
-        StackResize(node);
+    if(stack_size(node) >= stack_capacity(node)) {
+        stack_resize(node);
     }
 
     node->data[node->size_stack] = value;
@@ -278,15 +278,15 @@ void StackPush(Stack_t* node, Elem_t value) { //////////////////////////// STACK
     if(node->stack_status == STACK_IS_CREATED) {
         node->stack_status = STACK_OK;
     }
-    HASH_PROTECTION(node->stack_hash = GetHash(node);)
+    HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 }
 
-void StackPop(Stack_t* node) {
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__)); //, {name_file, 280, "StackPop"});
+void stack_pop(Stack_t* node) {
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__)); //, {name_file, 280, "StackPop"});
 
-    if(node->stack_status == STACK_EMPTY && StackIsEmpty(node)) {
+    if(node->stack_status == STACK_EMPTY && stack_is_empty(node)) {
         printf("Don't delete end element from stack\n");
         return;
     }
@@ -298,24 +298,24 @@ void StackPop(Stack_t* node) {
         --(node->size_stack);
     }
 
-    HASH_PROTECTION(node->stack_hash = GetHash(node);)
+    HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 }
 
-Elem_t StackBack(Stack_t* node) {
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+Elem_t stack_back(Stack_t* node) {
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
-    if(StackIsEmpty(node)) {
+    if(stack_is_empty(node)) {
         printf("Don't delete end element from stack\n");
         return POISON;
     }
 
-    return node->data[StackSize(node)];
+    return node->data[stack_size(node)];
 }
 
-void StackClear(Stack_t* node) {
-    StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
+void stack_clear(Stack_t* node) {
+    stack_err(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
     free(node->data);
     node->data = nullptr;
@@ -326,36 +326,36 @@ void StackClear(Stack_t* node) {
     HASH_PROTECTION(node->stack_hash =  0;)
 }
 
-void ClearFile(const char* name_log_file) {
+void clear_file(const char* name_log_file) {
     FILE* file = fopen(name_log_file, "w");
     fclose(file);
 }
 
 int initialization_stack() {
-    ClearFile(name_log_file);
+    clear_file(name_log_file);
 
     Stack_t stk = {};
-    StackConstruct(&stk);
+    stack_construct(&stk);
 
     //(&stk)->data = nullptr;
-    printf("size: %d\n", StackSize(&stk));
+    printf("size: %d\n", stack_size(&stk));
 
     for(int i=0; i<110; ++i) {
         int x = rand() % 69 + 1;
-        StackPush(&stk, x);
+        stack_push(&stk, x);
     }
-    StackPush(&stk, NULL);
+    stack_push(&stk, NULL);
 
-    StackDump(&stk, create_struct(name_file, __LINE__, __FUNCTION__));
-    StackClear(&stk);
+    stack_dump(&stk, create_struct(name_file, __LINE__, __FUNCTION__));
+    stack_clear(&stk);
 
     //printf("size: %d\n", StackSize(&stk));
     for(int i=0; i<3; ++i) {
         //printf("Size: %d, back: %d\n", StackSize(&stk), StackBack(&stk));
         //printf("%d\n", (&stk)->size_stack);
-        StackPop(&stk);
+        stack_pop(&stk);
     }
 
-    StackDump(&stk, create_struct(name_file, __LINE__, __FUNCTION__));
+    stack_dump(&stk, create_struct(name_file, __LINE__, __FUNCTION__));
     return 0;
 }

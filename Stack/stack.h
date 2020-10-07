@@ -41,7 +41,7 @@ struct call_of_dump {
 *   @return Hash of the stack
 */
 
-int GetHash(Stack_t* node);
+int get_hash(Stack_t* node);
 
 /**
 *   \brief This function prints int number to file
@@ -52,7 +52,7 @@ int GetHash(Stack_t* node);
 *   @return Nothing
 */
 
-void PrintElem_T(int value, FILE* file);
+void print_Elem_T(int value, FILE* file);
 
 /**
 *   \brief This function prints double number to file
@@ -63,7 +63,7 @@ void PrintElem_T(int value, FILE* file);
 *   @return Nothing
 */
 
-void PrintElem_T(double value, FILE* file);
+void print_Elem_T(double value, FILE* file);
 
 /**
 *   \brief This function prints char symbol to file
@@ -74,7 +74,7 @@ void PrintElem_T(double value, FILE* file);
 *   @return Nothing
 */
 
-void PrintElem_T(char value, FILE* file);
+void print_Elem_T(char value, FILE* file);
 
 /**
 *   \brief Checks if the value is equal to canary
@@ -84,7 +84,7 @@ void PrintElem_T(char value, FILE* file);
 *   @return true, if value is equal to canary, else false,
 */
 
-bool IsCanary(Elem_t value);
+bool is_canary(Elem_t value);
 
 /**
 *   \brief This function prints data to file
@@ -95,7 +95,7 @@ bool IsCanary(Elem_t value);
 *   @return Nothing
 */
 
-void ErrorPrintData(Stack_t* node, FILE* file);
+void error_print_data(Stack_t* node, FILE* file);
 
 /**
 *   \brief This function gets the number of digits of a number
@@ -127,7 +127,7 @@ void write_indent(FILE* file, int count_indent);
 *   @return Nothing
 */
 
-void StackDump(Stack_t* node, struct call_of_dump arguments_of_call);
+void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call);
 
 /**
 *   \brief This function checks the stack for simple errors and calls diagnostics in their case
@@ -138,7 +138,7 @@ void StackDump(Stack_t* node, struct call_of_dump arguments_of_call);
 *   @return Nothing
 */
 
-void StackErr(Stack_t* node, struct call_of_dump arguments_of_call);
+void stack_err(Stack_t* node, struct call_of_dump arguments_of_call);
 
 /**
 *   \brief This function returns size of the stack
@@ -148,7 +148,7 @@ void StackErr(Stack_t* node, struct call_of_dump arguments_of_call);
 *   @return Size of stack
 */
 
-int StackSize(Stack_t* node);
+int stack_size(Stack_t* node);
 
 /**
 *   \brief This function returns capacity of the stack
@@ -158,7 +158,7 @@ int StackSize(Stack_t* node);
 *   @return Capacity of stack
 */
 
-int StackCapacity(Stack_t* node);
+int stack_capacity(Stack_t* node);
 
 /**
 *   \brief This function constructs the stack
@@ -168,7 +168,7 @@ int StackCapacity(Stack_t* node);
 *   @return Nothing
 */
 
-void StackConstruct(Stack_t* node);
+void stack_construct(Stack_t* node);
 
 /**
 *   \brief This function destructs the stack
@@ -178,7 +178,7 @@ void StackConstruct(Stack_t* node);
 *   @return Nothing
 */
 
-void StackDestruct(Stack_t* node);
+void stack_destruct(Stack_t* node);
 
 /**
 *   \brief This function create new stack
@@ -188,7 +188,7 @@ void StackDestruct(Stack_t* node);
 *   @return New stack
 */
 
-Stack_t* NewStack(size_t dimension);
+Stack_t* new_stack(size_t dimension);
 
 /**
 *   \brief This function checks if the stack is empty
@@ -198,7 +198,7 @@ Stack_t* NewStack(size_t dimension);
 *   @return true, is node is empty, else false
 */
 
-bool StackIsEmpty(Stack_t* node);
+bool stack_is_empty(Stack_t* node);
 
 /**
 *   \brief This function resizes data of the stack
@@ -208,7 +208,7 @@ bool StackIsEmpty(Stack_t* node);
 *   @return Nothing
 */
 
-void StackResize(Stack_t* node);
+void stack_resize(Stack_t* node);
 
 /**
 *   \brief This function fills unused array cells by poison
@@ -229,7 +229,7 @@ void fill_stack_stuff(Stack_t* node);
 *   @return Nothing
 */
 
-void StackPush(Stack_t* node, int value);
+void stack_push(Stack_t* node, int value);
 
 /**
 *   \brief This function deletes last added element of the stack
@@ -239,7 +239,7 @@ void StackPush(Stack_t* node, int value);
 *   @return Nothing
 */
 
-void StackPop(Stack_t* node);
+void stack_pop(Stack_t* node);
 
 /**
 *   \brief This function returns last added element of the stack
@@ -249,7 +249,7 @@ void StackPop(Stack_t* node);
 *   @return Last added element of the stack
 */
 
-Elem_t StackBack(Stack_t* node);
+Elem_t stack_back(Stack_t* node);
 
 /**
 *   \brief This function deletes all elements from stack
@@ -259,7 +259,7 @@ Elem_t StackBack(Stack_t* node);
 *   @return Nothing
 */
 
-void StackClear(Stack_t* node);
+void stack_clear(Stack_t* node);
 
 /**
 *   \brief This function deletes all elements from file
@@ -269,7 +269,7 @@ void StackClear(Stack_t* node);
 *   @return Nothing
 */
 
-void ClearFile(const char* name_log_file);
+void clear_file(const char* name_log_file);
 
 /**
 *   \brief This function initializations the stack
