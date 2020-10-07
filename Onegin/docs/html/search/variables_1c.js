@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['Байрон_5058',['Байрон',['../Onegin_8txt.html#a0599a4e028d717e61de3ea3624a0e990',1,'Onegin.txt']]],
+  ['Балконы_5059',['Балконы',['../Onegin_8txt.html#ac602420e951241650049c35e1358a943',1,'Onegin.txt']]],
+  ['Безумец_5060',['Безумец',['../Onegin_8txt.html#a763b5f29c01ba1b9d804cde4b47f1a72',1,'Onegin.txt']]],
+  ['Белеют_5061',['Белеют',['../Onegin_8txt.html#adf02261412c1b3a924ef74b0980d08bd',1,'Onegin.txt']]],
+  ['Беля_5062',['Беля',['../Onegin_8txt.html#a18d052f4a47ef2260e9f684d0b3b8234',1,'Onegin.txt']]],
+  ['Бентама_5063',['Бентама',['../Onegin_8txt.html#ae215c757b4304847667c38ec9f42fa6b',1,'Onegin.txt']]],
+  ['Биша_5064',['Биша',['../Onegin_8txt.html#a2e092a037df1adcfb4adca67eee5eb74',1,'Onegin.txt']]],
+  ['Блажен_5065',['Блажен',['../Onegin_8txt.html#ac4e4262aec08b0a0ef571e828b932e60',1,'Onegin.txt']]],
+  ['Бледнеет_5066',['Бледнеет',['../Onegin_8txt.html#a288f8fc840473a9b3106635dec74d44f',1,'Onegin.txt']]],
+  ['Блеснуть_5067',['Блеснуть',['../Onegin_8txt.html#a7383dfcca0666f44ae5f75aa5129503e',1,'Onegin.txt']]],
+  ['Блестящей_5068',['Блестящей',['../Onegin_8txt.html#a7a1206ae60cc600486733605d8beed3c',1,'Onegin.txt']]],
+  ['Блистательна_5069',['Блистательна',['../Onegin_8txt.html#a0a07d901913a4efc94ba3aa81ea4b53b',1,'Onegin.txt']]],
+  ['Богат_5070',['Богат',['../Onegin_8txt.html#ad5b67bd038ac51d92e58bb0a2b4ea2fd',1,'Onegin.txt']]],
+  ['Большой_5071',['Большой',['../Onegin_8txt.html#a0371111d69b473be70f5b8427a4251c4',1,'Onegin.txt']]],
+  ['Бордо_5072',['Бордо',['../Onegin_8txt.html#a76a40aefe86145f9275dbd2cd40f028f',1,'Onegin.txt']]],
+  ['Боюсь_5073',['Боюсь',['../Onegin_8txt.html#a1d85adfdfcd0e8764b5036e8d878c8f4',1,'Onegin.txt']]],
+  ['Бульвары_5074',['Бульвары',['../Onegin_8txt.html#aabb21ed629d2926670e7b7e797b9ea38',1,'Onegin.txt']]],
+  ['Бухарцы_5075',['Бухарцы',['../Onegin_8txt.html#ab3eafa980dac6299473290f146fa45c1',1,'Onegin.txt']]],
+  ['Буянов_5076',['Буянов',['../Onegin_8txt.html#aebef013634f7a246481edd876c0382d4',1,'Onegin.txt']]],
+  ['Бывало_5077',['Бывало',['../Onegin_8txt.html#ad4c145980d1775b33cd002fd60974cd6',1,'Onegin.txt']]]
+];

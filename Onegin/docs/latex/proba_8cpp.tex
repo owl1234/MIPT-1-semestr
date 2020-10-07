@@ -1,0 +1,590 @@
+\hypertarget{proba_8cpp}{}\doxysection{proba.\+cpp File Reference}
+\label{proba_8cpp}\index{proba.cpp@{proba.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}Onegin.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}testing.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$typeinfo$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{proba_8cpp_a8c42136cd8fd696eea0800cd307c9f23}{sorting}} (const int argc, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em This function opens files and starts functions number\+\_\+of\+\_\+lines, initialization, make\+\_\+index\+\_\+array and write\+\_\+and\+\_\+sort. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{proba_8cpp_a067bdb0a8059e848b8f1a3c144ff66cb}{size\+\_\+of\+\_\+buffer}} (F\+I\+LE $\ast$file)
+\item 
+struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$ \mbox{\hyperlink{proba_8cpp_a98a2a68c2cb1461d7f2c4ce29cc851ae}{read\+\_\+buffer}} (F\+I\+LE $\ast$file, char $\ast$buffer, int size\+\_\+buffer, int $\ast$lines)
+\item 
+int \mbox{\hyperlink{proba_8cpp_a57f0157668adf51f44c638b51b8209c1}{number\+\_\+of\+\_\+lines}} (char $\ast$buffer, char separator)
+\item 
+void \mbox{\hyperlink{proba_8cpp_a931dd429df67f12627a238a616085856}{initialization}} (char $\ast$buffer, struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, const int lines)
+\item 
+int \mbox{\hyperlink{proba_8cpp_ac596567ee590bcbf97dea337bfd247a7}{write\+\_\+and\+\_\+sort}} (const char $\ast$name\+\_\+in, const char $\ast$name\+\_\+out, int lines, struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index)
+\item 
+void \mbox{\hyperlink{proba_8cpp_a6dff55160b6f3f5c03d7f083baad8942}{my\+\_\+qsort}} (int len, struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, int($\ast$compare)(char $\ast$, char $\ast$, int, int))
+\begin{DoxyCompactList}\small\item\em This function sorts text. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{proba_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}{strcmp\+\_\+forward}} (char $\ast$str1, char $\ast$str2, int len1, int len2)
+\begin{DoxyCompactList}\small\item\em This function contains string comparison rules (sort by first character) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\+\_\+alpha\+\_\+\+EN}} (char symbol)
+\item 
+void \mbox{\hyperlink{proba_8cpp_a4b763c36c18bdea741096b5f999937ec}{print\+\_\+array}} (F\+I\+LE $\ast$file, const struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, const int lines, int $\ast$number\+\_\+of\+\_\+out)
+\begin{DoxyCompactList}\small\item\em This function fills the index array with data from the file. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{proba_8cpp_a838142ab68aa363ac3bd206687839552}{comparator\+\_\+struct\+\_\+ptr}} (const void $\ast$\mbox{\hyperlink{Shakespeare_8txt_a9be49135c74a9b7646f5a5912a507c67}{first}}, const void $\ast$second)
+\begin{DoxyCompactList}\small\item\em This function compares two strings which are structure fields. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{proba_8cpp_a6ba26bda174677f10998727a674ab8a0}{strcmp\+\_\+reverse}} (char $\ast$str1, char $\ast$str2, int len1, int len2)
+\begin{DoxyCompactList}\small\item\em This function contains string comparison rules (sort by last character) \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{proba_8cpp_a370be717e4deee47ee8e559f3fa6511f}{comparator\+\_\+struct\+\_\+pos}} (const void $\ast$\mbox{\hyperlink{Shakespeare_8txt_a9be49135c74a9b7646f5a5912a507c67}{first}}, const void $\ast$second)
+\begin{DoxyCompactList}\small\item\em This function compares two indices of strings which are structure fields. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{proba_8cpp_a370be717e4deee47ee8e559f3fa6511f}\label{proba_8cpp_a370be717e4deee47ee8e559f3fa6511f}} 
+\index{proba.cpp@{proba.cpp}!comparator\_struct\_pos@{comparator\_struct\_pos}}
+\index{comparator\_struct\_pos@{comparator\_struct\_pos}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{comparator\_struct\_pos()}{comparator\_struct\_pos()}}
+{\footnotesize\ttfamily int comparator\+\_\+struct\+\_\+pos (\begin{DoxyParamCaption}\item[{const void $\ast$}]{first,  }\item[{const void $\ast$}]{second }\end{DoxyParamCaption})}
+
+
+
+This function compares two indices of strings which are structure fields. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em first,second} & Comparing structs\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if first.\+pos is less than second.\+pos 0, if first.\+pos is equal to second.\+pos Positive number, if first.\+pos is greater than second.\+pos 
+\end{DoxyReturn}
+
+
+Definition at line 320 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{320                                                                  \{}
+\DoxyCodeLine{321     assert(\mbox{\hyperlink{Shakespeare_8txt_a9be49135c74a9b7646f5a5912a507c67}{first}}  != NULL);}
+\DoxyCodeLine{322     assert(second != NULL);}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{324     \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}* first\_number  = (\textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}*)\mbox{\hyperlink{Shakespeare_8txt_a9be49135c74a9b7646f5a5912a507c67}{first}};}
+\DoxyCodeLine{325     \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}* second\_number = (\textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}*)second;}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327     \textcolor{keywordflow}{return} (*first\_number).pos -\/ (*second\_number).pos;}
+\DoxyCodeLine{328 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a838142ab68aa363ac3bd206687839552}\label{proba_8cpp_a838142ab68aa363ac3bd206687839552}} 
+\index{proba.cpp@{proba.cpp}!comparator\_struct\_ptr@{comparator\_struct\_ptr}}
+\index{comparator\_struct\_ptr@{comparator\_struct\_ptr}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{comparator\_struct\_ptr()}{comparator\_struct\_ptr()}}
+{\footnotesize\ttfamily int comparator\+\_\+struct\+\_\+ptr (\begin{DoxyParamCaption}\item[{const void $\ast$}]{first,  }\item[{const void $\ast$}]{second }\end{DoxyParamCaption})}
+
+
+
+This function compares two strings which are structure fields. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em first,second} & Comparing structs\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if first.\+ptr is less than second.\+ptr 0, if first.\+ptr is equal to second.\+ptr Positive number, if first.\+ptr is greater than second.\+ptr 
+\end{DoxyReturn}
+
+
+Definition at line 275 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{275                                                                  \{}
+\DoxyCodeLine{276     \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}} first\_struct  = *(\textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}*)\mbox{\hyperlink{Shakespeare_8txt_a9be49135c74a9b7646f5a5912a507c67}{first}};}
+\DoxyCodeLine{277     \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}} second\_struct = *(\textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}*)second;}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{279     \textcolor{keywordflow}{return} \mbox{\hyperlink{proba_8cpp_a6ba26bda174677f10998727a674ab8a0}{strcmp\_reverse}}(first\_struct.\mbox{\hyperlink{structpointer_a5d84d0775af750c5f49229cf94c7e73b}{ptr}}, second\_struct.\mbox{\hyperlink{structpointer_a5d84d0775af750c5f49229cf94c7e73b}{ptr}}, first\_struct.\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}, second\_struct.\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}});}
+\DoxyCodeLine{280 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a931dd429df67f12627a238a616085856}\label{proba_8cpp_a931dd429df67f12627a238a616085856}} 
+\index{proba.cpp@{proba.cpp}!initialization@{initialization}}
+\index{initialization@{initialization}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{initialization()}{initialization()}}
+{\footnotesize\ttfamily void initialization (\begin{DoxyParamCaption}\item[{char $\ast$}]{buffer,  }\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{const int}]{lines }\end{DoxyParamCaption})}
+
+
+
+Definition at line 88 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{88                                                                           \{}
+\DoxyCodeLine{89     assert(isfinite(lines));}
+\DoxyCodeLine{90     assert(index  != NULL);}
+\DoxyCodeLine{91     assert(buffer != NULL);}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     \textcolor{keywordtype}{int} now\_length = 0, now\_line = 0;}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95     (*index).ptr = buffer;}
+\DoxyCodeLine{96     \textcolor{keywordtype}{char} now\_symbol = *buffer;}
+\DoxyCodeLine{97     \textcolor{keywordflow}{while}(now\_symbol != \textcolor{charliteral}{'\(\backslash\)0'}) \{}
+\DoxyCodeLine{98         now\_symbol = *buffer;}
+\DoxyCodeLine{99         \textcolor{keywordflow}{if}(now\_symbol == \textcolor{charliteral}{'\(\backslash\)n'}) \{}
+\DoxyCodeLine{100             ++index;}
+\DoxyCodeLine{101             ++now\_line;}
+\DoxyCodeLine{102             ++buffer;}
+\DoxyCodeLine{103             (*(index -\/ 1)).\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}} = now\_length + 1;}
+\DoxyCodeLine{104             (*index).pos = now\_line;}
+\DoxyCodeLine{105             (*index).ptr = buffer;}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107             now\_length = 0;}
+\DoxyCodeLine{108         \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{109             ++now\_length;}
+\DoxyCodeLine{110             ++buffer;}
+\DoxyCodeLine{111         \}}
+\DoxyCodeLine{112     \}}
+\DoxyCodeLine{113 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_ae477ee503e23d46b407d0cd634807216}\label{proba_8cpp_ae477ee503e23d46b407d0cd634807216}} 
+\index{proba.cpp@{proba.cpp}!is\_alpha\_EN@{is\_alpha\_EN}}
+\index{is\_alpha\_EN@{is\_alpha\_EN}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{is\_alpha\_EN()}{is\_alpha\_EN()}}
+{\footnotesize\ttfamily bool is\+\_\+alpha\+\_\+\+EN (\begin{DoxyParamCaption}\item[{char}]{symbol }\end{DoxyParamCaption})}
+
+
+
+Definition at line 244 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{244                               \{}
+\DoxyCodeLine{245     \textcolor{keywordflow}{return} (\textcolor{charliteral}{'a'} <= symbol \&\& symbol <= \textcolor{charliteral}{'z'} || \textcolor{charliteral}{'A'} <= symbol \&\& symbol <= \textcolor{charliteral}{'Z'});}
+\DoxyCodeLine{246 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a6dff55160b6f3f5c03d7f083baad8942}\label{proba_8cpp_a6dff55160b6f3f5c03d7f083baad8942}} 
+\index{proba.cpp@{proba.cpp}!my\_qsort@{my\_qsort}}
+\index{my\_qsort@{my\_qsort}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{my\_qsort()}{my\_qsort()}}
+{\footnotesize\ttfamily void my\+\_\+qsort (\begin{DoxyParamCaption}\item[{int}]{len,  }\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{int($\ast$)(char $\ast$, char $\ast$, int, int)}]{compare }\end{DoxyParamCaption})}
+
+
+
+This function sorts text. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em len} & Number of lines in array \\
+\hline
+{\em index} & Array of type pointer$\ast$ \\
+\hline
+{\em compare} & Comparator\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+
+
+Definition at line 185 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{185                                                                                       \{}
+\DoxyCodeLine{186     assert(isfinite(\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}));}
+\DoxyCodeLine{187     assert(index != NULL);}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}; ++i) \{}
+\DoxyCodeLine{190         \textcolor{keywordtype}{int} min\_ind = i;}
+\DoxyCodeLine{191         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=i+1; j<\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}; ++j) \{}
+\DoxyCodeLine{192             \textcolor{keywordflow}{if}((*compare)(index[min\_ind].\mbox{\hyperlink{structpointer_a5d84d0775af750c5f49229cf94c7e73b}{ptr}}, index[j].\mbox{\hyperlink{structpointer_a5d84d0775af750c5f49229cf94c7e73b}{ptr}}, index[min\_ind].\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}, index[j].\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}) > 0) \{}
+\DoxyCodeLine{193                 min\_ind = j;}
+\DoxyCodeLine{194             \}}
+\DoxyCodeLine{195         \}}
+\DoxyCodeLine{196         \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}} temp = index[i];}
+\DoxyCodeLine{197         index[i] = index[min\_ind];}
+\DoxyCodeLine{198         index[min\_ind] = temp;}
+\DoxyCodeLine{199     \}}
+\DoxyCodeLine{200 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a57f0157668adf51f44c638b51b8209c1}\label{proba_8cpp_a57f0157668adf51f44c638b51b8209c1}} 
+\index{proba.cpp@{proba.cpp}!number\_of\_lines@{number\_of\_lines}}
+\index{number\_of\_lines@{number\_of\_lines}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{number\_of\_lines()}{number\_of\_lines()}}
+{\footnotesize\ttfamily int number\+\_\+of\+\_\+lines (\begin{DoxyParamCaption}\item[{char $\ast$}]{buffer,  }\item[{char}]{separator }\end{DoxyParamCaption})}
+
+
+
+Definition at line 74 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{74                                                   \{}
+\DoxyCodeLine{75     assert(buffer != NULL);}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77     \textcolor{keywordtype}{int} lines = 0;}
+\DoxyCodeLine{78     \textcolor{keywordflow}{while}(*buffer != \textcolor{charliteral}{'\(\backslash\)0'}) \{}
+\DoxyCodeLine{79         \textcolor{keywordflow}{if}(*buffer == separator) \{}
+\DoxyCodeLine{80             ++lines;}
+\DoxyCodeLine{81         \}}
+\DoxyCodeLine{82         ++buffer;}
+\DoxyCodeLine{83     \}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85     \textcolor{keywordflow}{return} lines;}
+\DoxyCodeLine{86 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a4b763c36c18bdea741096b5f999937ec}\label{proba_8cpp_a4b763c36c18bdea741096b5f999937ec}} 
+\index{proba.cpp@{proba.cpp}!print\_array@{print\_array}}
+\index{print\_array@{print\_array}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{print\_array()}{print\_array()}}
+{\footnotesize\ttfamily void print\+\_\+array (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{file,  }\item[{const struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{const int}]{lines,  }\item[{int $\ast$}]{number\+\_\+of\+\_\+out }\end{DoxyParamCaption})}
+
+
+
+This function fills the index array with data from the file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & File with strings \\
+\hline
+{\em index} & Array of type pointer$\ast$ \\
+\hline
+{\em lines} & Number of lines in array \\
+\hline
+{\em number\+\_\+of\+\_\+out} & Number of print\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+
+
+Definition at line 248 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{248                                                                                                \{}
+\DoxyCodeLine{249     assert(isfinite(lines));}
+\DoxyCodeLine{250     assert(file          != NULL);}
+\DoxyCodeLine{251     assert(index         != NULL);}
+\DoxyCodeLine{252     assert(number\_of\_out != NULL);}
+\DoxyCodeLine{253 }
+\DoxyCodeLine{254     printf(\textcolor{stringliteral}{"pr\_ar: \%d\(\backslash\)n"}, lines);}
+\DoxyCodeLine{255     printf(\textcolor{stringliteral}{"\%d\(\backslash\)n"}, *number\_of\_out);}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257     \textcolor{keywordtype}{char} check[] = \{ \textcolor{charliteral}{'w'} , \textcolor{charliteral}{'t'} , \textcolor{charliteral}{'f'} \};}
+\DoxyCodeLine{258 }
+\DoxyCodeLine{259     \textcolor{comment}{//fwrite(check , 1 , sizeof(check) , file ); // записать в файл содержимое буфера}}
+\DoxyCodeLine{260     \textcolor{comment}{//fputc()}}
+\DoxyCodeLine{261     printf(\textcolor{stringliteral}{"okay........\(\backslash\)n"});}
+\DoxyCodeLine{262     \textcolor{comment}{//fwrite(index, sizeof(index[0]), sizeof(index), file);}}
+\DoxyCodeLine{263     \textcolor{comment}{//fprintf(file, "@");}}
+\DoxyCodeLine{264     fputs(\textcolor{stringliteral}{"-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ BEGIN DO PART \%d -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\(\backslash\)n"}, file); \textcolor{comment}{// *number\_of\_out);}}
+\DoxyCodeLine{265     \textcolor{comment}{/*for (int i=0; i<lines; ++i) \{}}
+\DoxyCodeLine{266 \textcolor{comment}{        for(int j=0; j<=index[i].len; ++j) \{}}
+\DoxyCodeLine{267 \textcolor{comment}{            fprintf(file, "\%c", (index[i].ptr)[j]);}}
+\DoxyCodeLine{268 \textcolor{comment}{        \}}}
+\DoxyCodeLine{269 \textcolor{comment}{    \}*/}}
+\DoxyCodeLine{270     \textcolor{comment}{//fprintf(file, "-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ END DO PART \%d -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\(\backslash\)n\(\backslash\)n", *number\_of\_out);}}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272     (*number\_of\_out)++;}
+\DoxyCodeLine{273 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a98a2a68c2cb1461d7f2c4ce29cc851ae}\label{proba_8cpp_a98a2a68c2cb1461d7f2c4ce29cc851ae}} 
+\index{proba.cpp@{proba.cpp}!read\_buffer@{read\_buffer}}
+\index{read\_buffer@{read\_buffer}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{read\_buffer()}{read\_buffer()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structpointer}{pointer}}$\ast$ read\+\_\+buffer (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{file,  }\item[{char $\ast$}]{buffer,  }\item[{int}]{size\+\_\+buffer,  }\item[{int $\ast$}]{lines }\end{DoxyParamCaption})}
+
+
+
+Definition at line 63 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{63                                                                                    \{}
+\DoxyCodeLine{64     \textcolor{keywordtype}{int} status = fread(buffer, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char}), size\_buffer, file);}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66     *lines = \mbox{\hyperlink{proba_8cpp_a57f0157668adf51f44c638b51b8209c1}{number\_of\_lines}}(buffer, \textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68     \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}* index = (\textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}*)calloc(*lines, \textcolor{keyword}{sizeof}(\textcolor{keyword}{struct} \mbox{\hyperlink{structpointer}{pointer}}));}
+\DoxyCodeLine{69     \mbox{\hyperlink{proba_8cpp_a931dd429df67f12627a238a616085856}{initialization}}(buffer, index, *lines);}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71     \textcolor{keywordflow}{return} index;}
+\DoxyCodeLine{72 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a067bdb0a8059e848b8f1a3c144ff66cb}\label{proba_8cpp_a067bdb0a8059e848b8f1a3c144ff66cb}} 
+\index{proba.cpp@{proba.cpp}!size\_of\_buffer@{size\_of\_buffer}}
+\index{size\_of\_buffer@{size\_of\_buffer}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{size\_of\_buffer()}{size\_of\_buffer()}}
+{\footnotesize\ttfamily int size\+\_\+of\+\_\+buffer (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{file }\end{DoxyParamCaption})}
+
+
+
+Definition at line 52 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{52                                \{}
+\DoxyCodeLine{53     \textcolor{keywordtype}{int} size\_buffer = 0;}
+\DoxyCodeLine{54     \textcolor{keywordflow}{if}(!fseek(file, 0, SEEK\_END)) \{}
+\DoxyCodeLine{55         size\_buffer = ftell(file);}
+\DoxyCodeLine{56     \}}
+\DoxyCodeLine{57     ++size\_buffer;}
+\DoxyCodeLine{58     fseek(file, 0, SEEK\_SET);}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60     \textcolor{keywordflow}{return} size\_buffer;}
+\DoxyCodeLine{61 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a8c42136cd8fd696eea0800cd307c9f23}\label{proba_8cpp_a8c42136cd8fd696eea0800cd307c9f23}} 
+\index{proba.cpp@{proba.cpp}!sorting@{sorting}}
+\index{sorting@{sorting}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{sorting()}{sorting()}}
+{\footnotesize\ttfamily int sorting (\begin{DoxyParamCaption}\item[{const int}]{argc,  }\item[{const char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+This function opens files and starts functions number\+\_\+of\+\_\+lines, initialization, make\+\_\+index\+\_\+array and write\+\_\+and\+\_\+sort. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc,argv} & Command line parameters\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error\+\_\+number, if an error occurred, else 0 
+\end{DoxyReturn}
+
+
+Definition at line 11 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{11                                                 \{}
+\DoxyCodeLine{12     assert(isfinite(argc));}
+\DoxyCodeLine{13     assert(argv != NULL);}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* name\_in  = argv[2];}
+\DoxyCodeLine{16     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* name\_out = argv[3];}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18     FILE* poem = fopen(name\_in, \textcolor{stringliteral}{"rb"});}
+\DoxyCodeLine{19     \textcolor{keywordflow}{if}(poem == \textcolor{keyword}{nullptr}) \{}
+\DoxyCodeLine{20         printf(\textcolor{stringliteral}{"File \%s don't open\(\backslash\)n"}, name\_in);}
+\DoxyCodeLine{21         \textcolor{keywordflow}{return} \mbox{\hyperlink{main_8h_a7187bae3037460a7883cad0abfeab653}{error\_number}};}
+\DoxyCodeLine{22     \}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24     \textcolor{keywordtype}{int} max\_length = 0, lines = 0;}
+\DoxyCodeLine{25     \textcolor{keywordtype}{int} size\_buffer = \mbox{\hyperlink{proba_8cpp_a067bdb0a8059e848b8f1a3c144ff66cb}{size\_of\_buffer}}(poem);}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27     \textcolor{keywordtype}{char}* buffer = (\textcolor{keywordtype}{char}*)calloc(size\_buffer, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char}));}
+\DoxyCodeLine{28     \textcolor{keyword}{struct }\mbox{\hyperlink{structpointer}{pointer}}* index = \mbox{\hyperlink{proba_8cpp_a98a2a68c2cb1461d7f2c4ce29cc851ae}{read\_buffer}}(poem, buffer, size\_buffer, \&lines);}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30     \textcolor{keywordtype}{int} close\_file\_result = fclose(poem);}
+\DoxyCodeLine{31     \textcolor{keywordflow}{if}(close\_file\_result == -\/1) \{}
+\DoxyCodeLine{32         printf(\textcolor{stringliteral}{"There were problems with the file \%s. Run the program again.\(\backslash\)n"}, name\_in);}
+\DoxyCodeLine{33         \textcolor{keywordflow}{return} \mbox{\hyperlink{main_8h_a7187bae3037460a7883cad0abfeab653}{error\_number}};}
+\DoxyCodeLine{34     \}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36     printf(\textcolor{stringliteral}{"lines: \%d\(\backslash\)n"}, lines);}
+\DoxyCodeLine{37     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<lines; ++i) \{}
+\DoxyCodeLine{38         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0; j<=index[i].\mbox{\hyperlink{structpointer_aa7322a3a33b37a0357ffbbd0bd2eb66c}{len}}; ++j) \{}
+\DoxyCodeLine{39             printf(\textcolor{stringliteral}{"\%c"}, (index[i].\mbox{\hyperlink{structpointer_a5d84d0775af750c5f49229cf94c7e73b}{ptr}})[j]);}
+\DoxyCodeLine{40         \}}
+\DoxyCodeLine{41     \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43     \textcolor{keywordtype}{int} status = \mbox{\hyperlink{proba_8cpp_ac596567ee590bcbf97dea337bfd247a7}{write\_and\_sort}}(name\_in, name\_out, lines, index);}
+\DoxyCodeLine{44     \textcolor{keywordflow}{if}(status == \mbox{\hyperlink{main_8h_a7187bae3037460a7883cad0abfeab653}{error\_number}}) \{}
+\DoxyCodeLine{45         printf(\textcolor{stringliteral}{"File \%s don't open\(\backslash\)n"}, name\_in);}
+\DoxyCodeLine{46     \}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48     free(buffer);}
+\DoxyCodeLine{49     \textcolor{keywordflow}{return} status;}
+\DoxyCodeLine{50 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}\label{proba_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}} 
+\index{proba.cpp@{proba.cpp}!strcmp\_forward@{strcmp\_forward}}
+\index{strcmp\_forward@{strcmp\_forward}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{strcmp\_forward()}{strcmp\_forward()}}
+{\footnotesize\ttfamily int strcmp\+\_\+forward (\begin{DoxyParamCaption}\item[{char $\ast$}]{str1,  }\item[{char $\ast$}]{str2,  }\item[{int}]{len1,  }\item[{int}]{len2 }\end{DoxyParamCaption})}
+
+
+
+This function contains string comparison rules (sort by first character) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str1,str2} & Comparing strings\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if str1 is less than str2 0, if str1 is equal to str2 Positive number, if str1 is greater than str2 
+\end{DoxyReturn}
+
+
+Definition at line 202 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{202                                                                \{}
+\DoxyCodeLine{203     assert(isfinite(len1));}
+\DoxyCodeLine{204     assert(isfinite(len2));}
+\DoxyCodeLine{205     assert(str1 != NULL);}
+\DoxyCodeLine{206     assert(str2 != NULL);}
+\DoxyCodeLine{207 }
+\DoxyCodeLine{208     \textcolor{keywordflow}{while}(*(str1 + 1) != \textcolor{charliteral}{'\(\backslash\)n'} \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str1)) \{}
+\DoxyCodeLine{209         str1++;}
+\DoxyCodeLine{210     \}}
+\DoxyCodeLine{211     \textcolor{keywordflow}{while}(*(str2 + 1) != \textcolor{charliteral}{'\(\backslash\)n'} \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str2)) \{}
+\DoxyCodeLine{212         str2++;}
+\DoxyCodeLine{213     \}}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{215     \textcolor{keywordflow}{while}(*(str1 + 1) != \textcolor{charliteral}{'\(\backslash\)n'} \&\& *(str2 + 1) != \textcolor{charliteral}{'\(\backslash\)n'} \&\& *str1 == *str2) \{}
+\DoxyCodeLine{216         \textcolor{keywordflow}{while}(*(str1 + 1) != \textcolor{charliteral}{'\(\backslash\)n'} \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str1)) \{}
+\DoxyCodeLine{217             str1++;}
+\DoxyCodeLine{218         \}}
+\DoxyCodeLine{219         \textcolor{keywordflow}{while}(*(str2 + 1) != \textcolor{charliteral}{'\(\backslash\)n'} \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str2)) \{}
+\DoxyCodeLine{220             str2++;}
+\DoxyCodeLine{221         \}}
+\DoxyCodeLine{222 }
+\DoxyCodeLine{223         \textcolor{keywordflow}{if}(*str1 != *str2) \{}
+\DoxyCodeLine{224             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{225         \}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227         str1++;}
+\DoxyCodeLine{228         str2++;}
+\DoxyCodeLine{229     \}}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231     \textcolor{keywordflow}{if}(*str1 == *str2) \{}
+\DoxyCodeLine{232         \textcolor{keywordflow}{if}(*(str1 + 1) == \textcolor{charliteral}{'\(\backslash\)n'} \&\& *(str2 + 1) == \textcolor{charliteral}{'\(\backslash\)n'}) \{}
+\DoxyCodeLine{233             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{234         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(*(str1 + 1) == \textcolor{charliteral}{'\(\backslash\)n'}) \{}
+\DoxyCodeLine{235             \textcolor{keywordflow}{return} -\/1;}
+\DoxyCodeLine{236         \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{237             \textcolor{keywordflow}{return} 1;}
+\DoxyCodeLine{238         \}}
+\DoxyCodeLine{239     \}}
+\DoxyCodeLine{240 }
+\DoxyCodeLine{241     \textcolor{keywordflow}{return} *str1 -\/ *str2;}
+\DoxyCodeLine{242 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_a6ba26bda174677f10998727a674ab8a0}\label{proba_8cpp_a6ba26bda174677f10998727a674ab8a0}} 
+\index{proba.cpp@{proba.cpp}!strcmp\_reverse@{strcmp\_reverse}}
+\index{strcmp\_reverse@{strcmp\_reverse}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{strcmp\_reverse()}{strcmp\_reverse()}}
+{\footnotesize\ttfamily int strcmp\+\_\+reverse (\begin{DoxyParamCaption}\item[{char $\ast$}]{str1,  }\item[{char $\ast$}]{str2,  }\item[{int}]{len1,  }\item[{int}]{len2 }\end{DoxyParamCaption})}
+
+
+
+This function contains string comparison rules (sort by last character) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str1,str2} & Comparing strings\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if str1 is less than str2 0, if str1 is equal to str2 Positive number, if str1 is greater than str2 
+\end{DoxyReturn}
+
+
+Definition at line 282 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{282                                                                \{}
+\DoxyCodeLine{283     assert(isfinite(len1));}
+\DoxyCodeLine{284     assert(isfinite(len2));}
+\DoxyCodeLine{285     assert(str1 != NULL);}
+\DoxyCodeLine{286     assert(str2 != NULL);}
+\DoxyCodeLine{287 }
+\DoxyCodeLine{288     str1 += len1 -\/ 1;}
+\DoxyCodeLine{289     str2 += len2 -\/ 1;}
+\DoxyCodeLine{290     \textcolor{keywordtype}{int} pos1 = len1 -\/ 1;}
+\DoxyCodeLine{291     \textcolor{keywordtype}{int} pos2 = len2 -\/ 1;}
+\DoxyCodeLine{292     \textcolor{keywordflow}{while}(pos1 -\/ 1 >= 0 \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str1)) \{ str1-\/-\/, pos1-\/-\/; \}}
+\DoxyCodeLine{293     \textcolor{keywordflow}{while}(pos2 -\/ 1 >= 0 \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str2)) \{ str2-\/-\/; pos2-\/-\/; \}}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{295     \textcolor{keywordflow}{while}(pos1 -\/ 1 >= 0 \&\& pos2 -\/ 1 >= 0 \&\& *str1 == *str2) \{}
+\DoxyCodeLine{296         \textcolor{keywordflow}{while}(pos1 -\/ 1 >= 0 \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str1)) \{ str1-\/-\/; pos1-\/-\/; \}}
+\DoxyCodeLine{297         \textcolor{keywordflow}{while}(pos2 -\/ 1 >= 0 \&\& !\mbox{\hyperlink{proba_8cpp_ae477ee503e23d46b407d0cd634807216}{is\_alpha\_EN}}(*str2)) \{ str2-\/-\/; pos2-\/-\/; \}}
+\DoxyCodeLine{298 }
+\DoxyCodeLine{299         \textcolor{keywordflow}{if}(*str1 != *str2) \{}
+\DoxyCodeLine{300             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{301         \}}
+\DoxyCodeLine{302 }
+\DoxyCodeLine{303         str1-\/-\/, pos1-\/-\/;}
+\DoxyCodeLine{304         str2-\/-\/, pos2-\/-\/;}
+\DoxyCodeLine{305     \}}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{307     \textcolor{keywordflow}{if}(*str1 == *str2) \{}
+\DoxyCodeLine{308         \textcolor{keywordflow}{if}(pos1 -\/ 1 >= 0 \&\& pos2 -\/ 1 >= 0 || pos1 == pos2 \&\& pos1 == 0) \{}
+\DoxyCodeLine{309             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{310         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pos1 -\/ 1 >= 0) \{}
+\DoxyCodeLine{311             \textcolor{keywordflow}{return} 1;}
+\DoxyCodeLine{312         \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{313             \textcolor{keywordflow}{return} -\/1;}
+\DoxyCodeLine{314         \}}
+\DoxyCodeLine{315     \}}
+\DoxyCodeLine{316 }
+\DoxyCodeLine{317     \textcolor{keywordflow}{return} *str1 -\/ *str2;}
+\DoxyCodeLine{318 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{proba_8cpp_ac596567ee590bcbf97dea337bfd247a7}\label{proba_8cpp_ac596567ee590bcbf97dea337bfd247a7}} 
+\index{proba.cpp@{proba.cpp}!write\_and\_sort@{write\_and\_sort}}
+\index{write\_and\_sort@{write\_and\_sort}!proba.cpp@{proba.cpp}}
+\doxysubsubsection{\texorpdfstring{write\_and\_sort()}{write\_and\_sort()}}
+{\footnotesize\ttfamily int write\+\_\+and\+\_\+sort (\begin{DoxyParamCaption}\item[{const char $\ast$}]{name\+\_\+in,  }\item[{const char $\ast$}]{name\+\_\+out,  }\item[{int}]{lines,  }\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index }\end{DoxyParamCaption})}
+
+
+
+Definition at line 150 of file proba.\+cpp.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{150                                                                                                 \{}
+\DoxyCodeLine{151     assert(isfinite(lines));}
+\DoxyCodeLine{152     assert(name\_in  != NULL);}
+\DoxyCodeLine{153     assert(name\_out != NULL);}
+\DoxyCodeLine{154     assert(index    != NULL);}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156     printf(\textcolor{stringliteral}{"name\_out: \%s\(\backslash\)n"}, name\_out);}
+\DoxyCodeLine{157     FILE* file\_result = fopen(name\_out, \textcolor{stringliteral}{"wb"});}
+\DoxyCodeLine{158     \textcolor{keywordflow}{if}(file\_result == \textcolor{keyword}{nullptr}) \{}
+\DoxyCodeLine{159         printf(\textcolor{stringliteral}{"klsdjfbjhkagsjidlkoxnbkhsjvbnjk\(\backslash\)n"});}
+\DoxyCodeLine{160         \textcolor{keywordflow}{return} \mbox{\hyperlink{main_8h_a7187bae3037460a7883cad0abfeab653}{error\_number}};}
+\DoxyCodeLine{161     \}}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164     \textcolor{comment}{//fprintf(file\_result, "!!!");}}
+\DoxyCodeLine{165     printf(\textcolor{stringliteral}{"hop-\/hey-\/lalaley\(\backslash\)n"});}
+\DoxyCodeLine{166     \textcolor{keywordtype}{int} number\_of\_out = 1;}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168     \mbox{\hyperlink{proba_8cpp_a6dff55160b6f3f5c03d7f083baad8942}{my\_qsort}}(lines, index, \mbox{\hyperlink{proba_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}{strcmp\_forward}});}
+\DoxyCodeLine{169     printf(\textcolor{stringliteral}{"!!!!!!!\(\backslash\)n"});}
+\DoxyCodeLine{170     \mbox{\hyperlink{Shakespeare_8txt_ab153cf584930e208da69eddd05481beb}{sleep}}(1);}
+\DoxyCodeLine{171     \mbox{\hyperlink{proba_8cpp_a4b763c36c18bdea741096b5f999937ec}{print\_array}}(file\_result, index, lines, \&number\_of\_out);}
+\DoxyCodeLine{172     printf(\textcolor{stringliteral}{"!!!!!!!\(\backslash\)n"});}
+\DoxyCodeLine{173     \mbox{\hyperlink{Shakespeare_8txt_ab153cf584930e208da69eddd05481beb}{sleep}}(1);}
+\DoxyCodeLine{174     qsort(index, lines, \textcolor{keyword}{sizeof}(index[0]), \mbox{\hyperlink{proba_8cpp_a838142ab68aa363ac3bd206687839552}{comparator\_struct\_ptr}});}
+\DoxyCodeLine{175     \mbox{\hyperlink{proba_8cpp_a4b763c36c18bdea741096b5f999937ec}{print\_array}}(file\_result, index, lines, \&number\_of\_out);}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177     qsort(index, lines, \textcolor{keyword}{sizeof}(index[0]), \mbox{\hyperlink{proba_8cpp_a370be717e4deee47ee8e559f3fa6511f}{comparator\_struct\_pos}});}
+\DoxyCodeLine{178     \mbox{\hyperlink{proba_8cpp_a4b763c36c18bdea741096b5f999937ec}{print\_array}}(file\_result, index, lines, \&number\_of\_out);}
+\DoxyCodeLine{179 }
+\DoxyCodeLine{180     fclose(file\_result);}
+\DoxyCodeLine{181 }
+\DoxyCodeLine{182     \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{183 \}}
+
+\end{DoxyCode}

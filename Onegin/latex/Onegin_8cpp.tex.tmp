@@ -1,0 +1,321 @@
+\hypertarget{Onegin_8cpp}{}\doxysection{Onegin.\+cpp File Reference}
+\label{Onegin_8cpp}\index{Onegin.cpp@{Onegin.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}Onegin.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}testing.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$typeinfo$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+Include dependency graph for Onegin.\+cpp\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{Onegin_8cpp_a97ee70a8770dc30d06c744b24eb2fcfc}{help}} ()
+\begin{DoxyCompactList}\small\item\em This function prints help. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{Onegin_8cpp_ad53223b8779f25caeddb70a3b9172967}\label{Onegin_8cpp_ad53223b8779f25caeddb70a3b9172967}} 
+int {\bfseries main} (const int argc, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{Onegin_8cpp_a8c42136cd8fd696eea0800cd307c9f23}{sorting}} (const int argc, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em This function opens files and starts functions number\+\_\+of\+\_\+lines, initialization, make\+\_\+index\+\_\+array and write\+\_\+and\+\_\+sort. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{Onegin_8cpp_a03ad565d441311805ef230964364f4fa}{number\+\_\+of\+\_\+lines}} (F\+I\+LE $\ast$file, int $\ast$max\+\_\+length, char separator)
+\begin{DoxyCompactList}\small\item\em This function calculates number of lines in the file. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{Onegin_8cpp_acd43ef48c86ca9d907d02a37fc788251}{initialization}} (struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, const int lines, const int max\+\_\+length)
+\begin{DoxyCompactList}\small\item\em This function initializes an array index with the zeros (fields len and pos) and empty arrays (field ptr) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{Onegin_8cpp_a85767bebc69cb16388d508c2f885883f}{fill\+\_\+index\+\_\+array}} (F\+I\+LE $\ast$file, struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, int lines, int max\+\_\+length, char separator)
+\begin{DoxyCompactList}\small\item\em This function fills the index array with data from the file. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{Onegin_8cpp_ac596567ee590bcbf97dea337bfd247a7}{write\+\_\+and\+\_\+sort}} (const char $\ast$name\+\_\+in, const char $\ast$name\+\_\+out, int lines, struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index)
+\begin{DoxyCompactList}\small\item\em This function starts sorting. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{Onegin_8cpp_a6dff55160b6f3f5c03d7f083baad8942}{my\+\_\+qsort}} (int len, struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, int($\ast$compare)(char $\ast$, char $\ast$, int, int))
+\begin{DoxyCompactList}\small\item\em This function sorts text. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{Onegin_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}{strcmp\+\_\+forward}} (char $\ast$str1, char $\ast$str2, int len1, int len2)
+\begin{DoxyCompactList}\small\item\em This function contains string comparison rules (sort by first character) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{Onegin_8cpp_ae477ee503e23d46b407d0cd634807216}{is\+\_\+alpha\+\_\+\+EN}} (char symbol)
+\begin{DoxyCompactList}\small\item\em This function checks whether the character is a letter. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{Onegin_8cpp_a4b763c36c18bdea741096b5f999937ec}{print\+\_\+array}} (F\+I\+LE $\ast$file, const struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$index, const int lines, int $\ast$number\+\_\+of\+\_\+out)
+\begin{DoxyCompactList}\small\item\em This function fills the index array with data from the file. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{Onegin_8cpp_a838142ab68aa363ac3bd206687839552}{comparator\+\_\+struct\+\_\+ptr}} (const void $\ast$first, const void $\ast$second)
+\begin{DoxyCompactList}\small\item\em This function compares two strings which are structure fields. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{Onegin_8cpp_a6ba26bda174677f10998727a674ab8a0}{strcmp\+\_\+reverse}} (char $\ast$str1, char $\ast$str2, int len1, int len2)
+\begin{DoxyCompactList}\small\item\em This function contains string comparison rules (sort by last character) \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{Onegin_8cpp_a370be717e4deee47ee8e559f3fa6511f}{comparator\+\_\+struct\+\_\+pos}} (const void $\ast$first, const void $\ast$second)
+\begin{DoxyCompactList}\small\item\em This function compares two indices of strings which are structure fields. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{Onegin_8cpp_a7187bae3037460a7883cad0abfeab653}\label{Onegin_8cpp_a7187bae3037460a7883cad0abfeab653}} 
+const int {\bfseries error\+\_\+number} = 3802
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Kolesnikova Xenia \href{mailto:heiduk.k.k.s@yandex.ru}{\texttt{ heiduk.\+k.\+k.\+s@yandex.\+ru}} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+1.\+0 $\ast$ 
+\end{DoxyVersion}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Onegin_8cpp_a370be717e4deee47ee8e559f3fa6511f}\label{Onegin_8cpp_a370be717e4deee47ee8e559f3fa6511f}} 
+\index{Onegin.cpp@{Onegin.cpp}!comparator\_struct\_pos@{comparator\_struct\_pos}}
+\index{comparator\_struct\_pos@{comparator\_struct\_pos}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{comparator\_struct\_pos()}{comparator\_struct\_pos()}}
+{\footnotesize\ttfamily int comparator\+\_\+struct\+\_\+pos (\begin{DoxyParamCaption}\item[{const void $\ast$}]{first,  }\item[{const void $\ast$}]{second }\end{DoxyParamCaption})}
+
+
+
+This function compares two indices of strings which are structure fields. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em first,second} & Comparing structs\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if first.\+pos is less than second.\+pos 0, if first.\+pos is equal to second.\+pos Positive number, if first.\+pos is greater than second.\+pos 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a838142ab68aa363ac3bd206687839552}\label{Onegin_8cpp_a838142ab68aa363ac3bd206687839552}} 
+\index{Onegin.cpp@{Onegin.cpp}!comparator\_struct\_ptr@{comparator\_struct\_ptr}}
+\index{comparator\_struct\_ptr@{comparator\_struct\_ptr}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{comparator\_struct\_ptr()}{comparator\_struct\_ptr()}}
+{\footnotesize\ttfamily int comparator\+\_\+struct\+\_\+ptr (\begin{DoxyParamCaption}\item[{const void $\ast$}]{first,  }\item[{const void $\ast$}]{second }\end{DoxyParamCaption})}
+
+
+
+This function compares two strings which are structure fields. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em first,second} & Comparing structs\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if first.\+ptr is less than second.\+ptr 0, if first.\+ptr is equal to second.\+ptr Positive number, if first.\+ptr is greater than second.\+ptr 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a85767bebc69cb16388d508c2f885883f}\label{Onegin_8cpp_a85767bebc69cb16388d508c2f885883f}} 
+\index{Onegin.cpp@{Onegin.cpp}!fill\_index\_array@{fill\_index\_array}}
+\index{fill\_index\_array@{fill\_index\_array}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{fill\_index\_array()}{fill\_index\_array()}}
+{\footnotesize\ttfamily void fill\+\_\+index\+\_\+array (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{file,  }\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{int}]{lines,  }\item[{int}]{max\+\_\+length,  }\item[{char}]{separator }\end{DoxyParamCaption})}
+
+
+
+This function fills the index array with data from the file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & File with strings \\
+\hline
+{\em index} & Array of type pointer$\ast$ \\
+\hline
+{\em lines} & Number of lines in array \\
+\hline
+{\em max\+\_\+length} & Maximum length of strings in a file \\
+\hline
+{\em separator} & A symbol that is considered the end of a string\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a97ee70a8770dc30d06c744b24eb2fcfc}\label{Onegin_8cpp_a97ee70a8770dc30d06c744b24eb2fcfc}} 
+\index{Onegin.cpp@{Onegin.cpp}!help@{help}}
+\index{help@{help}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily void help (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+This function prints help. 
+
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_acd43ef48c86ca9d907d02a37fc788251}\label{Onegin_8cpp_acd43ef48c86ca9d907d02a37fc788251}} 
+\index{Onegin.cpp@{Onegin.cpp}!initialization@{initialization}}
+\index{initialization@{initialization}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{initialization()}{initialization()}}
+{\footnotesize\ttfamily void initialization (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{const int}]{lines,  }\item[{const int}]{max\+\_\+length }\end{DoxyParamCaption})}
+
+
+
+This function initializes an array index with the zeros (fields len and pos) and empty arrays (field ptr) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Array of type pointer$\ast$ \\
+\hline
+{\em lines} & Number of lines in array \\
+\hline
+{\em max\+\_\+length} & Maximum length of strings in a file\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_ae477ee503e23d46b407d0cd634807216}\label{Onegin_8cpp_ae477ee503e23d46b407d0cd634807216}} 
+\index{Onegin.cpp@{Onegin.cpp}!is\_alpha\_EN@{is\_alpha\_EN}}
+\index{is\_alpha\_EN@{is\_alpha\_EN}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{is\_alpha\_EN()}{is\_alpha\_EN()}}
+{\footnotesize\ttfamily bool is\+\_\+alpha\+\_\+\+EN (\begin{DoxyParamCaption}\item[{char}]{symbol }\end{DoxyParamCaption})}
+
+
+
+This function checks whether the character is a letter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em symbol} & Symbol\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a6dff55160b6f3f5c03d7f083baad8942}\label{Onegin_8cpp_a6dff55160b6f3f5c03d7f083baad8942}} 
+\index{Onegin.cpp@{Onegin.cpp}!my\_qsort@{my\_qsort}}
+\index{my\_qsort@{my\_qsort}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{my\_qsort()}{my\_qsort()}}
+{\footnotesize\ttfamily void my\+\_\+qsort (\begin{DoxyParamCaption}\item[{int}]{len,  }\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{int($\ast$)(char $\ast$, char $\ast$, int, int)}]{compare }\end{DoxyParamCaption})}
+
+
+
+This function sorts text. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em len} & Number of lines in array \\
+\hline
+{\em index} & Array of type pointer$\ast$ \\
+\hline
+{\em compare} & Comparator\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a03ad565d441311805ef230964364f4fa}\label{Onegin_8cpp_a03ad565d441311805ef230964364f4fa}} 
+\index{Onegin.cpp@{Onegin.cpp}!number\_of\_lines@{number\_of\_lines}}
+\index{number\_of\_lines@{number\_of\_lines}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{number\_of\_lines()}{number\_of\_lines()}}
+{\footnotesize\ttfamily int number\+\_\+of\+\_\+lines (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{file,  }\item[{int $\ast$}]{max\+\_\+length,  }\item[{char}]{separator }\end{DoxyParamCaption})}
+
+
+
+This function calculates number of lines in the file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & File with strings \\
+\hline
+{\em max\+\_\+length} & Maximum length of strings in a file \\
+\hline
+{\em separator} & A symbol that is considered the end of a string\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of lines in the file 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a4b763c36c18bdea741096b5f999937ec}\label{Onegin_8cpp_a4b763c36c18bdea741096b5f999937ec}} 
+\index{Onegin.cpp@{Onegin.cpp}!print\_array@{print\_array}}
+\index{print\_array@{print\_array}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{print\_array()}{print\_array()}}
+{\footnotesize\ttfamily void print\+\_\+array (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{file,  }\item[{const struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index,  }\item[{const int}]{lines,  }\item[{int $\ast$}]{number\+\_\+of\+\_\+out }\end{DoxyParamCaption})}
+
+
+
+This function fills the index array with data from the file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & File with strings \\
+\hline
+{\em index} & Array of type pointer$\ast$ \\
+\hline
+{\em lines} & Number of lines in array \\
+\hline
+{\em number\+\_\+of\+\_\+out} & Number of print\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a8c42136cd8fd696eea0800cd307c9f23}\label{Onegin_8cpp_a8c42136cd8fd696eea0800cd307c9f23}} 
+\index{Onegin.cpp@{Onegin.cpp}!sorting@{sorting}}
+\index{sorting@{sorting}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{sorting()}{sorting()}}
+{\footnotesize\ttfamily int sorting (\begin{DoxyParamCaption}\item[{const int}]{argc,  }\item[{const char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+This function opens files and starts functions number\+\_\+of\+\_\+lines, initialization, make\+\_\+index\+\_\+array and write\+\_\+and\+\_\+sort. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc,argv} & Command line parameters\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error\+\_\+number, if an error occurred, else 0 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}\label{Onegin_8cpp_a5ea5a48371a0344c0158fe5f8b088c3b}} 
+\index{Onegin.cpp@{Onegin.cpp}!strcmp\_forward@{strcmp\_forward}}
+\index{strcmp\_forward@{strcmp\_forward}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{strcmp\_forward()}{strcmp\_forward()}}
+{\footnotesize\ttfamily int strcmp\+\_\+forward (\begin{DoxyParamCaption}\item[{char $\ast$}]{str1,  }\item[{char $\ast$}]{str2,  }\item[{int}]{len1,  }\item[{int}]{len2 }\end{DoxyParamCaption})}
+
+
+
+This function contains string comparison rules (sort by first character) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str1,str2} & Comparing strings\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if str1 is less than str2 0, if str1 is equal to str2 Positive number, if str1 is greater than str2 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_a6ba26bda174677f10998727a674ab8a0}\label{Onegin_8cpp_a6ba26bda174677f10998727a674ab8a0}} 
+\index{Onegin.cpp@{Onegin.cpp}!strcmp\_reverse@{strcmp\_reverse}}
+\index{strcmp\_reverse@{strcmp\_reverse}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{strcmp\_reverse()}{strcmp\_reverse()}}
+{\footnotesize\ttfamily int strcmp\+\_\+reverse (\begin{DoxyParamCaption}\item[{char $\ast$}]{str1,  }\item[{char $\ast$}]{str2,  }\item[{int}]{len1,  }\item[{int}]{len2 }\end{DoxyParamCaption})}
+
+
+
+This function contains string comparison rules (sort by last character) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str1,str2} & Comparing strings\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Negative number, if str1 is less than str2 0, if str1 is equal to str2 Positive number, if str1 is greater than str2 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Onegin_8cpp_ac596567ee590bcbf97dea337bfd247a7}\label{Onegin_8cpp_ac596567ee590bcbf97dea337bfd247a7}} 
+\index{Onegin.cpp@{Onegin.cpp}!write\_and\_sort@{write\_and\_sort}}
+\index{write\_and\_sort@{write\_and\_sort}!Onegin.cpp@{Onegin.cpp}}
+\doxysubsubsection{\texorpdfstring{write\_and\_sort()}{write\_and\_sort()}}
+{\footnotesize\ttfamily int write\+\_\+and\+\_\+sort (\begin{DoxyParamCaption}\item[{const char $\ast$}]{name\+\_\+in,  }\item[{const char $\ast$}]{name\+\_\+out,  }\item[{int}]{lines,  }\item[{struct \mbox{\hyperlink{structpointer}{pointer}} $\ast$}]{index }\end{DoxyParamCaption})}
+
+
+
+This function starts sorting. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name\+\_\+in,name\+\_\+out} & Input and output files \\
+\hline
+{\em lines} & Number of lines in array \\
+\hline
+{\em index} & Array of type pointer$\ast$\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nothing 
+\end{DoxyReturn}
