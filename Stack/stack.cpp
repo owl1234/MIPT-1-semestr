@@ -19,8 +19,8 @@ const char* text_stack_t_status[] = {
     "Capacity is very big",
     "Size is bigger than capacity",
     "Stack created just now",
-    "Bad hash of stack",
-    "Canary is killed",
+    HASH_PROTECTION("Bad hash of stack"),
+    CANARY_PROTECTION("Canary is killed")
 };
 
 HASH_PROTECTION(
@@ -225,7 +225,7 @@ void StackDestruct(Stack_t* node) {
     free(node);
 }
 
-int StackIsEmpty(Stack_t* node){
+bool StackIsEmpty(Stack_t* node){
     StackErr(node, create_struct(name_file, __LINE__, __FUNCTION__));
 
     int size_of_stack = StackSize(node);

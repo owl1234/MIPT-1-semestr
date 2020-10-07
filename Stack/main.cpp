@@ -10,11 +10,10 @@ void help() {
                     "[-h] -if you want to read this help again\n"
                     "[-s] - if you want to work with stack\n"
                     "[-t] - if you want to test this program.\n"
-                    "For more information, go here: https://github.com/owl1234/String-sorter\n");
+                    "For more information, go here: https://github.com/owl1234/MIPT-1-semestr/tree/master/Stack\n");
 }
 
 int main(const int argc, const char* argv[]) {
-    //const int args_for_testing = 2;
     const int args_for_stack = 2;
 
     if(argc == args_for_stack) {
