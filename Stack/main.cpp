@@ -41,11 +41,12 @@ int initialization_stack() {
 
     Stack_t stk = {};
     stack_construct(&stk);
+    stack_destruct(&stk);
     //stk.size_stack = -1;
     //printf("%d\n", stk.size_stack);
 
     //(&stk)->data = nullptr;
-    printf("size: %d\n", stack_size(&stk));
+    /*printf("size: %d\n", stack_size(&stk));
 
     for(int i=0; i<35; ++i) {
         int x = rand() % 69 + 1;
@@ -63,6 +64,6 @@ int initialization_stack() {
         stack_pop(&stk);
     }
 
-    stack_dump(&stk, create_struct(file_name, __LINE__, __FUNCTION__));
+    stack_dump(&stk, create_struct(file_name, __LINE__, __FUNCTION__));*/
     return 0;
 }

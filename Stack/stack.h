@@ -18,8 +18,9 @@ typedef enum {
     STACK_IS_CREATED        = 6,
     STACK_DATA_NULL         = 7,
     STACK_BAD_SIZE          = 8,
-    HASH_PROTECTION  (STACK_BAD_HASH   = 9),
-    CANARY_PROTECTION(STACK_BAD_CANARY = 10)
+    STACK_IS_DECTRUCT       = 9,
+    HASH_PROTECTION  (STACK_BAD_HASH   = 10),
+    CANARY_PROTECTION(STACK_BAD_CANARY = 11)
 } stack_t_status;
 
 struct Stack_t {

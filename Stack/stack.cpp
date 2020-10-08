@@ -21,6 +21,7 @@ const char* text_stack_t_status[] = {
     "Stack created just now",
     "Data is null",
     "Size is bad",
+    "Stack is destructed",
     HASH_PROTECTION("Bad hash of stack"),
     CANARY_PROTECTION("Canary is killed")
 };
@@ -252,8 +253,8 @@ void stack_destruct(Stack_t* node) {
     free(node->data);
     node->size_stack = POISON;
     node->capacity   = POISON;
-
-    free(node);
+    node->data = nullptr;
+    node->stack_status = STACK_IS_DECTRUCT;
 }
 
 bool stack_is_empty(Stack_t* node){
