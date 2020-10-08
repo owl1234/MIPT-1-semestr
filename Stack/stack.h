@@ -1,3 +1,6 @@
+#ifndef H_STACK
+#define H_STACK
+
 #define CANARY_PROTECTION(code) code
 #define HASH_PROTECTION(code) code
 
@@ -11,10 +14,12 @@ typedef enum {
     STACK_EMPTY             = 2,
     STACK_OVERFLOW          = 3,
     STACK_CAPACITY_OVERFLOW = 4,
-    STACK_SMALL_CAPACITY    = 5,
+    STACK_BAD_CAPACITY      = 5,
     STACK_IS_CREATED        = 6,
-    HASH_PROTECTION  (STACK_BAD_HASH   = 7),
-    CANARY_PROTECTION(STACK_BAD_CANARY = 8)
+    STACK_DATA_NULL         = 7,
+    STACK_BAD_SIZE          = 8,
+    HASH_PROTECTION  (STACK_BAD_HASH   = 9),
+    CANARY_PROTECTION(STACK_BAD_CANARY = 10)
 } stack_t_status;
 
 struct Stack_t {
@@ -130,6 +135,19 @@ void write_indent(FILE* file, int count_indent);
 void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call);
 
 /**
+*   \brief This function create the struct with specified value
+*
+*   @param file_name Name of the file where the call corrupted
+*   @param number Number of line where the call corrupted
+*   @param function_name Name of function where the call corrupted
+*
+*   @return Nothing
+*/
+
+
+struct call_of_dump create_struct(const char* file_name, int number, const char* function_name);
+
+/**
 *   \brief This function checks the stack for simple errors and calls diagnostics in their case
 *
 *   @param node Stack
@@ -139,6 +157,8 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call);
 */
 
 void stack_err(Stack_t* node, struct call_of_dump arguments_of_call);
+
+void fell(Stack_t* node);
 
 /**
 *   \brief This function returns size of the stack
@@ -269,7 +289,9 @@ void stack_clear(Stack_t* node);
 *   @return Nothing
 */
 
-void clear_file(const char* name_log_file);
+void clear_file(const char* file_log_name);
+
+#endif
 
 /**
 *   \brief This function initializations the stack
@@ -279,4 +301,4 @@ void clear_file(const char* name_log_file);
 *   @return 0, if there are no errors
 */
 
-int initialization_stack();
+//int initialization_stack();
