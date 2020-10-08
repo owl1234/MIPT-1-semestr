@@ -33,19 +33,22 @@ int sorting(const int argc, const char* argv[]) {
     }
 
     int max_length = 0;
-    int size_buffer = size_of_buffer(poem);
 
-    char* buffer = (char*)calloc(size_buffer + 5, sizeof(char));
+    struct file_variables in_file = {};
+    in_file.name_file   = name_in;
+    in_file.size_buffer = size_of_buffer(poem);
+
     int lines = 0;
-    struct pointer* index = read_buffer(poem, buffer, size_buffer, &lines);
+    read_buffer(poem, &in_file, in_file.size_buffer, &lines);
 
-    int status = write_and_sort(name_in, name_out, lines, index, buffer);
+    struct pointer* index = (struct pointer*)calloc(lines, sizeof(struct pointer));
+    fill_index_array(in_file.buffer, index, in_file.size_buffer, '\n');
+
+    int status = write_and_sort(name_in, name_out, lines, index, in_file.buffer);
     if(status == error_number) {
         printf("File %s don't open\n", name_in);
     }
 
-    free(index);
-    free(buffer);
 
     return status;
 }
@@ -60,20 +63,16 @@ int size_of_buffer(FILE* file) { // stat
     return length;
 }
 
-struct pointer* read_buffer(FILE* file, char* buffer, int size_buffer, int* lines) {
-    int status = fread(buffer, sizeof(char), size_buffer, file);
+void read_buffer(FILE* file, struct file_variables* file_vars, int size_buffer, int* lines) {
+    file_vars->buffer = (char*)calloc(size_buffer + 5, sizeof(char));
+    int status = fread(file_vars->buffer, sizeof(char), size_buffer, file);
 
     if(status != size_buffer) {
         printf("Error in read file\n");
-        return nullptr;
+        return;
     }
 
-    *lines = number_of_symbols(buffer, '\n');
-
-    struct pointer* index = (struct pointer*)calloc(*lines, sizeof(struct pointer));
-    fill_index_array(buffer, index, size_buffer, '\n');
-
-    return index;
+    *lines = number_of_symbols(file_vars->buffer, '\n');
 }
 
 void fill_index_array(char* buffer, struct pointer* index, int size_buffer, char separator) {

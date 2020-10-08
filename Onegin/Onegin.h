@@ -4,6 +4,13 @@ struct pointer {
     int len;
 };
 
+struct file_variables {
+    const char* name_file;
+    char* buffer;
+    int size_buffer;
+};
+
+
 /**
 *   \brief This function opens files and starts functions number_of_lines, initialization, make_index_array and write_and_sort
 *
@@ -16,7 +23,7 @@ int sorting(const int argc, const char* argv[]);
 
 int size_of_buffer(FILE* file);
 
-struct pointer* read_buffer(FILE* file, char* buffer, int size_buffer, int* lines);
+void read_buffer(FILE* file, struct file_variables* file_vars, int size_buffer, int* lines);
 
 /**
 *   \brief This function calculates number of lines in the file
