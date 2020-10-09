@@ -1,0 +1,24 @@
+Stack_t [0x7ffcde70e4a0]
+File from which the dump is called main.cpp from line 44 (called the function initialization_stack)
+{
+	size_stack = 0
+	capacity   = 8
+	Status of stack: Stack created just now
+	Left  canary of stack: -57005 (okey canary)
+	Right canary of stack: -57005 (okey canary)
+	Hash: 688742457
+	data [0x562bd0255480]
+	{
+	         [0] - [0x562bd0255480] - !!!  NULL  !!! 	 ( !!! ATTENTION !!! DATA IS NULL !!! )
+	         [1] - [0x562bd0255484] - !!! POISON !!!
+	         [2] - [0x562bd0255488] - !!! POISON !!!
+	         [3] - [0x562bd025548c] - !!! POISON !!!
+	         [4] - [0x562bd0255490] - !!! POISON !!!
+	         [5] - [0x562bd0255494] - !!! POISON !!!
+	         [6] - [0x562bd0255498] - !!! POISON !!!
+	         [7] - [0x562bd025549c] - !!! POISON !!!
+
+	}
+}
+
+

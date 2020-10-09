@@ -28,8 +28,8 @@ int sorting(const int argc, const char* argv[]) {
 
     int max_length = 0;
 
-    struct file_variables in_file = {};
-    in_file.name_file   = name_in;
+    struct file_info in_file = {};
+    in_file.name_file = name_in;
 
     int lines = 0;
     int status = read_buffer(&in_file, &lines);
@@ -60,7 +60,7 @@ int size_of_buffer(FILE* file) { // stat
     return length;
 }
 
-int read_buffer(struct file_variables* file_vars, int* lines) {
+int read_buffer(struct file_info* file_vars, int* lines) {
     FILE* poem = fopen(file_vars->name_file, "r");
     if(poem == nullptr) {
         printf("File %s don't open\n", file_vars->name_file);

@@ -41,7 +41,7 @@ int initialization_stack() {
 
     Stack_t stk = {};
     stack_construct(&stk);
-    stack_destruct(&stk);
+    stack_dump(&stk, create_struct(file_name, __LINE__, __FUNCTION__));
     //stk.size_stack = -1;
     //printf("%d\n", stk.size_stack);
 

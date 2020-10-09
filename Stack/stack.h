@@ -1,12 +1,13 @@
 #ifndef H_STACK
 #define H_STACK
 
-#define CANARY_PROTECTION(code) code
-#define HASH_PROTECTION(code) code
+#define IF_CANARY_PROTECTION(code) code
+#define IF_HASH_PROTECTION(code) code
+#define IF_DEBUG(code) code
 
 typedef int Elem_t;
 const int POISON = -3802;
-CANARY_PROTECTION(const int CANARY = -57005;)
+IF_CANARY_PROTECTION(const int CANARY = -57005;)
 
 typedef enum {
     STACK_OK                = 0,
@@ -19,18 +20,18 @@ typedef enum {
     STACK_DATA_NULL         = 7,
     STACK_BAD_SIZE          = 8,
     STACK_IS_DECTRUCT       = 9,
-    HASH_PROTECTION  (STACK_BAD_HASH   = 10),
-    CANARY_PROTECTION(STACK_BAD_CANARY = 11)
+    IF_HASH_PROTECTION  (STACK_BAD_HASH   = 10),
+    IF_CANARY_PROTECTION(STACK_BAD_CANARY = 11)
 } stack_t_status;
 
 struct Stack_t {
-    CANARY_PROTECTION(int canary_left[1] = { CANARY };)
+    IF_CANARY_PROTECTION(int canary_left[1] = { CANARY };)
     Elem_t* data;
     size_t size_stack;
     size_t capacity;
     stack_t_status stack_status;
     int stack_hash;
-    CANARY_PROTECTION(int canary_right[1] = { CANARY };)
+    IF_CANARY_PROTECTION(int canary_right[1] = { CANARY };)
 };
 
 struct call_of_dump {

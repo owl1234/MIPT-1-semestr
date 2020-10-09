@@ -4,12 +4,11 @@
 #include <string.h>
 #include "stack.h"
 
-const int dimension = 8;
-const long long hash_number = 1000000009;
-const int tabulation_in_probels = 7;
-const char* this_file_name = __FILE__;
+const int DIMENSION = 8;
+const long long HASH_NUMBER = 1000000009;
+const int TABULATION_IN_PROBELS = 7;
 const char* name_log_file = "log.txt";
-const struct call_of_dump base_arguments_of_call = {this_file_name, -1, " "};
+const struct call_of_dump base_arguments_of_call = {__FILE__, -1, " "};
 
 const char* text_stack_t_status[] = {
     "Stack is okey",
@@ -22,32 +21,32 @@ const char* text_stack_t_status[] = {
     "Data is null",
     "Size is bad",
     "Stack is destructed",
-    HASH_PROTECTION("Bad hash of stack"),
-    CANARY_PROTECTION("Canary is killed")
+    IF_HASH_PROTECTION("Bad hash of stack"),
+    IF_CANARY_PROTECTION("Canary is killed")
 };
 
-HASH_PROTECTION(
+#ifdef IF_CANARY_PROTECTION
 int get_hash(Stack_t* node) {
     long long hash_st = 0;
     int size_stack = node->size_stack;
     if(node->stack_status != STACK_EMPTY) {
         for(int i=0; i<=size_stack; ++i) {
-            hash_st = (hash_st + node->data[i] % hash_number)  % hash_number;
+            hash_st = (hash_st + node->data[i] % HASH_NUMBER)  % HASH_NUMBER;
         }
     } else {
-        hash_st = (hash_st + POISON % hash_number)  % hash_number;
+        hash_st = (hash_st + POISON % HASH_NUMBER)  % HASH_NUMBER;
     }
 
-    CANARY_PROTECTION(hash_st = (hash_st + node->canary_left[0] % hash_number) % hash_number;)
-    CANARY_PROTECTION(hash_st = (hash_st + node->canary_right[0] % hash_number) % hash_number;)
+    IF_CANARY_PROTECTION(hash_st = (hash_st + node->canary_left[0]  % HASH_NUMBER) % HASH_NUMBER;)
+    IF_CANARY_PROTECTION(hash_st = (hash_st + node->canary_right[0] % HASH_NUMBER) % HASH_NUMBER;)
 
-    hash_st = (hash_st + node->capacity     % hash_number) % hash_number;
-    hash_st = (hash_st + node->size_stack   % hash_number) % hash_number;
-    hash_st = (hash_st + node->stack_status % hash_number) % hash_number;
+    hash_st = (hash_st + node->capacity     % HASH_NUMBER) % HASH_NUMBER;
+    hash_st = (hash_st + node->size_stack   % HASH_NUMBER) % HASH_NUMBER;
+    hash_st = (hash_st + node->stack_status % HASH_NUMBER) % HASH_NUMBER;
 
     return hash_st;
 }
-)
+#endif // IF_CANARY_PROTECTION
 
 void print_Elem_T(int value, FILE* file) {
     fprintf(file, "%d", value);
@@ -69,7 +68,7 @@ void error_print_data(Stack_t* node, FILE* file) {
     int stack_all_size  = node->capacity;
     int stack_real_size = node->size_stack;
     int len_indent = get_len_indent(node->capacity);
-    const int base_indent = 2 * tabulation_in_probels;
+    const int base_indent = 2 * TABULATION_IN_PROBELS;
 
     if(node->stack_status == STACK_BAD_CAPACITY) {
         fprintf(file, "\n");
@@ -117,7 +116,7 @@ int get_len_indent(size_t number) {
 
 void write_indent(FILE* file, int count_indent) {
     int i = 1;
-    for(; tabulation_in_probels * i < count_indent; i *= tabulation_in_probels) {
+    for(; TABULATION_IN_PROBELS * i < count_indent; i *= TABULATION_IN_PROBELS) {
         fprintf(file, "\t");
     }
     for(; i <= count_indent; ++i) {
@@ -135,7 +134,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     fprintf(log_errors, "\tcapacity   = %ld\n", node->capacity);
     fprintf(log_errors, "\tStatus of stack: %s\n", text_stack_t_status[node->stack_status]);
 
-    CANARY_PROTECTION(
+    #ifdef IF_CANARY_PROTECTION
     fprintf(log_errors, "\tLeft  canary of stack: %d ", node->canary_left[0]);
     if(node->canary_left[0] == CANARY) {
         fprintf(log_errors, "(okey canary)\n");
@@ -148,9 +147,9 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     } else {
         fprintf(log_errors, "(BAD CANARY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)\n");
     }
-    )
+    #endif
 
-    HASH_PROTECTION(fprintf(log_errors, "\tHash: %d\n", node->stack_hash);)
+    IF_HASH_PROTECTION(fprintf(log_errors, "\tHash: %d\n", node->stack_hash);)
     fprintf(log_errors, "\tdata [%p]\n", node->data);
     fprintf(log_errors, "\t{");
     error_print_data(node, log_errors);
@@ -163,46 +162,47 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
 
 struct call_of_dump create_struct(const char* file_name, int number, const char* function_name) {
     struct call_of_dump tmp = {};
-    tmp.name_file      = this_file_name;
+    tmp.name_file      = file_name;
     tmp.number_of_line = number;
     tmp.name_function  = function_name;
     return tmp;
 }
 
+#ifdef IF_DEBUG
 void stack_err(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
     //printf("stack_err: status: %d, line: %d\n", node->stack_status, arguments_of_call.number_of_line);
     if(node == nullptr) {
         node->stack_status = STACK_ERROR;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
     if(node->data == nullptr && node->stack_status != STACK_EMPTY) {
         node->stack_status = STACK_EMPTY;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
     if((node->size_stack) > (node->capacity)) {
         node->stack_status = STACK_OVERFLOW;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
     if(node->size_stack < 0) {
         node->stack_status = STACK_BAD_SIZE;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
     if(node->capacity < 0) {
         node->stack_status = STACK_BAD_CAPACITY;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
 
-    HASH_PROTECTION(
+    IF_HASH_PROTECTION(
     if(node != nullptr && node->data != nullptr && get_hash(node) != node->stack_hash) {
         node->stack_status = STACK_BAD_HASH;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
     )
 
-    CANARY_PROTECTION(
+    IF_CANARY_PROTECTION(
     if(node->canary_left[0] != CANARY || node->canary_right[0] != CANARY) {
         node->stack_status = STACK_BAD_CANARY;
-        stack_dump(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+        stack_dump(node, create_struct(__FILE__, __LINE__, __FUNCTION__));
     }
     )
 
@@ -211,6 +211,7 @@ void stack_err(Stack_t* node, struct call_of_dump arguments_of_call = base_argum
         fell(node);
     }
 }
+#endif
 
 void fell(Stack_t* node) {
     FILE* log_errors = fopen(name_log_file, "a");
@@ -227,28 +228,27 @@ int stack_size(Stack_t* node) {
 }
 
 int stack_capacity(Stack_t* node) {
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     return node->capacity;
 }
 
 void stack_construct(Stack_t* node) {
-    assert(dimension > 0);
     assert(node != nullptr);
 
-    node->data = (Elem_t*)calloc(dimension, sizeof(Elem_t));
+    node->data = (Elem_t*)calloc(DIMENSION, sizeof(Elem_t));
     node->size_stack = 0;
-    node->capacity = dimension;
+    node->capacity = DIMENSION;
     fill_stack_stuff(node);
 
     node->stack_status = STACK_IS_CREATED;
-    HASH_PROTECTION(node->stack_hash = get_hash(node);)
+    IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 }
 
 void stack_destruct(Stack_t* node) {
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     free(node->data);
     node->size_stack = POISON;
@@ -258,20 +258,20 @@ void stack_destruct(Stack_t* node) {
 }
 
 bool stack_is_empty(Stack_t* node){
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     int size_of_stack = stack_size(node);
     if(size_of_stack == 0) {
         node->stack_status = STACK_EMPTY;
     }
 
-    HASH_PROTECTION(node->stack_hash = get_hash(node);)
+    IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
     return (size_of_stack == 0);
 }
 
 void stack_resize(Stack_t* node) {
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
     assert(node->capacity >= stack_size(node));
 
     Elem_t* new_data = (Elem_t*)realloc(node->data, stack_capacity(node) * 2 * sizeof(Elem_t) + 1);
@@ -281,9 +281,9 @@ void stack_resize(Stack_t* node) {
     assert(new_data != nullptr);
     node->data = new_data;
 
-    HASH_PROTECTION(node->stack_hash = get_hash(node);)
+    IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 }
 
 void fill_stack_stuff(Stack_t* node) {
@@ -298,7 +298,7 @@ void fill_stack_stuff(Stack_t* node) {
 }
 
 void stack_push(Stack_t* node, Elem_t value) { //////////////////////////// STACK ELEM T VALUE
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     if(node->size_stack >= node->capacity) {
         stack_resize(node);
@@ -310,13 +310,13 @@ void stack_push(Stack_t* node, Elem_t value) { //////////////////////////// STAC
     if(node->stack_status == STACK_IS_CREATED) {
         node->stack_status = STACK_OK;
     }
-    HASH_PROTECTION(node->stack_hash = get_hash(node);)
+    IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 }
 
 void stack_pop(Stack_t* node) {
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__)); //, {name_file, 280, "StackPop"});
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     if(node->stack_status == STACK_EMPTY && stack_is_empty(node)) {
         printf("Don't delete end element from stack\n");
@@ -330,13 +330,13 @@ void stack_pop(Stack_t* node) {
         --(node->size_stack);
     }
 
-    HASH_PROTECTION(node->stack_hash = get_hash(node);)
+    IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 }
 
 Elem_t stack_back(Stack_t* node) {
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     if(stack_is_empty(node)) {
         printf("Don't delete end element from stack\n");
@@ -347,7 +347,7 @@ Elem_t stack_back(Stack_t* node) {
 }
 
 void stack_clear(Stack_t* node) {
-    stack_err(node, create_struct(this_file_name, __LINE__, __FUNCTION__));
+    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     free(node->data);
     node->data = nullptr;
@@ -355,7 +355,7 @@ void stack_clear(Stack_t* node) {
     node->size_stack = 0;
     node->stack_status = STACK_EMPTY;
 
-    HASH_PROTECTION(node->stack_hash =  0;)
+    IF_HASH_PROTECTION(node->stack_hash =  0;)
 }
 
 void clear_file(const char* file_log_name) {
