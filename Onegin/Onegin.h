@@ -23,7 +23,7 @@ int sorting(const int argc, const char* argv[]);
 
 int size_of_buffer(FILE* file);
 
-void read_buffer(FILE* file, struct file_variables* file_vars, int size_buffer, int* lines);
+int read_buffer(struct file_variables* file_vars, int* lines);
 
 /**
 *   \brief This function calculates number of lines in the file
