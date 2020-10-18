@@ -5,9 +5,6 @@
 #include "common.h"
 #include "disassembler.h"
 
-const char* name_input_file_disass  = "input_disass.txt";
-const char* name_output_file_disass = "output_disass.txt";
-
 void disassembling_file() {
     File input_file = {};
     int status = file_construct(&input_file, name_input_file_disass);
@@ -129,8 +126,4 @@ int create_disassembling_file(const char* disassembled_text, const int index_in_
     }
 
     return OK_FILE;
-}
-
-int main() {
-    disassembling_file();
 }

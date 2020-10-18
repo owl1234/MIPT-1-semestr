@@ -7,9 +7,6 @@
 #include "assembler.h"
 #include "common.h"
 
-const char* name_input_file_ass  = "input_ass.txt";
-const char* name_output_file_ass = "output_ass.txt";
-
 void assembling_file() {
     File input_file = {};
     int status = file_construct(&input_file, name_input_file_ass);
@@ -137,11 +134,4 @@ int reversed_number(int value, int* length) {
     }
 
     return reverse_number;
-}
-
-
-int main() {
-    assembling_file();
-
-    return 0;
 }
