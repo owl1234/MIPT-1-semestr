@@ -19,7 +19,7 @@ void assembling_file() {
 
     char symbol = '!';
     char temp_string[MAX_SIZE] = {};
-    int now_pos_symbol = 0;
+    int now_pos_symbol = 0, code_of_last_command = -1;
 
     char* assembled_text = (char*)calloc(MAX_SIZE * input_file.lines, sizeof(char));
     int index_in_assembled_text = 0;
@@ -30,39 +30,70 @@ void assembling_file() {
         if(isspace(temp_string[now_pos_symbol++])) {
             if(!is_right_command(temp_string, "push")) {
                 // printf("yes of push........\n");
-                put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, &index_in_assembled_text, NOT_END_LINE);
+                code_of_last_command = OPERATION_CODE_PUSH;
                 now_pos_symbol = 0;
                 //return;
             } else if(!is_right_command(temp_string, "pop")) {
                 // printf("yes of pop........\n");
-                put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text);
+
+                if(input_file.text[i] == '\n') {
+                    printf("AAAAAAAAAAAAAAAAAa\n");
+                    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text, NOT_END_LINE);
+                    put_int_into_assembled_text(0, assembled_text, &index_in_assembled_text, END_LINE);
+                } else {
+                    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text, NOT_END_LINE);
+                }
+
+                code_of_last_command = OPERATION_CODE_POP;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "add")) {
                 // printf("yes of add........\n");
-                put_int_into_assembled_text(OPERATION_CODE_ADD, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_ADD, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_ADD;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "sub")) {
                 // printf("yes of sub........\n");
-                put_int_into_assembled_text(OPERATION_CODE_SUB, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_SUB, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_SUB;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "mul")) {
                 // printf("yes of mul........\n");
-                put_int_into_assembled_text(OPERATION_CODE_MUL, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_MUL, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_MUL;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "div")) {
                 // printf("yes of div........\n");
-                put_int_into_assembled_text(OPERATION_CODE_DIV, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_DIV, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_DIV;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "out")) {
                 // printf("yes of out........\n");
-                put_int_into_assembled_text(OPERATION_CODE_OUT, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_OUT, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_OUT;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "hlt")) {
                 // printf("yes of hlt........\n");
-                put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, &index_in_assembled_text);
+                put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_HLT;
                 now_pos_symbol = 0;
-            } else {
+            } else if(!is_right_command(temp_string, "rax")) {
+                work_with_registers(code_of_last_command, RAX, assembled_text, &index_in_assembled_text);
+                now_pos_symbol = 0;
+            } else if(!is_right_command(temp_string, "rbx")) {
+                work_with_registers(code_of_last_command, RBX, assembled_text, &index_in_assembled_text);
+                now_pos_symbol = 0;
+            } else if(!is_right_command(temp_string, "rcx")) {
+                work_with_registers(code_of_last_command, RCX, assembled_text, &index_in_assembled_text);
+                now_pos_symbol = 0;
+            } else if(!is_right_command(temp_string, "rdx")) {
+                work_with_registers(code_of_last_command, RDX, assembled_text, &index_in_assembled_text);
+                now_pos_symbol = 0;
+            }
+            else {
+                put_int_into_assembled_text(0, assembled_text, &index_in_assembled_text, NOT_END_LINE);
                 put_char_into_assembled_text(temp_string, now_pos_symbol, assembled_text, &index_in_assembled_text);
+                // put_char_into_assembled_text("\n", 1, assembled_text, &index_in_assembled_text);
                 if(input_file.text[i] == '\n') {
                     now_pos_symbol = 0;
                 }
@@ -79,7 +110,7 @@ void assembling_file() {
     printf("End to assembling file...........................................\n");
 }
 
-void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index) {
+void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index, int flag_of_the_end_line) {
     int length_code = 0;
     int reverse_code = reversed_number(code_of_operation, &length_code);
 
@@ -89,7 +120,7 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
         ++(*index);
     }
 
-    if(NUMBER_ARGUMENTS_FOR_OPERATION[code_of_operation] == 0) {
+    if(flag_of_the_end_line == END_LINE) {
         put_char_into_assembled_text("\n", 1, assembled_text, index);
     } else {
         put_char_into_assembled_text(" ", 1, assembled_text, index);
@@ -134,4 +165,14 @@ int reversed_number(int value, int* length) {
     }
 
     return reverse_number;
+}
+
+void work_with_registers(int last_operation_code, int registr, char* assembled_text, int* index_in_assembled_text) {
+    put_int_into_assembled_text(1, assembled_text, index_in_assembled_text, NOT_END_LINE);
+    put_int_into_assembled_text(registr, assembled_text, index_in_assembled_text, NOT_END_LINE);
+    put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text);
+}
+
+int main() {
+    assembling_file();
 }

@@ -16,6 +16,8 @@ const char name_output_file_disass[] = "output_disass.txt";
 const int MAX_SIZE = 10;
 const int ERROR_NUMBER = -3802;
 const int OK_FILE = 0;
+const int number_of_register_vars = 4;
+const int number_of_commands = 9;
 
 struct File {
     FILE* ptr_to_file;

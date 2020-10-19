@@ -318,7 +318,6 @@ void stack_push(Stack_t* node, Elem_t value) { //////////////////////////// STAC
     }
 
     node->data[node->size_stack] = value;
-    //printf("\tpush): value: %lg, %lg\n", value, node->data[node->size_stack]);
     ++(node->size_stack);
 
     if(node->stack_status == STACK_IS_CREATED) {

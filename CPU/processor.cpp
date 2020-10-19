@@ -5,33 +5,64 @@
 #include "stack.h"
 #include "processor.h"
 
+void print_regs(Elem_t* registers_variables, int number_of_register_vars) {
+    for(int i=0; i<number_of_register_vars; ++i)
+        printf("%lg ", registers_variables[i]);
+    printf("\n");
+}
+
 void file_handler(File file) {
+    int status = check_commands();
+    if(status == ERROR_NUMBER) {
+        return;
+    }
+
     Stack_t proc_stack = {};
     stack_construct(&proc_stack);
 
-    printf("%s\n", file.name);
+    Elem_t* registers_variables = (Elem_t*)calloc(number_of_register_vars, sizeof(Elem_t));
+
     int now_command = -1;
     double now_value = 0.0;
-    char string_double_value[MAX_SIZE] = "";
+    char push_value[MAX_SIZE] = "";
 
-    Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0;
+    Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0;
+    int flag_of_registers = -1, number_of_register = -1;
 
     while(now_command != 0) {
-        sscanf(file.text, "%i", &now_command);
+        sscanf(file.text, "%d", &now_command);
         file.text += length_of_number(now_command) + 1; // move_ptr(now_command)
 
         if(now_command == OPERATION_CODE_HLT) {
             printf("End of work (hlt!)\n");
+            print_regs(registers_variables, number_of_register_vars);
             break;
         } else if(now_command == OPERATION_CODE_PUSH) {
-            sscanf(file.text, "%s", string_double_value);
-            file.text += strlen(string_double_value) + 1;
+            sscanf(file.text, "%d", &flag_of_registers);
+            file.text += length_of_number(flag_of_registers) + 1; // move_ptr(now_command)
 
-            now_value = string_to_double(string_double_value);
-            stack_push(&proc_stack, now_value);
+            if(flag_of_registers == 1) {
+                sscanf(file.text, "%d", &number_of_register);
+                file.text += length_of_number(number_of_register) + 1;
+                push_in_registers(number_of_register, registers_variables, &proc_stack);
+            } else {
+                sscanf(file.text, "%s", push_value);
+                file.text += strlen(push_value) + 1;
+                now_value = string_to_double(push_value);
+                stack_push(&proc_stack, now_value);
+            }
         } else if(now_command == OPERATION_CODE_POP) {
-            back_element = stack_back(&proc_stack);
-            stack_pop(&proc_stack);
+            sscanf(file.text, "%d", &flag_of_registers);
+            file.text += length_of_number(flag_of_registers) + 1; // move_ptr(now_command)
+
+            if(flag_of_registers == 1) {
+                sscanf(file.text, "%d", &number_of_register);
+                file.text += length_of_number(number_of_register) + 1;
+                pop_in_registers(number_of_register, registers_variables, &proc_stack);
+            } else {
+                back_element = stack_back(&proc_stack);
+                stack_pop(&proc_stack);
+            }
         } else if(now_command == OPERATION_CODE_ADD) {
             last = stack_back(&proc_stack);
             stack_pop(&proc_stack);
@@ -65,13 +96,24 @@ void file_handler(File file) {
 
             stack_push(&proc_stack, penultimate / last);
         } else if(now_command == OPERATION_CODE_OUT) {
-            printf("%lg\n", stack_back(&proc_stack));
+            if(proc_stack.size_stack == 0) {
+                printf("Stack is empty\n");
+            } else {
+                printf("%lg\n", stack_back(&proc_stack));
+            }
+        } else if(now_command == OPERATION_CODE_IN) {
+            scanf("%lg", input_value);
+            stack_push(&proc_stack, input_value);
         } else {
             printf("popados (%d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command);
             abort();
         }
-        //printf("    hellooooooooooooooooooooooooooo\n");
     }
+}
+
+int check_commands() {
+    printf("%d\n", (TEXT_OPERATION));
+    return ERROR_NUMBER;
 }
 
 int length_of_number(int value) {
@@ -94,8 +136,6 @@ void move_ptr(char* text, int value) {
 
 void move_ptr(char* text, char* value) {
     text += strlen(value);
-    //printf("strlen: %d\n", strlen(value));
-    //printf("text: %s\n-------------------------------------------------------------\n", text);
 }
 
 double string_to_double(char* text) {
@@ -125,5 +165,24 @@ double string_to_double(char* text) {
     }
 
     return whole_part;
+}
 
+void push_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
+    registers_variables[registr] = stack_back(proc_stack);
+}
+
+void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
+    registers_variables[registr] = stack_back(proc_stack);
+    stack_pop(proc_stack);
+}
+
+int main() {
+    File input_file = {};
+
+        int status = file_construct(&input_file, name_output_file_ass);
+        if(status != OK_FILE) {
+            return ERROR_NUMBER;
+        }
+
+        file_handler(input_file);
 }
