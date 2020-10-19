@@ -173,6 +173,8 @@ void work_with_registers(int last_operation_code, int registr, char* assembled_t
     put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text);
 }
 
+/*
 int main() {
     assembling_file();
 }
+*/

@@ -176,6 +176,7 @@ void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_st
     stack_pop(proc_stack);
 }
 
+/*
 int main() {
     File input_file = {};
 
@@ -186,3 +187,4 @@ int main() {
 
         file_handler(input_file);
 }
+*/

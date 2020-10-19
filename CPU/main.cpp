@@ -3,7 +3,7 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  October 18, 2020, 19:35:00
+ *                  October 19, 2020, 18:04:25
  *  @par What was changed?
  *                      Added a main file that starts assembly, disassembly or computation depending on command line parameters
  */
