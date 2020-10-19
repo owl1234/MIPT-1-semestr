@@ -6,6 +6,8 @@
 #define IF_DEBUG(code) //code
 
 typedef double Elem_t;
+const char identity[] = "%lg";
+
 const int POISON = -3802;
 IF_CANARY_PROTECTION(const int CANARY = -57005;)
 

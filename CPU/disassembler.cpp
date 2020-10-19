@@ -26,7 +26,6 @@ void disassembling_file() {
     for(int i=0; i<input_file.information.st_size; ++i) {
         temp_string[now_pos_symbol] = input_file.text[i];
 
-        // printf("i: %d, index: %d, flag_of_the_command: %d\n", i, now_pos_symbol, flag_of_the_command);
         if(isspace(temp_string[now_pos_symbol++])) {
             if(!is_right_command(temp_string, "1") && !flag_of_the_command) {
                 // printf("yes of push........\n");

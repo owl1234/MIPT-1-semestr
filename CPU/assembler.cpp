@@ -29,16 +29,12 @@ void assembling_file() {
 
         if(isspace(temp_string[now_pos_symbol++])) {
             if(!is_right_command(temp_string, "push")) {
-                // printf("yes of push........\n");
                 put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, &index_in_assembled_text, NOT_END_LINE);
                 code_of_last_command = OPERATION_CODE_PUSH;
                 now_pos_symbol = 0;
-                //return;
             } else if(!is_right_command(temp_string, "pop")) {
-                // printf("yes of pop........\n");
 
                 if(input_file.text[i] == '\n') {
-                    printf("AAAAAAAAAAAAAAAAAa\n");
                     put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text, NOT_END_LINE);
                     put_int_into_assembled_text(0, assembled_text, &index_in_assembled_text, END_LINE);
                 } else {
@@ -48,32 +44,26 @@ void assembling_file() {
                 code_of_last_command = OPERATION_CODE_POP;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "add")) {
-                // printf("yes of add........\n");
                 put_int_into_assembled_text(OPERATION_CODE_ADD, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_ADD;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "sub")) {
-                // printf("yes of sub........\n");
                 put_int_into_assembled_text(OPERATION_CODE_SUB, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_SUB;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "mul")) {
-                // printf("yes of mul........\n");
                 put_int_into_assembled_text(OPERATION_CODE_MUL, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_MUL;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "div")) {
-                // printf("yes of div........\n");
                 put_int_into_assembled_text(OPERATION_CODE_DIV, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_DIV;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "out")) {
-                // printf("yes of out........\n");
                 put_int_into_assembled_text(OPERATION_CODE_OUT, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_OUT;
                 now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "hlt")) {
-                // printf("yes of hlt........\n");
                 put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_HLT;
                 now_pos_symbol = 0;
@@ -93,7 +83,6 @@ void assembling_file() {
             else {
                 put_int_into_assembled_text(0, assembled_text, &index_in_assembled_text, NOT_END_LINE);
                 put_char_into_assembled_text(temp_string, now_pos_symbol, assembled_text, &index_in_assembled_text);
-                // put_char_into_assembled_text("\n", 1, assembled_text, &index_in_assembled_text);
                 if(input_file.text[i] == '\n') {
                     now_pos_symbol = 0;
                 }

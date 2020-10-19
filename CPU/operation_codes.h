@@ -39,6 +39,7 @@ const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
     0,
     0,
     0,
+    0,
     0
 };
 

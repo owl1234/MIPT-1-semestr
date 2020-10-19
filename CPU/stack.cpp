@@ -1,13 +1,3 @@
-/**
- *  @file
- *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
- *  @version 1.0
- *  @par Last edition
- *                  October 19, 2020, 18:04:25
- *  @par What was changed?
- *                      Call the function stack_err is wrapped in a macro
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
