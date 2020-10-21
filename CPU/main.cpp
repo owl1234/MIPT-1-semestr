@@ -3,9 +3,9 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  October 21, 2020, 09:42:25
+ *                  October 21, 2020, 13:33:25
  *  @par What was changed?
- *                      1. Add the 'in' command
+ *                      1. The disassembler works!
  */
 
 #include <stdio.h>

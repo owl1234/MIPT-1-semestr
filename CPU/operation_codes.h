@@ -31,6 +31,13 @@ const char TEXT_OPERATION[][5] = {
     "in"
 };
 
+const char TEXT_REGISTERS[][4] = {
+    "rax",
+    "rbx",
+    "rcx",
+    "rdx"
+};
+
 const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
     0,
     2,

@@ -9,7 +9,7 @@ int is_right_command(const char* line, const char* command) {
 
     for(int i=0; i<length_command; ++i) {
         if(command[i] != line[i]) {
-            return -1;
+            return 1;
         }
     }
 

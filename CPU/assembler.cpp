@@ -104,20 +104,20 @@ void assembling_file() {
     printf("End to assembling file...........................................\n");
 }
 
-void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index, int flag_of_the_end_line) {
+void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int flag_of_the_end_line) {
     int length_code = 0;
     int reverse_code = reversed_number(code_of_operation, &length_code);
 
     for(int i=0; i<length_code; ++i) {
-        assembled_text[*index] = (reverse_code % 10 + 48);
+        assembled_text[*index_in_assembled_text] = (reverse_code % 10 + 48);
         reverse_code /= 10;
-        ++(*index);
+        ++(*index_in_assembled_text);
     }
 
     if(flag_of_the_end_line == END_LINE) {
-        put_char_into_assembled_text("\n", 1, assembled_text, index);
+        put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text);
     } else {
-        put_char_into_assembled_text(" ", 1, assembled_text, index);
+        put_char_into_assembled_text(" ", 1, assembled_text, index_in_assembled_text);
     }
 }
 
