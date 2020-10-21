@@ -16,7 +16,7 @@ void print_regs(Elem_t* registers_variables, int number_of_register_vars) {
 }
 
 void file_handler(File file) {
-    printf("file: %s\n", file.name);
+    printf("Input file: %s\n", file.name);
     int status = check_commands();
     if(status == ERROR_NUMBER) {
         return;
@@ -40,10 +40,6 @@ void file_handler(File file) {
 
         if(now_command == OPERATION_CODE_HLT) {
             printf("End of work (hlt!)\n");
-            printf(identity, registers_variables[0]);
-            printf("\n");
-
-            print_regs(registers_variables, number_of_register_vars);
             break;
         } else if(now_command == OPERATION_CODE_PUSH) {
             proc_push(&file, push_value, &proc_stack, registers_variables);
@@ -61,11 +57,12 @@ void file_handler(File file) {
             if(proc_stack.size_stack == 0) {
                 printf("Stack is empty\n");
             } else {
+                printf("Answer: ");
                 printf(identity, stack_back(&proc_stack));
                 printf("\n");
             }
         } else if(now_command == OPERATION_CODE_IN) {
-            scanf(identity, input_value);
+            scanf(identity, &input_value);
             stack_push(&proc_stack, input_value);
         } else {
             printf("popados (%d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command);
@@ -128,7 +125,7 @@ double string_to_double(char* text) {
 }
 
 void push_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
-    registers_variables[registr] = stack_back(proc_stack);
+    stack_push(proc_stack, registers_variables[registr]);
 }
 
 void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
@@ -196,11 +193,12 @@ void proc_arifmetics(Stack_t* proc_stack, int operation_code) {
 int main() {
     File input_file = {};
 
-        int status = file_construct(&input_file, name_output_file_ass);
-        if(status != OK_FILE) {
-            return ERROR_NUMBER;
-        }
+    int status = file_construct(&input_file, name_output_file_ass);
+    if(status != OK_FILE) {
+        return ERROR_NUMBER;
+    }
 
-        file_handler(input_file);
+    file_handler(input_file);
+    return 0;
 }
 */

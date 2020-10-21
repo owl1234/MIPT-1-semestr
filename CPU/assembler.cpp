@@ -63,10 +63,15 @@ void assembling_file() {
                 put_int_into_assembled_text(OPERATION_CODE_OUT, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_OUT;
                 now_pos_symbol = 0;
+            } else if(!is_right_command(temp_string, "in")) {
+                put_int_into_assembled_text(OPERATION_CODE_IN, assembled_text, &index_in_assembled_text, END_LINE);
+                code_of_last_command = OPERATION_CODE_IN;
+                now_pos_symbol = 0;
             } else if(!is_right_command(temp_string, "hlt")) {
                 put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, &index_in_assembled_text, END_LINE);
                 code_of_last_command = OPERATION_CODE_HLT;
                 now_pos_symbol = 0;
+                break;
             } else if(!is_right_command(temp_string, "rax")) {
                 work_with_registers(code_of_last_command, RAX, assembled_text, &index_in_assembled_text);
                 now_pos_symbol = 0;
@@ -158,8 +163,7 @@ int reversed_number(int value, int* length) {
 
 void work_with_registers(int last_operation_code, int registr, char* assembled_text, int* index_in_assembled_text) {
     put_int_into_assembled_text(1, assembled_text, index_in_assembled_text, NOT_END_LINE);
-    put_int_into_assembled_text(registr, assembled_text, index_in_assembled_text, NOT_END_LINE);
-    put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text);
+    put_int_into_assembled_text(registr, assembled_text, index_in_assembled_text, END_LINE);
 }
 
 /*

@@ -3,11 +3,9 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  October 19, 2020, 19:34:25
+ *                  October 21, 2020, 09:42:25
  *  @par What was changed?
- *                      1. The classifier of double (Elem_t) is placed in a separate variable
- *                      2. Arifmetic operations with values of the stack is placed in a separate function
- *                      3. A check was made for variables associated with commands (place in operation_codes.h)
+ *                      1. Add the 'in' command
  */
 
 #include <stdio.h>
