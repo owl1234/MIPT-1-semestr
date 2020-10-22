@@ -4,6 +4,7 @@
 #include "common.h"
 #include "stack.h"
 #include "processor.h"
+#include <unistd.h>
 
 // #define connect_strings(first, second) first ## second
 
@@ -32,20 +33,28 @@ void file_handler(File file) {
     char push_value[MAX_SIZE] = "";
 
     Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0;
-    int flag_of_registers = -1, number_of_register = -1;
+    int flag_of_registers = -1, number_of_register = -1, now_byte = 0;
 
     while(now_command != 0) {
         sscanf(file.text, "%d", &now_command);
+        sleep(1);
+        printf("now_command: %d, now_byte:  %d\n", now_command, now_byte);
+        //index_in_text += length_of_number(now_command) + 1;
         file.text += length_of_number(now_command) + 1;
 
         if(now_command == OPERATION_CODE_HLT) {
             printf("End of work (hlt!)\n");
             break;
         } else if(now_command == OPERATION_CODE_PUSH) {
-            proc_push(&file, push_value, &proc_stack, registers_variables);
+            proc_push(&file, push_value, &now_byte, &proc_stack);
+        } else if(now_command == OPERATION_CODE_PUSH_IN_REGISTR) {
+            push_in_registers(&file, OPERATION_CODE_PUSH_IN_REGISTR, registers_variables, &now_byte, &proc_stack);
         } else if(now_command == OPERATION_CODE_POP) {
-            proc_pop(&file, &proc_stack, registers_variables);
+            proc_pop(&file, &proc_stack);
+        } else if(now_command / 10 == OPERATION_CODE_POP && now_command % 10 < number_of_register) {
+            pop_in_registers(now_command % 10, registers_variables, &proc_stack);
         } else if(now_command == OPERATION_CODE_ADD) {
+            printf("Add\n");
             proc_arifmetics(&proc_stack, OPERATION_CODE_ADD);
         } else if(now_command == OPERATION_CODE_SUB) {
             proc_arifmetics(&proc_stack, OPERATION_CODE_SUB);
@@ -64,10 +73,14 @@ void file_handler(File file) {
         } else if(now_command == OPERATION_CODE_IN) {
             scanf(identity, &input_value);
             stack_push(&proc_stack, input_value);
+        } else if(now_command == OPERATION_CODE_JMP) {
+            proc_jmp(&file, &now_byte);
         } else {
             printf("popados (%d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command);
             abort();
         }
+
+        ++now_byte;
     }
 }
 
@@ -124,8 +137,15 @@ double string_to_double(char* text) {
     return whole_part;
 }
 
-void push_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
-    stack_push(proc_stack, registers_variables[registr]);
+void push_in_registers(File* file, int code_operation, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack) {
+    char number[MAX_SIZE] = "";
+    sscanf(file->text, "%s", number);
+
+    double registr = string_to_double(number);
+    ++(*now_byte);
+    file->text += strlen(number);
+    registers_variables[code_operation % 10] = registr;
+    //stack_push(proc_stack, registers_variables[registr]);
 }
 
 void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
@@ -133,42 +153,24 @@ void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_st
     stack_pop(proc_stack);
 }
 
-void proc_push(File* file, char* push_value, Stack_t* proc_stack, Elem_t* registers_variables) {
+void proc_push(File* file, char* push_value, int* now_byte, Stack_t* proc_stack) {
     int flag_of_registers = -1, number_of_register = -1;
     double now_value = 0.0;
 
-    sscanf(file->text, "%d", &flag_of_registers);
-    file->text += length_of_number(flag_of_registers) + 1;
+    sscanf(file->text, "%s", push_value);
+    ++(*now_byte);
+    file->text += strlen(push_value) + 1;
 
-    if(flag_of_registers == IS_REGISTER) {
-        sscanf(file->text, "%d", &number_of_register);
-        file->text += length_of_number(number_of_register) + 1;
-
-        push_in_registers(number_of_register, registers_variables, proc_stack);
-    } else {
-        sscanf(file->text, "%s", push_value);
-        file->text += strlen(push_value) + 1;
-
-        now_value = string_to_double(push_value);
-        stack_push(proc_stack, now_value);
-    }
+    now_value = string_to_double(push_value);
+    stack_push(proc_stack, now_value);
+    printf("push_value: %lg\n", now_value);
 }
 
-void proc_pop(File* file, Stack_t* proc_stack, Elem_t* registers_variables) {
-    int flag_of_registers = 0, number_of_register = 0;
+void proc_pop(File* file, Stack_t* proc_stack) {
     double back_element = 0.0;
 
-    sscanf(file->text, "%d", &flag_of_registers);
-    file->text += length_of_number(flag_of_registers) + 1;
-
-    if(flag_of_registers == 1) {
-        sscanf(file->text, "%d", &number_of_register);
-        file->text += length_of_number(number_of_register) + 1;
-        pop_in_registers(number_of_register, registers_variables, proc_stack);
-    } else {
-        back_element = stack_back(proc_stack);
-        stack_pop(proc_stack);
-    }
+    back_element = stack_back(proc_stack);
+    stack_pop(proc_stack);
 }
 
 void proc_arifmetics(Stack_t* proc_stack, int operation_code) {
@@ -189,14 +191,46 @@ void proc_arifmetics(Stack_t* proc_stack, int operation_code) {
     }
 }
 
+void proc_jmp(File* file, int* now_byte) {
+    int address_label = 0;
+    sscanf(file->text, "%d", &address_label);
+
+    ++(*now_byte);
+
+    //printf("labeL: %d, now_byte: %d\n", address_label, *now_byte);
+    *now_byte = 0;
+
+    file->text = file->copy_of_text;
+
+    while(*now_byte < address_label) {
+        while(*(file->text) != ' ' && *(file->text) != '\n')
+            ++(file->text);
+        ++(file->text);
+        ++(*now_byte);
+    }
+
+    /*while(*now_byte > address_label) {
+        printf("index_text: %d, text: %s, now_symbol: %c\n", *now_byte, file->text, *(file->text));
+        while(*(file->text) != ' ' && *(file->text) != '\n')
+            --(file->text);
+        --(file->text);
+        --(*now_byte);
+    }
+    --(file->text);*/
+    //printf("text: %s\n\n", file->text);
+}
+
 /*
 int main() {
     File input_file = {};
 
     int status = file_construct(&input_file, name_output_file_ass);
+    printf("ame: %s\n", name_output_file_ass);
     if(status != OK_FILE) {
         return ERROR_NUMBER;
     }
+
+    printf("%s\n", input_file.copy_of_text);
 
     file_handler(input_file);
     return 0;

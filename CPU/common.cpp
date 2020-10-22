@@ -39,7 +39,8 @@ int file_construct(File* file, const char* name_file) {
     file->name = name_file;
     stat(file->name, &(file->information));
 
-    file->text = (char*)calloc(file->information.st_size + 2, sizeof(char));
+    file->text         = (char*)calloc(file->information.st_size + 2, sizeof(char));
+    file->copy_of_text = (char*)calloc(file->information.st_size + 2, sizeof(char));
 
     file->ptr_to_file = fopen(file->name, "r");
     int status = fread(file->text, sizeof(char), file->information.st_size, file->ptr_to_file);
@@ -48,6 +49,7 @@ int file_construct(File* file, const char* name_file) {
         return ERROR_NUMBER;
     }
 
+    strcpy(file->copy_of_text, file->text);
     fclose(file->ptr_to_file);
 
     file->lines = number_of_symbols(file->text, '\n');

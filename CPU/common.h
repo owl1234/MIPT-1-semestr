@@ -19,6 +19,8 @@ const int number_of_register_vars = 4;
 const int number_of_commands = 9;
 const int IS_REGISTER = 1;
 
+const char SEPARATORS[] = "\n ";
+
 enum FLAGS_OF_THE_END_LINE {
     END_LINE = 0,
     NOT_END_LINE = 1
@@ -28,8 +30,14 @@ struct File {
     FILE* ptr_to_file;
     const char* name;
     char* text;
+    char* copy_of_text;
     int lines;
     struct stat information;
+};
+
+struct Label {
+    char* name;
+    int address;
 };
 
 #endif // COMMON_H
