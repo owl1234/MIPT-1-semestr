@@ -57,68 +57,19 @@ void assembling_file() {
 
 void find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
                                                                                             Label* jump_byte_position, int* index_in_jump_byte_position) {
-    if(!is_right_command(text, "push")) {
-        put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
+    int number_of_condition = 0;
 
-        text = strtok(NULL, SEPARATORS);
-
-        if(type_of_value(text) == IS_REGISTER) {
-            put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-            put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-        } else {
-            put_int_into_assembled_text(IS_ELEM_T, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-            put_char_into_assembled_text(text, strlen(text), assembled_text, index_in_assembled_text, number_of_byte);
-            put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text, number_of_byte);
-        }
-    } else if(!is_right_command(text, "pop")) {
-        put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-
-        text = strtok(NULL, SEPARATORS);
-
-        if(type_of_value(text) == IS_REGISTER) {
-            put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-            put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-        } else {
-            put_int_into_assembled_text(NOT_ARGS, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-            find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, jump_byte_position, index_in_jump_byte_position);
-        }
-    } else if(!is_right_command(text, "hlt")) {
+    if(!strcmp(text, "push")) {
+        assembler_push(text, assembled_text, index_in_assembled_text, number_of_byte);
+    } else if(!strcmp(text, "pop")) {
+        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, jump_byte_position, index_in_jump_byte_position);
+    } else if(!strcmp(text, "hlt")) {
         put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
         return;
-    } else if(!is_right_command(text, "jmp") || !is_right_command(text, "je")) {
-        if(!is_right_command(text, "jmp")) {
-            put_int_into_assembled_text(OPERATION_CODE_JMP, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-        } else {
-            put_int_into_assembled_text(OPERATION_CODE_JE, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-        }
-        text = strtok(NULL, SEPARATORS);
-
-        jump_byte_position[*index_in_jump_byte_position].name = text;
-        jump_byte_position[(*index_in_jump_byte_position)++].address = *index_in_assembled_text;
-        put_int_into_assembled_text(MAX_SIZE, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-    } else if(!is_right_command(text, "cmp")) {
-        put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-
-        text = strtok(NULL, SEPARATORS);
-
-        int type_of_argument = type_of_value(text);
-        put_int_into_assembled_text(type_of_argument, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-        if(type_of_argument == IS_REGISTER) {
-            put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-        } else {
-            put_char_into_assembled_text(text, strlen(text), assembled_text, index_in_assembled_text, number_of_byte);
-            put_char_into_assembled_text(" ", 1, assembled_text, index_in_assembled_text, number_of_byte);
-        }
-
-        text = strtok(NULL, SEPARATORS);
-        type_of_argument = type_of_value(text);
-        put_int_into_assembled_text(type_of_argument, assembled_text, index_in_assembled_text, number_of_byte, NOT_END_LINE);
-        if(type_of_argument == IS_REGISTER) {
-            put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-        } else {
-            put_char_into_assembled_text(text, strlen(text), assembled_text, index_in_assembled_text, number_of_byte);
-            put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text, number_of_byte);
-        }
+    } else if(is_text_connected_with_labels(text, &number_of_condition)) {
+        assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, jump_byte_position, index_in_jump_byte_position, number_of_condition);
+    } else if(!strcmp(text, "cmp")) {
+        assembler_cmp(text, assembled_text, index_in_assembled_text, number_of_byte);
     } else {
         for(int operation_code = OPERATION_CODE_ADD; operation_code<number_of_commands; ++operation_code) {
             if(!strcmp(text, TEXT_OPERATION[operation_code])) {
@@ -134,6 +85,67 @@ void find_and_write_command(char* text, char* assembled_text, int* index_in_asse
     }
 }
 
+void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+    put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
+    text = strtok(NULL, SEPARATORS);
+
+    if(type_of_value(text) == IS_REGISTER) {
+        put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+    } else {
+        put_int_into_assembled_text(IS_ELEM_T, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+        put_char_into_assembled_text(text, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+    }
+}
+
+void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
+                                                                                            Label* jump_byte_position, int* index_in_jump_byte_position) {
+    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
+    text = strtok(NULL, SEPARATORS);
+
+    if(type_of_value(text) == IS_REGISTER) {
+        put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+    } else {
+        put_int_into_assembled_text(NOT_ARGS, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, jump_byte_position, index_in_jump_byte_position);
+    }
+}
+
+void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+    put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
+    put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
+    put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+}
+
+void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* jump_byte_position, int* index_in_jump_byte_position, int number_of_condition) {
+    put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+    number_of_condition = -1;
+
+    text = strtok(NULL, SEPARATORS);
+
+    jump_byte_position[*index_in_jump_byte_position].name = text;
+    jump_byte_position[(*index_in_jump_byte_position)++].address = *index_in_assembled_text;
+    put_int_into_assembled_text(MAX_SIZE, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+}
+
+void put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, int end_of_line) {
+    text = strtok(NULL, SEPARATORS);
+
+    int type_of_argument = type_of_value(text);
+    put_int_into_assembled_text(type_of_argument, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
+    if(type_of_argument == IS_REGISTER) {
+        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, end_of_line);
+    } else {
+        put_char_into_assembled_text(text, assembled_text, index_in_assembled_text, number_of_byte, end_of_line);
+    }
+}
+
 void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, int flag_of_the_end_line) {
     int length_code = 0;
     int reverse_code = reversed_number(code_of_operation, &length_code);
@@ -145,9 +157,9 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
     }
 
     if(flag_of_the_end_line == END_LINE) {
-        put_char_into_assembled_text("\n", 1, assembled_text, index_in_assembled_text, number_of_byte);
-    } else {
-        put_char_into_assembled_text(" ", 1, assembled_text, index_in_assembled_text, number_of_byte);
+        put_char_into_assembled_text("\n", assembled_text, index_in_assembled_text, number_of_byte, NOTHING);
+    } else if(flag_of_the_end_line == SPACE) {
+        put_char_into_assembled_text(" ", assembled_text, index_in_assembled_text, number_of_byte, NOTHING);
     }
 
     ++(*number_of_byte);
@@ -162,7 +174,9 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
     ++(*index_in_labels);
 }
 
-void put_char_into_assembled_text(const char* temp_string, const int length, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+void put_char_into_assembled_text(const char* temp_string, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, int flag_of_the_end_line) {
+    int length = strlen(temp_string);
+
     for(int i=0; i<length; ++i) {
         assembled_text[*index_in_assembled_text] = temp_string[i];
         ++(*index_in_assembled_text);
@@ -170,6 +184,12 @@ void put_char_into_assembled_text(const char* temp_string, const int length, cha
 
     if(temp_string != " " && temp_string != "\n") {
         ++(*number_of_byte);
+    }
+
+    if(flag_of_the_end_line == END_LINE)  {
+        assembled_text[(*index_in_assembled_text)++] = '\n';
+    } else if(flag_of_the_end_line == SPACE) {
+        assembled_text[(*index_in_assembled_text)++] = ' ';
     }
 }
 
@@ -235,6 +255,31 @@ void fill_array_by_machine_code(Label* labels, int count_of_labels, Label* jump_
             }
         }
     }
+}
+
+bool is_text_connected_with_labels(char* text, int* number_of_condition) {
+    int command_is_condition = true;
+
+    if(!strcmp(text, "jmp")) {
+        *number_of_condition = OPERATION_CODE_JMP;
+    } else if(!strcmp(text, "je")) {
+        *number_of_condition = OPERATION_CODE_JE;
+    } else if(!strcmp(text, "jen")) {
+        *number_of_condition = OPERATION_CODE_JNE;
+    } else if(!strcmp(text, "ja")) {
+        *number_of_condition = OPERATION_CODE_JA;
+    } else if(!strcmp(text, "jae")) {
+        *number_of_condition = OPERATION_CODE_JAE;
+    } else if(!strcmp(text, "jb")) {
+        *number_of_condition = OPERATION_CODE_JB;
+    } else if(!strcmp(text, "jbe")) {
+        *number_of_condition = OPERATION_CODE_JBE;
+    } else {
+        *number_of_condition = -1;
+        command_is_condition = false;
+    }
+
+    return command_is_condition;
 }
 
 int main() {

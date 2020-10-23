@@ -22,7 +22,8 @@ const char SEPARATORS[] = "\n ";
 
 enum FLAGS_OF_THE_END_LINE {
     END_LINE = 0,
-    NOT_END_LINE = 1
+    SPACE    = 1,
+    NOTHING  = 2
 };
 
 enum TYPE_OF_ARGUMENT {
