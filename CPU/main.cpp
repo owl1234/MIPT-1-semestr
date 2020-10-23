@@ -3,11 +3,11 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  October 22, 2020, 22:19:25
+ *                  October 23, 2020, 23:26:25
  *  @par What was changed?
- *                      1. The disassembler doesn't work because of it is there have been cardinal changes.
- *                      2. Add jmp.
- *                      3. Change some operations codes.
+ *                      1. The disassembler doesn't work because of it is there have been cardinal changes (old information).
+ *                      2. Add >, >=, <, <=, ==, !=.
+ *                      3. Assembler become more adequate.
  */
 
 #include <stdio.h>

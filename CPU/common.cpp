@@ -55,3 +55,21 @@ int file_construct(File* file, const char* name_file) {
     file->lines = number_of_symbols(file->text, '\n');
     return OK_FILE;
 }
+
+
+int type_of_value(const char* operation) {
+    for(int registr=0; registr<number_of_register_vars; ++registr) {
+        if(!strcmp(TEXT_REGISTERS[registr], operation)) {
+            return IS_REGISTER;
+        }
+    }
+    return IS_ELEM_T;
+}
+
+int get_number_of_register(const char* text) {
+    for(int registr=0; registr<number_of_register_vars; ++registr) {
+        if(!strcmp(TEXT_REGISTERS[registr], text)) {
+            return registr;
+        }
+    }
+}

@@ -17,13 +17,18 @@ const int OK_FILE = 0;
 const int OK = 0;
 const int number_of_register_vars = 4;
 const int number_of_commands = 9;
-const int IS_REGISTER = 1;
 
 const char SEPARATORS[] = "\n ";
 
 enum FLAGS_OF_THE_END_LINE {
     END_LINE = 0,
     NOT_END_LINE = 1
+};
+
+enum TYPE_OF_ARGUMENT {
+    NOT_ARGS    = 0, // for pop
+    IS_REGISTER = 1,
+    IS_ELEM_T   = 2
 };
 
 struct File {
@@ -48,4 +53,7 @@ int number_of_symbols(char* buffer, char separator);
 
 int file_construct(File* file, const char* name_file);
 
+int type_of_value(const char* operation);
+
+int get_number_of_register(const char* text);
 
