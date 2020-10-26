@@ -18,7 +18,9 @@ void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_st
 
 void proc_arifmetics(Stack_t* proc_stack, int operation_code);
 
-void proc_jmp(File* file, int* now_byte);
+void proc_jmp_and_call(File* file, int* now_byte, Stack_t* call_stack, int code_of_command);
+
+void proc_ret(File* file, int* now_byte, Stack_t* call_stack);
 
 void proc_cmp(File* file, int* now_byte, Elem_t* first_comparison, Elem_t* second_comparison, Elem_t* register_variables);
 
@@ -30,4 +32,4 @@ int get_int_from_text(File* file, int* now_byte);
 
 char* get_char_from_text(File* file, int* now_byte);
 
-void proc_conditions(File* file, int number_of_condition, Elem_t first_comparison, Elem_t second_comparison, int* now_byte);
+void proc_conditions(File* file, int number_of_condition, Elem_t first_comparison, Elem_t second_comparison, int* now_byte, Stack_t* call_stack);

@@ -3,10 +3,9 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  October 24, 2020, 00:42:25
+ *                  October 26, 2020, 14:34:25
  *  @par What was changed?
- *                      1. The disassembler doesn't work because of it is there have been cardinal changes (old information).
- *                      3. Assembler become more and mode adequate.
+ *                      1. Add call and ret in assembly.
  */
 
 #include <stdio.h>

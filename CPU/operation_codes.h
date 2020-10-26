@@ -17,7 +17,9 @@ enum OPERATIONS_CODES {
     OPERATION_CODE_JA              = 33,
     OPERATION_CODE_JAE             = 34,
     OPERATION_CODE_JB              = 35,
-    OPERATION_CODE_JBE             = 36
+    OPERATION_CODE_JBE             = 36,
+    OPERATION_CODE_CALL            = 40,
+    OPERATION_CODE_RET             = 41
 };
 
 enum REGISTER_VARIABLES {

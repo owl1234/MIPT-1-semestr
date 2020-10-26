@@ -26,6 +26,9 @@ void file_handler(File file) {
     Stack_t proc_stack = {};
     stack_construct(&proc_stack);
 
+    Stack_t call_stack = {};
+    stack_construct(&call_stack);
+
     Elem_t* registers_variables = (Elem_t*)calloc(number_of_register_vars, sizeof(Elem_t));
 
     int now_command = -1;
@@ -68,13 +71,15 @@ void file_handler(File file) {
         } else if(now_command == OPERATION_CODE_IN) {
             scanf(identity, &input_value);
             stack_push(&proc_stack, input_value);
-        } else if(now_command == OPERATION_CODE_JMP) {
-            proc_jmp(&file, &now_byte);
         } else if(now_command == OPERATION_CODE_CMP) {
             proc_cmp(&file, &now_byte, &first_comparison, &second_comparison, registers_variables);
+        } else if(now_command == OPERATION_CODE_CALL || now_command == OPERATION_CODE_JMP) {
+            proc_jmp_and_call(&file, &now_byte, &call_stack, now_command);
+        } else if(now_command == OPERATION_CODE_RET) {
+            proc_ret(&file, &now_byte, &call_stack);
         } else if(is_condition(now_command, &number_of_condition)) {                                      // JE JNE JA JAE JB JBE
             printf("cmp: first: %lg, second: %lg (now_b: %d)\n", first_comparison, second_comparison, now_byte);
-            proc_conditions(&file, number_of_condition, first_comparison, second_comparison, &now_byte);
+            proc_conditions(&file, number_of_condition, first_comparison, second_comparison, &now_byte, &call_stack);
         } else {
             printf("popados (%d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command);
             abort();
@@ -199,7 +204,7 @@ void proc_arifmetics(Stack_t* proc_stack, int operation_code) {
     }
 }
 
-void proc_jmp(File* file, int* now_byte) {
+void proc_jmp_and_call(File* file, int* now_byte, Stack_t* call_stack, int code_of_command) {
     int address_label = get_int_from_text(file, now_byte);
 
     //printf("labeL: %d, now_byte: %d\n", address_label, *now_byte);
@@ -214,6 +219,13 @@ void proc_jmp(File* file, int* now_byte) {
         ++(*now_byte);
     }
 
+    if(code_of_command == OPERATION_CODE_CALL) {
+        stack_push(call_stack, address_label);
+        //printf("call: %d (size: %d) \n", address_label, call_stack->size_stack);
+    }
+
+
+
     /*while(*now_byte > address_label) {
         printf("index_text: %d, text: %s, now_symbol: %c\n", *now_byte, file->text, *(file->text));
         while(*(file->text) != ' ' && *(file->text) != '\n')
@@ -223,6 +235,24 @@ void proc_jmp(File* file, int* now_byte) {
     }
     --(file->text);*/
     //printf("text: %s\n\n", file->text);
+}
+
+void proc_ret(File* file, int* now_byte, Stack_t* call_stack) {
+    int go_to_address = stack_back(call_stack);
+
+    *now_byte = 0;
+
+    file->text = file->copy_of_text;
+
+    while(*now_byte < go_to_address) {
+        while(*(file->text) != ' ' && *(file->text) != '\n')
+            ++(file->text);
+        ++(file->text);
+        ++(*now_byte);
+    }
+
+    printf("size of call_stack: %d\n", call_stack->size_stack);
+    printf("Ret to %d address\n", go_to_address);
 }
 
 void proc_cmp(File* file, int* now_byte, Elem_t* first_comparison, Elem_t* second_comparison, Elem_t* register_variables) {
@@ -299,14 +329,14 @@ char* get_char_from_text(File* file, int* now_byte) {
     return temp;
 }
 
-void proc_conditions(File* file, int number_of_condition, Elem_t first_comparison, Elem_t second_comparison, int* now_byte) {
+void proc_conditions(File* file, int number_of_condition, Elem_t first_comparison, Elem_t second_comparison, int* now_byte, Stack_t* call_stack) {
     if(number_of_condition == OPERATION_CODE_JE  && first_comparison == second_comparison ||
        number_of_condition == OPERATION_CODE_JNE && first_comparison != second_comparison ||
        number_of_condition == OPERATION_CODE_JA  && first_comparison >  second_comparison ||
        number_of_condition == OPERATION_CODE_JAE && first_comparison >= second_comparison ||
        number_of_condition == OPERATION_CODE_JB  && first_comparison <  second_comparison ||
        number_of_condition == OPERATION_CODE_JBE && first_comparison <= second_comparison) {
-        proc_jmp(file, now_byte);
+        proc_jmp_and_call(file, now_byte, call_stack, OPERATION_CODE_JMP);
     }
 }
 
