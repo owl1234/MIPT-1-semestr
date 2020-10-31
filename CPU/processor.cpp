@@ -9,6 +9,11 @@
 
 // #define connect_strings(first, second) first ## second
 
+void POPADOS() {
+    printf("ti lox\n");
+    abort();
+}
+
 void print_regs(Elem_t* registers_variables, int number_of_register_vars) {
     for(int i=0; i<number_of_register_vars; ++i) {
         printf(identity, registers_variables[i]);
@@ -38,11 +43,14 @@ void file_handler(File file) {
 
     Elem_t* registers_variables = (Elem_t*)calloc(number_of_register_vars, sizeof(Elem_t));
 
+    Elem_t* ram = (Elem_t*)calloc(MAX_SIZE_RAM, sizeof(Elem_t));
+
     int now_command = -1;
     double now_value = 0.0;
 
     Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0;
     int flag_of_registers = -1, number_of_register = -1, now_byte = 0;
+
     Elem_t first_comparison = 0.0, second_comparison = 0.0;
     int number_of_condition = -1;
 
@@ -56,7 +64,7 @@ void file_handler(File file) {
             printf("End of work (hlt!)\n");
             break;
         } else if(now_command == OPERATION_CODE_PUSH) {
-            proc_push(&file, registers_variables, &now_byte, &proc_stack);
+            proc_push(&file, registers_variables, &now_byte, &proc_stack, ram);
         } else if(now_command == OPERATION_CODE_POP) {
             proc_pop(&file, &proc_stack, &now_byte, registers_variables);
         } else if(now_command == OPERATION_CODE_ADD) {
@@ -168,37 +176,35 @@ double string_to_double(char* text) {
     return whole_part;
 }
 
-void push_in_registers(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack) {
-    //char number[MAX_SIZE] = "";
-    int number = get_int_from_text(file, now_byte);
-    //registers_variables[number] = stack_back(proc_stack);
-    //printf("(push) number of reg: %d, value: %d\n", number, registers_variables[number]);
-    stack_push(proc_stack, registers_variables[number]);
-}
-
 void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
     registers_variables[registr] = stack_back(proc_stack);
     //printf("(pop) number of reg: %d, value: %lg\n", registr, registers_variables[registr]);
     stack_pop(proc_stack);
 }
 
-void proc_push(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack) {
+void proc_push(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack, Elem_t* ram) {
     Elem_t now_value = 0.0;
 
     int flag_of_registers = get_int_from_text(file, now_byte);
 
     if(flag_of_registers == IS_REGISTER) {
-        push_in_registers(file, registers_variables, now_byte, proc_stack);
-        //print_stack(proc_stack);
-    } else {
-        //char* push_value = (char*)calloc(MAX_SIZE, sizeof(char));
+        int number = get_int_from_text(file, now_byte);
+        stack_push(proc_stack, registers_variables[number]);
+    } else if(flag_of_registers == IS_ELEM_T) {
         char* push_value = (char*)calloc(MAX_SIZE, sizeof(char));
         push_value = get_char_from_text(file, now_byte);
-        //printf("push_val: %s ", push_value);
         now_value = string_to_double(push_value);
-        //printf("(%lg)\n", now_value);
         stack_push(proc_stack, now_value);
+    } else if(flag_of_registers == (IS_RAM | IS_REGISTER)) {
+        int number = get_int_from_text(file, now_byte);
+        stack_push(proc_stack, ram[(int)registers_variables[number]]);
+    } else if(flag_of_registers == (IS_RAM | IS_ELEM_T)) {
+        int number = get_int_from_text(file, now_byte);
+        stack_push(proc_stack, ram[number]);
+    } else {
+        POPADOS();
     }
+
     //printf("push: now size %d\n", proc_stack->size_stack);
 }
 

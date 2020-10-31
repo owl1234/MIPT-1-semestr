@@ -3,11 +3,12 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  October 31, 2020, 22:46:25
+ *                  November 1, 2020, 00:00:25
  *  @par What was changed?
- *                      1. Call, ret, jump and other functions work adequately.
- *                      2. Add recret function (makes a return from a recursive function).
- *                      3. Add meow function (say meow).
+ *                      1. HAPPY HALLOWEEN !!!
+ *                      2. Add ram.
+ *                              push [rax] - take the contents of the register, contact the address in ram and make push
+ *                              push [4]   - contact address 4 in ram and make push
  */
 
 #include <stdio.h>

@@ -143,6 +143,13 @@ const char TEXT_REGISTERS[][4] = {
     "rdx"
 };
 
+const char RAM_TEXT_REGISTERS[][6] = {
+    "[rax]",
+    "[rbx]",
+    "[rcx]",
+    "[rdx]"
+};
+
 const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
     0,
     2,

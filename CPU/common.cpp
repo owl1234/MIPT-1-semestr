@@ -58,19 +58,40 @@ int file_construct(File* file, const char* name_file) {
 
 
 int type_of_value(const char* operation) {
+    int length = strlen(operation);
+    int flag_of_value = 0;
+
     for(int registr=0; registr<number_of_register_vars; ++registr) {
         if(!strcmp(TEXT_REGISTERS[registr], operation)) {
             return IS_REGISTER;
         }
     }
-    return IS_ELEM_T;
+
+    if(!(operation[0] == '[' && operation[length-1] == ']')) {
+        return IS_ELEM_T;
+    }
+
+    char* ram_address = (char*)calloc(length - 1, sizeof(char));
+
+    for(int i=1; i<length-1; ++i) {
+        ram_address[i-1] = operation[i];
+    }
+
+    for(int registr=0; registr<number_of_register_vars; ++registr) {
+        if(!strcmp(TEXT_REGISTERS[registr], ram_address)) {
+            return (IS_RAM | IS_REGISTER);
+        }
+    }
+
+    return (IS_ELEM_T | IS_RAM);
 }
 
 int get_number_of_register(const char* text) {
     for(int registr=0; registr<number_of_register_vars; ++registr) {
-        if(!strcmp(TEXT_REGISTERS[registr], text)) {
+        if(!strcmp(TEXT_REGISTERS[registr], text) || !strcmp(RAM_TEXT_REGISTERS[registr], text)) {
             return registr;
         }
     }
+
     return ERROR_NUMBER;
 }

@@ -8,9 +8,7 @@ int length_of_number(int value);
 
 double string_to_double(char* text);
 
-void push_in_registers(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack);
-
-void proc_push(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack);
+void proc_push(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack, Elem_t* ram);
 
 void proc_pop(File* file, Stack_t* proc_stack, int* now_byte, Elem_t* registers_variables);
 

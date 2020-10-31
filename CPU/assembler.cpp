@@ -7,6 +7,13 @@
 #include "assembler.h"
 #include "common.h"
 
+void print_ram(Elem_t* ram) {
+    for(int i=0; i<10; ++i) {
+        printf("%d ", ram[i]);
+    }
+    printf("\n");
+}
+
 void assembling_file() {
     File input_file = {};
     int status = file_construct(&input_file, name_input_file_ass);
@@ -67,6 +74,7 @@ void find_and_write_command(char* text, char* assembled_text, int* index_in_asse
         assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, go_to_labels, index_in_go_to_labels);
     } else if(!strcmp(text, "hlt")) {
         put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+        print_ram(ram);
     } else if(is_text_connected_with_labels(text, &number_of_condition)) {
         //printf("jshba %s\n", text);
         assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, go_to_labels, index_in_go_to_labels, number_of_condition);
@@ -79,7 +87,7 @@ void find_and_write_command(char* text, char* assembled_text, int* index_in_asse
     } else {
         for(int operation_code = OPERATION_CODE_ADD; operation_code<number_of_commands; ++operation_code) {
             if(!strcmp(text, TEXT_OPERATION[operation_code])) {
-                printf("=-------------------------------------operat_code: %d (%s)\n", operation_code, text);
+                //printf("=-------------------------------------operat_code: %d (%s)\n", operation_code, text);
                 put_int_into_assembled_text(operation_code, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
                 return;
             }
@@ -97,12 +105,17 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
 
     text = strtok(NULL, SEPARATORS);
 
-    if(type_of_value(text) == IS_REGISTER) {
-        put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+    int type_push_value = type_of_value(text);
+    printf("ass_push: %d\n", type_push_value);
+    put_int_into_assembled_text(type_push_value, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
+    if(type_push_value == IS_REGISTER || type_push_value == (IS_RAM | IS_REGISTER)) {
         put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-    } else {
-        put_int_into_assembled_text(IS_ELEM_T, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+    } else if(type_push_value == IS_ELEM_T || type_push_value == (IS_RAM | IS_ELEM_T)) {
         put_char_into_assembled_text(text, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+    } else {
+        printf("goodbue... (%d)\n", type_push_value);
+        abort();
     }
 }
 
@@ -223,15 +236,21 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
 
 void put_char_into_assembled_text(const char* temp_string, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, int flag_of_the_end_line) {
     int length = strlen(temp_string);
+    int deduction = 0;
+
+    if(temp_string[0] == '[')
+        deduction += 2;
 
     if(!(length == 0)) {
-        for(int i=0; i<8-length; ++i) {
+        for(int i=0; i<8-length+deduction; ++i) {
             assembled_text[*index_in_assembled_text] = '0';
             ++(*index_in_assembled_text);
         }
         for(int i=0; i<length; ++i) {
-            assembled_text[*index_in_assembled_text] = temp_string[i];
-            ++(*index_in_assembled_text);
+            if(temp_string[i] != '[' && temp_string[i] != ']') {
+                assembled_text[*index_in_assembled_text] = temp_string[i];
+                ++(*index_in_assembled_text);
+            }
         }
 
         if(temp_string != " " && temp_string != "\n") {

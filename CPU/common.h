@@ -5,13 +5,14 @@
 
 #include "operation_codes.h"
 
-const char name_input_file_ass[]  = "factorial.txt";
+const char name_input_file_ass[]  = "input_ass.txt";
 const char name_output_file_ass[] = "output_ass.txt";
 
 const char name_input_file_disass[]  = "input_disass.txt";
 const char name_output_file_disass[] = "output_disass.txt";
 
 const int MAX_SIZE = 10;
+const int MAX_SIZE_RAM = 100000;
 const int ERROR_NUMBER = -3802;
 const int OK_FILE = 0;
 const int OK = 0;
@@ -29,8 +30,9 @@ enum FLAGS_OF_THE_END_LINE {
 
 enum TYPE_OF_ARGUMENT {
     NOT_ARGS    = 0, // for pop
-    IS_REGISTER = 1,
-    IS_ELEM_T   = 2
+    IS_ELEM_T   = 1,
+    IS_REGISTER = 2,
+    IS_RAM      = 4,
 };
 
 struct File {
