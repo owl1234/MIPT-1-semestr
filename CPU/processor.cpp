@@ -5,6 +5,7 @@
 #include "stack.h"
 #include "processor.h"
 #include <unistd.h>
+#include <math.h>
 
 // #define connect_strings(first, second) first ## second
 
@@ -14,6 +15,12 @@ void print_regs(Elem_t* registers_variables, int number_of_register_vars) {
         printf(" ");
     }
     printf("\n");
+}
+
+void print_stack(Stack_t* stack_) {
+    for(int i=0; i<=stack_->size_stack; ++i)
+        printf("%lg ", stack_->data[i]);
+    printf("\n\n");
 }
 
 void file_handler(File file) {
@@ -41,7 +48,7 @@ void file_handler(File file) {
 
     while(now_command != 0) {
         sscanf(file.text, "%d", &now_command);
-        file.text += length_of_number(now_command) + 1;
+        file.text += 9; //length_of_number(now_command) + 1;
 
         //printf("> now_command: %d (byte: %d) \n", now_command, now_byte);
 
@@ -58,19 +65,23 @@ void file_handler(File file) {
             proc_arifmetics(&proc_stack, OPERATION_CODE_SUB);
         } else if(now_command == OPERATION_CODE_MUL) {
             proc_arifmetics(&proc_stack, OPERATION_CODE_MUL);
+        } else if(now_command == OPERATION_CODE_SQRT) {
+            proc_arifmetics(&proc_stack, OPERATION_CODE_SQRT);
         } else if(now_command == OPERATION_CODE_DIV) {
             proc_arifmetics(&proc_stack, OPERATION_CODE_DIV);
         } else if(now_command == OPERATION_CODE_OUT) {
             if(proc_stack.size_stack == 0) {
                 printf("Stack is empty\n");
             } else {
+                //print_stack(&proc_stack);
                 printf("Answer: (size = %d) ", proc_stack.size_stack);
                 printf(identity, stack_back(&proc_stack));
-                printf("\n");
+                printf("\n\n");
             }
         } else if(now_command == OPERATION_CODE_IN) {
             scanf(identity, &input_value);
             stack_push(&proc_stack, input_value);
+            //print_stack(&proc_stack);
         } else if(now_command == OPERATION_CODE_CMP) {
             proc_cmp(&file, &now_byte, &first_comparison, &second_comparison, registers_variables);
         } else if(now_command == OPERATION_CODE_CALL || now_command == OPERATION_CODE_JMP) {
@@ -78,8 +89,10 @@ void file_handler(File file) {
         } else if(now_command == OPERATION_CODE_RET) {
             proc_ret(&file, &now_byte, &call_stack);
         } else if(is_condition(now_command, &number_of_condition)) {                                      // JE JNE JA JAE JB JBE
-            printf("cmp: first: %lg, second: %lg (now_b: %d)\n", first_comparison, second_comparison, now_byte);
+            //printf("cmp: first: %lg, second: %lg (now_b: %d, command: %d)\n", first_comparison, second_comparison, now_byte, now_command);
             proc_conditions(&file, number_of_condition, first_comparison, second_comparison, &now_byte, &call_stack);
+        } else if(now_command == OPERATION_CODE_MEOW) {
+            proc_meow(&file, &now_byte);
         } else {
             printf("popados (%d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command);
             abort();
@@ -118,9 +131,18 @@ double string_to_double(char* text) {
     double whole_part = 0;
     double fractional_part = 0;
 
-    int length = strlen(text);
-
+    int length = 8; //strlen(text);
+    int is_negative = 1;
     int position = 0;
+
+    while(text[position] == '0') {
+        ++position;
+    }
+
+    if(text[position] == '-') {
+        ++position;
+        is_negative = -1;
+    }
 
     for(; position<length; ++position) {
         if(text[position] == '.') {
@@ -141,18 +163,22 @@ double string_to_double(char* text) {
         whole_part += fractional_part;
     }
 
+    whole_part *= is_negative;
+
     return whole_part;
 }
 
 void push_in_registers(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* proc_stack) {
     //char number[MAX_SIZE] = "";
     int number = get_int_from_text(file, now_byte);
-    registers_variables[number] = stack_back(proc_stack);
-    //stack_push(proc_stack, registers_variables[registr]);
+    //registers_variables[number] = stack_back(proc_stack);
+    //printf("(push) number of reg: %d, value: %d\n", number, registers_variables[number]);
+    stack_push(proc_stack, registers_variables[number]);
 }
 
 void pop_in_registers(int registr, Elem_t* registers_variables, Stack_t* proc_stack) {
     registers_variables[registr] = stack_back(proc_stack);
+    //printf("(pop) number of reg: %d, value: %lg\n", registr, registers_variables[registr]);
     stack_pop(proc_stack);
 }
 
@@ -163,50 +189,74 @@ void proc_push(File* file, Elem_t* registers_variables, int* now_byte, Stack_t* 
 
     if(flag_of_registers == IS_REGISTER) {
         push_in_registers(file, registers_variables, now_byte, proc_stack);
+        //print_stack(proc_stack);
     } else {
         //char* push_value = (char*)calloc(MAX_SIZE, sizeof(char));
         char* push_value = (char*)calloc(MAX_SIZE, sizeof(char));
         push_value = get_char_from_text(file, now_byte);
+        //printf("push_val: %s ", push_value);
         now_value = string_to_double(push_value);
+        //printf("(%lg)\n", now_value);
         stack_push(proc_stack, now_value);
     }
+    //printf("push: now size %d\n", proc_stack->size_stack);
 }
 
 void proc_pop(File* file, Stack_t* proc_stack, int* now_byte, Elem_t* registers_variables) {
     double back_element = 0.0;
 
     int flag_of_registers = get_int_from_text(file, now_byte);
+    //printf("flag_of_reg: %d\n", flag_of_registers);
 
     if(flag_of_registers == NOT_ARGS) {
         back_element = stack_back(proc_stack);
         stack_pop(proc_stack);
     } else {
-        int number_of_register = -get_int_from_text(file, now_byte);
+        int number_of_register = get_int_from_text(file, now_byte);
         pop_in_registers(number_of_register, registers_variables, proc_stack);
+        //abort();
     }
+    //printf("pop: now size %d\n", proc_stack->size_stack);
 }
 
 void proc_arifmetics(Stack_t* proc_stack, int operation_code) {
     double last = stack_back(proc_stack);
     stack_pop(proc_stack);
 
-    double penultimate = stack_back(proc_stack);
-    stack_pop(proc_stack);
+    if(operation_code == OPERATION_CODE_SQRT) {
+        stack_push(proc_stack, sqrt(last));
+    } else {
+        double penultimate = stack_back(proc_stack);
+        stack_pop(proc_stack);
 
-    if(operation_code == OPERATION_CODE_ADD) {
-        stack_push(proc_stack, last + penultimate);
-    } else if(operation_code == OPERATION_CODE_SUB) {
-        stack_push(proc_stack, penultimate - last);
-    } else if(operation_code == OPERATION_CODE_MUL) {
-        stack_push(proc_stack, last * penultimate);
-    } else if(operation_code == OPERATION_CODE_DIV) {
-        stack_push(proc_stack, penultimate / last);
+        if(operation_code == OPERATION_CODE_ADD) {
+            stack_push(proc_stack, last + penultimate);
+        } else if(operation_code == OPERATION_CODE_SUB) {
+            stack_push(proc_stack, penultimate - last);
+        } else if(operation_code == OPERATION_CODE_MUL) {
+            stack_push(proc_stack, last * penultimate);
+        } else if(operation_code == OPERATION_CODE_DIV) {
+            stack_push(proc_stack, penultimate / last);
+        }
     }
 }
 
 void proc_jmp_and_call(File* file, int* now_byte, Stack_t* call_stack, int code_of_command) {
-    int address_label = get_int_from_text(file, now_byte);
+    int address_label = get_int_from_text(file, now_byte), number_of_condition = 0;
 
+    //printf("!!! JUMP AND CALL !!! %d\n", address_label);
+    if(address_label == OPERATION_CODE_RECURSIVE_RET) {
+        proc_ret(file, now_byte, call_stack);
+        //printf("recret !!!!!!!!!!!!!!!!!!!!1\n");
+        return;
+    }
+    //printf("add_label: %d\n", address_label);
+    //printf("code_of_command: %d\n", code_of_command);
+
+    if(code_of_command == OPERATION_CODE_JE || code_of_command == OPERATION_CODE_CALL) { // is_condition(code_of_command, &number_of_condition)
+        stack_push(call_stack, *now_byte);
+        //printf("call: %d (size: %d) \n", *now_byte, call_stack->size_stack);
+    }
     //printf("labeL: %d, now_byte: %d\n", address_label, *now_byte);
     *now_byte = 0;
 
@@ -219,11 +269,8 @@ void proc_jmp_and_call(File* file, int* now_byte, Stack_t* call_stack, int code_
         ++(*now_byte);
     }
 
-    if(code_of_command == OPERATION_CODE_CALL) {
-        stack_push(call_stack, address_label);
-        //printf("call: %d (size: %d) \n", address_label, call_stack->size_stack);
-    }
 
+    //printf("now_byte: %d\n", *now_byte);
 
 
     /*while(*now_byte > address_label) {
@@ -239,20 +286,29 @@ void proc_jmp_and_call(File* file, int* now_byte, Stack_t* call_stack, int code_
 
 void proc_ret(File* file, int* now_byte, Stack_t* call_stack) {
     int go_to_address = stack_back(call_stack);
+    //printf("BACK CALL STACK: %d\n", go_to_address);
 
-    *now_byte = 0;
 
-    file->text = file->copy_of_text;
+    //printf("go_to_add: %d (size: %d)\n", go_to_address, call_stack->size_stack);
+    if(call_stack->size_stack != 0) {
+        *now_byte = 0;
 
-    while(*now_byte < go_to_address) {
-        while(*(file->text) != ' ' && *(file->text) != '\n')
+        file->text = file->copy_of_text;
+
+        while(*now_byte < go_to_address) {
+            while(*(file->text) != ' ' && *(file->text) != '\n')
+                ++(file->text);
             ++(file->text);
-        ++(file->text);
-        ++(*now_byte);
-    }
+            ++(*now_byte);
+        }
 
-    printf("size of call_stack: %d\n", call_stack->size_stack);
-    printf("Ret to %d address\n", go_to_address);
+        stack_pop(call_stack);
+
+        //printf("size of call_stack: %d\n", call_stack->size_stack);
+        //printf("Ret to %d address\n", go_to_address);
+    } else {
+        //printf("I DON'T REEEEEEEEEEEEEEEEEEET\n");
+    }
 }
 
 void proc_cmp(File* file, int* now_byte, Elem_t* first_comparison, Elem_t* second_comparison, Elem_t* register_variables) {
@@ -312,8 +368,9 @@ bool is_condition(int now_command, int* number_of_condition) {
 int get_int_from_text(File* file, int* now_byte) {
     int value = 0;
     sscanf(file->text, "%d", &value);
+    //printf("vslue: %d\n", value);
 
-    file->text += length_of_number(value) + 1;
+    file->text += 9; //length_of_number(value) + 1;
     ++(*now_byte);
 
     return value;
@@ -336,8 +393,15 @@ void proc_conditions(File* file, int number_of_condition, Elem_t first_compariso
        number_of_condition == OPERATION_CODE_JAE && first_comparison >= second_comparison ||
        number_of_condition == OPERATION_CODE_JB  && first_comparison <  second_comparison ||
        number_of_condition == OPERATION_CODE_JBE && first_comparison <= second_comparison) {
-        proc_jmp_and_call(file, now_byte, call_stack, OPERATION_CODE_JMP);
+        //printf("HERE\n");
+        proc_jmp_and_call(file, now_byte, call_stack, OPERATION_CODE_CALL);
+    } else {
+        get_int_from_text(file, now_byte);
     }
+}
+
+void proc_meow(File* file, int* now_byte) {
+    printf("meow\n");
 }
 
 int main() {

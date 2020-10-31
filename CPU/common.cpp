@@ -72,4 +72,5 @@ int get_number_of_register(const char* text) {
             return registr;
         }
     }
+    return ERROR_NUMBER;
 }

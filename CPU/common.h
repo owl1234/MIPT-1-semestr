@@ -5,7 +5,7 @@
 
 #include "operation_codes.h"
 
-const char name_input_file_ass[]  = "input_ass.txt";
+const char name_input_file_ass[]  = "factorial.txt";
 const char name_output_file_ass[] = "output_ass.txt";
 
 const char name_input_file_disass[]  = "input_disass.txt";
@@ -17,6 +17,7 @@ const int OK_FILE = 0;
 const int OK = 0;
 const int number_of_register_vars = 4;
 const int number_of_commands = 9;
+const int MAX_COUNT_LABELS = 20;
 
 const char SEPARATORS[] = "\n ";
 
@@ -43,7 +44,9 @@ struct File {
 
 struct Label {
     char* name;
-    int address;
+    int address; //symbol_address;
+    int byte_address;
+    int type_of_command;
 };
 
 #endif // COMMON_H
@@ -57,4 +60,3 @@ int file_construct(File* file, const char* name_file);
 int type_of_value(const char* operation);
 
 int get_number_of_register(const char* text);
-

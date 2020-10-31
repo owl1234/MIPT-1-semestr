@@ -33,3 +33,5 @@ int get_int_from_text(File* file, int* now_byte);
 char* get_char_from_text(File* file, int* now_byte);
 
 void proc_conditions(File* file, int number_of_condition, Elem_t first_comparison, Elem_t second_comparison, int* now_byte, Stack_t* call_stack);
+
+void proc_meow(File* file, int* now_byte);

@@ -21,20 +21,19 @@ void assembling_file() {
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
     int now_pos_symbol = 0, code_of_last_command = -1;
 
-    char* assembled_text = (char*)calloc(MAX_SIZE * input_file.lines, sizeof(char));
-    Label* labels = (Label*)calloc(MAX_SIZE, sizeof(Label));
+    char* assembled_text = (char*)calloc(100 * input_file.lines, sizeof(char));
+    Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
     int index_in_assembled_text = 0, index_in_labels = 0;
     int number_of_byte = 0;
 
-    Label* jump_byte_position = (Label*)calloc(MAX_SIZE * input_file.lines, sizeof(Label));
-    Label* ret_byte_position  = (Label*)calloc(MAX_SIZE * input_file.lines, sizeof(Label));
-    int index_in_jump_byte_position = 0, index_in_ret_byte_position = 0;
+    Label* go_to_labels = (Label*)calloc(MAX_SIZE * input_file.lines, sizeof(Label));
+
+    int index_in_go_to_labels = 0; //, index_in_ret_byte_position = 0, index_in_call_byte_position = 0, index_in_cond_byte_position = 0;
 
     temp_string = strtok(input_file.text, SEPARATORS);
     while(temp_string != NULL) {
-        //printf("now_command: %s\n", temp_string);
-        find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, &index_in_labels, &number_of_byte, jump_byte_position, &index_in_jump_byte_position,
-                                                                                                                                 ret_byte_position,  &index_in_ret_byte_position);
+        printf("now_command: %s\n", temp_string);
+        find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, &index_in_labels, &number_of_byte, go_to_labels, &index_in_go_to_labels);
         temp_string = strtok(NULL, SEPARATORS);
     }
 
@@ -47,8 +46,7 @@ void assembling_file() {
         printf("%s %d\n", jump_byte_position[i].name, jump_byte_position[i].address);
     printf("\n\n");*/
 
-    fill_array_by_machine_code(labels, index_in_labels, jump_byte_position, index_in_jump_byte_position, assembled_text, index_in_assembled_text,
-                                                        ret_byte_position,  index_in_ret_byte_position);
+    fill_array_by_machine_code(labels, index_in_labels, go_to_labels,  index_in_go_to_labels, assembled_text, index_in_assembled_text);
 
     status = create_assembling_file(assembled_text, index_in_assembled_text);
     if(status != OK_FILE) {
@@ -60,26 +58,28 @@ void assembling_file() {
 }
 
 void find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
-                                                                                            Label* jump_byte_position, int* index_in_jump_byte_position,
-                                                                                            Label* ret_byte_position,  int* index_in_ret_byte_position) {
+                                                                                            Label* go_to_labels, int* index_in_go_to_labels) {
     int number_of_condition = 0;
 
     if(!strcmp(text, "push")) {
         assembler_push(text, assembled_text, index_in_assembled_text, number_of_byte);
     } else if(!strcmp(text, "pop")) {
-        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, jump_byte_position, index_in_jump_byte_position,
-                                                                                                              ret_byte_position,  index_in_ret_byte_position);
+        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, go_to_labels, index_in_go_to_labels);
     } else if(!strcmp(text, "hlt")) {
         put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
     } else if(is_text_connected_with_labels(text, &number_of_condition)) {
         //printf("jshba %s\n", text);
-        assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, jump_byte_position, index_in_jump_byte_position, number_of_condition,
-                                                                                        ret_byte_position,  index_in_ret_byte_position);
+        assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, go_to_labels, index_in_go_to_labels, number_of_condition);
     } else if(!strcmp(text, "cmp")) {
         assembler_cmp(text, assembled_text, index_in_assembled_text, number_of_byte);
+    } else if(!strcmp(text, "meow")) {
+        assembler_meow(assembled_text, index_in_assembled_text, number_of_byte);
+    } else if(!strcmp(text, "sqrt")) {
+        assembler_sqrt(assembled_text, index_in_assembled_text, number_of_byte);
     } else {
         for(int operation_code = OPERATION_CODE_ADD; operation_code<number_of_commands; ++operation_code) {
             if(!strcmp(text, TEXT_OPERATION[operation_code])) {
+                printf("=-------------------------------------operat_code: %d (%s)\n", operation_code, text);
                 put_int_into_assembled_text(operation_code, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
                 return;
             }
@@ -107,8 +107,7 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
 }
 
 void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
-                                                                                   Label* jump_byte_position, int* index_in_jump_byte_position,
-                                                                                   Label* ret_byte_position,  int* index_in_ret_byte_position) {
+                                                                                   Label* go_to_labels, int* index_in_go_to_labels) {
 
     put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
 
@@ -119,8 +118,7 @@ void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_tex
         put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
     } else {
         put_int_into_assembled_text(NOT_ARGS, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
-        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, jump_byte_position, index_in_jump_byte_position,
-                                                                                                                       ret_byte_position,  index_in_ret_byte_position);
+        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, go_to_labels, index_in_go_to_labels);
     }
 }
 
@@ -132,26 +130,39 @@ void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_tex
     put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
 }
 
-void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* jump_byte_position, int* index_in_jump_byte_position, int number_of_condition,
-                                                                                                           Label* ret_byte_position,  int* index_in_ret_byte_position) {
-    put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
-    number_of_condition = -1;
+void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+    put_int_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+    printf("meow\n");
+}
+
+void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+    put_int_into_assembled_text(OPERATION_CODE_SQRT, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+}
+
+void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* go_to_labels, int* index_in_go_to_labels, int number_of_condition) {
 
     int now_command = 0;
 
-    if(!strcmp(text, "jmp")) {
+    if(strcmp(text, "ret")) {
+        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, SPACE);
+
         text = strtok(NULL, SEPARATORS);
-        //printf("jump_byte_pos: %d\n", *index_in_jump_byte_position);
-        jump_byte_position[*index_in_jump_byte_position].name = text;
-        jump_byte_position[(*index_in_jump_byte_position)++].address = *index_in_assembled_text;
-    } else if(!strcmp(text, "call")) {
-        text = strtok(NULL, SEPARATORS);
-        ret_byte_position[*index_in_ret_byte_position].name = text;
-        ret_byte_position[(*index_in_ret_byte_position)++].address = *index_in_assembled_text;
-        //printf("call_byte_pos: %d %d, text: %s\n", *index_in_ret_byte_position, *index_in_assembled_text, text);
+        if(!strcmp(text, "recret")) {
+            //printf("!!!!!!!!!!!!!!!!!!!! RECRET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   \n");
+            put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+        } else {
+            go_to_labels[*index_in_go_to_labels].name = text;
+            go_to_labels[*index_in_go_to_labels].byte_address = *number_of_byte;
+            go_to_labels[*index_in_go_to_labels].type_of_command = number_of_condition;
+            //printf("num: %d (%s)\n", number_of_condition, text);
+            go_to_labels[(*index_in_go_to_labels)++].address = *index_in_assembled_text;
+
+            put_int_into_assembled_text(98, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
+        }
+    } else {
+        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
     }
 
-    put_int_into_assembled_text(MAX_SIZE, assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
 
     //printf("I'm here %s\n", text);
 }
@@ -173,6 +184,10 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
     int length_code = 0;
     int reverse_code = reversed_number(code_of_operation, &length_code);
 
+    for(int i=0; i<8-length_code; ++i) {
+        assembled_text[*index_in_assembled_text] = '0';
+        ++(*index_in_assembled_text);
+    }
     for(int i=0; i<length_code; ++i) {
         assembled_text[*index_in_assembled_text] = (reverse_code % 10 + 48);
         reverse_code /= 10;
@@ -180,12 +195,19 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
     }
 
     if(flag_of_the_end_line == END_LINE) {
-        put_char_into_assembled_text("\n", assembled_text, index_in_assembled_text, number_of_byte, NOTHING);
+        put_char_into_assembled_text("", assembled_text, index_in_assembled_text, number_of_byte, END_LINE);
     } else if(flag_of_the_end_line == SPACE) {
-        put_char_into_assembled_text(" ", assembled_text, index_in_assembled_text, number_of_byte, NOTHING);
+        put_char_into_assembled_text("", assembled_text, index_in_assembled_text, number_of_byte, SPACE);
     }
 
     ++(*number_of_byte);
+    /*char* text = (char*)calloc(8, sizeof(char));
+    for(int i=0; i<8; ++i) {
+        text[i] = reverse_code % 10 + 48;
+        reverse_code /= 10;
+    }
+
+    put_char_into_assembled_text(text, assembled_text, index_in_assembled_text, number_of_byte, flag_of_the_end_line);*/
 }
 
 void create_label(char* text, Label* labels, int* index_in_labels, int index_in_assembled_text, int number_of_byte) {
@@ -193,6 +215,8 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
     labels[*index_in_labels].name = (char*)calloc(MAX_SIZE, sizeof(char));
     strcpy(labels[*index_in_labels].name, text);
     labels[*index_in_labels].address = number_of_byte;
+    labels[*index_in_labels].byte_address = number_of_byte;
+    labels[*index_in_labels].type_of_command = -1;
 
     ++(*index_in_labels);
 }
@@ -200,13 +224,19 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
 void put_char_into_assembled_text(const char* temp_string, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, int flag_of_the_end_line) {
     int length = strlen(temp_string);
 
-    for(int i=0; i<length; ++i) {
-        assembled_text[*index_in_assembled_text] = temp_string[i];
-        ++(*index_in_assembled_text);
-    }
+    if(!(length == 0)) {
+        for(int i=0; i<8-length; ++i) {
+            assembled_text[*index_in_assembled_text] = '0';
+            ++(*index_in_assembled_text);
+        }
+        for(int i=0; i<length; ++i) {
+            assembled_text[*index_in_assembled_text] = temp_string[i];
+            ++(*index_in_assembled_text);
+        }
 
-    if(temp_string != " " && temp_string != "\n") {
-        ++(*number_of_byte);
+        if(temp_string != " " && temp_string != "\n") {
+            ++(*number_of_byte);
+        }
     }
 
     if(flag_of_the_end_line == END_LINE)  {
@@ -264,18 +294,40 @@ int length_of_number(int value) {
     return length;
 }
 
-void fill_array_by_machine_code(Label* labels, int count_of_labels, Label* jump_byte_position, int count_of_jump_byte_position, char* assembled_text, int length_of_assembled_text,
-                                                                    Label* ret_byte_position,  int count_of_ret_byte_position) {
+void fill_array_by_machine_code(Label* labels, int count_of_labels, Label* go_to_labels, int count_of_go_to_labels, char* assembled_text, int length_of_assembled_text) {
+    /*printf("size: %d\n", count_of_go_to_labels);
+    for(int i=0; i<count_of_go_to_labels; ++i) {
+        printf("%s %d %d %d\n", go_to_labels[i].name, go_to_labels[i].address, go_to_labels[i].byte_address, go_to_labels[i].type_of_command);
+    }*/
+
+    for(int i=0; i<count_of_go_to_labels; ++i) {
+        int position = go_to_labels[i].address;
+
+
+        for(int j=0; j<count_of_labels; ++j) {
+            if(!strcmp(labels[j].name, go_to_labels[i].name)) {
+                int now_address = labels[j].address;
+                //printf("position: %d\n", position);
+                for(int now_pow=7; now_pow>=0; --now_pow) {
+                    assembled_text[position + now_pow] = now_address % 10 + 48;
+                    now_address /= 10;
+                }
+            }
+        }
+    }
     /*printf("jump (%d) : ", count_of_jump_byte_position);
     for(int i=0; i<count_of_jump_byte_position; ++i)
         printf("%d ", jump_byte_position[i].address);
     printf("\nret (%d) : ", count_of_ret_byte_position);
     for(int i=0; i<count_of_ret_byte_position; ++i)
-        printf("%d ", ret_byte_position[i].address);
+        printf("%d (%d),\t", ret_byte_position[i].address, ret_byte_position[i].byte_address);
     printf("\nlabels: (%d) \n", count_of_labels);
     for(int i=0; i<count_of_labels; ++i)
         printf("%d %s\n", labels[i].address, labels[i].name);
-    printf("\n\n");*/
+    //printf("\nconds: (%d) \n", count_of_cond_byte_position);
+    //for(int i=0; i<count_of_cond_byte_position; ++i)
+    //    printf("%d %s\n", cond_byte_position[i].address, cond_byte_position[i].name);
+    printf("\n\n");
 
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
     int label_index = 0, assembler_text_index = 0;
@@ -291,15 +343,23 @@ void fill_array_by_machine_code(Label* labels, int count_of_labels, Label* jump_
         }
     }
 
-    for(int i=0; i<count_of_ret_byte_position; ++i) {
-        int position = ret_byte_position[i].address;
+    for(int i=0; i<count_of_call_byte_position; ++i) {
+        int position = call_byte_position[i].address;
 
         for(int j=0; j<count_of_labels; ++j) {
-            if(!strcmp(ret_byte_position[i].name, labels[j].name)) {
+            if(!strcmp(call_byte_position[i].name, labels[j].name)) {
                 assembled_text[position]     = labels[j].address / 10 + 48;
                 assembled_text[position + 1] = labels[j].address % 10 + 48;
             }
         }
+    }
+
+    for(int i=0; i<count_of_call_byte_position; ++i) {
+        int position = ret_byte_position[i].address;
+
+        printf("ret_b_p[i]: %d, call_b_pos.byte_add = %d\n", ret_byte_position[i].address, call_byte_position[i].byte_address);
+        assembled_text[position]     = (call_byte_position[i].byte_address + 1) / 10 + 48;
+        assembled_text[position + 1] = (call_byte_position[i].byte_address + 1) % 10 + 48;
     }
 
     /*printf("jump (%d) : ", count_of_jump_byte_position);
@@ -338,6 +398,7 @@ bool is_text_connected_with_labels(char* text, int* number_of_condition) {
         *number_of_condition = -1;
         command_is_condition = false;
     }
+    printf("num_of_cond: %d\n", *number_of_condition);
 
     return command_is_condition;
 }
