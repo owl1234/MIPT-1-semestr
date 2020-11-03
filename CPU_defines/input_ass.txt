@@ -1,0 +1,10 @@
+push 1
+pop rax
+cmp rax 2
+je cat:
+hlt
+
+cat:
+meow
+ret
+
