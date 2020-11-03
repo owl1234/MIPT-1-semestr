@@ -1,0 +1,53 @@
+jmp main:
+
+factN:
+pop rax
+push rax
+push 1
+call factRec:
+ret
+
+fact1:
+push 1
+ret
+
+factRec:
+push rax
+mul
+call decRax:
+cmp 1 rax
+jae recret
+call factRec:
+ret
+
+decRax:
+push rax
+push 1
+sub
+pop rax
+ret
+
+nosol:
+meow
+ret
+
+main:
+in
+pop rax
+push rax
+
+cmp rax 0
+jb nosol:
+
+cmp rax 0
+je fact1:
+
+cmp rax 1
+je fact1:
+
+cmp rax 1
+ja factN:
+
+out
+
+hlt
