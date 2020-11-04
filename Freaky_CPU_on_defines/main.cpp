@@ -3,12 +3,9 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  November 1, 2020, 00:00:25
+ *                  November 4, 2020, 12:41:25
  *  @par What was changed?
- *                      1. HAPPY HALLOWEEN !!!
- *                      2. Add ram.
- *                              push [rax] - take the contents of the register, contact the address in ram and make push
- *                              push [4]   - contact address 4 in ram and make push
+ *                      1. Fixed some bugs
  */
 
 #include <stdio.h>
@@ -16,40 +13,57 @@
 #include <assert.h>
 #include <string.h>
 #include "assembler.h"
-#include "disassembler.h"
+//#include "disassembler.h"
 #include "processor.h"
 #include "common.h"
 
+#define CREATE_FILE(file_name, reading_mode)                      \
+    File file = {};                                               \
+                                                                  \
+    status = file_construct(&file, file_name, reading_mode);      \
+    if(status != OK) {                                            \
+        return ERROR_NUMBER;                                      \
+    }
+
+#define CREATE_PROCESSOR(name_input_file)                         \
+    Processor processor = {};                                     \
+                                                                  \
+    status = initialization_proc(&processor, name_input_file);    \
+    if(status != OK) {                                            \
+        return ERROR_NUMBER;                                      \
+    }
+
 void help() {
-    printf("This program sorts strings from file in alphabetical order (without taking into account the signs of pre).\n"
+    printf("That is my realisarion of softprocessor.\n"
            "The required parameters look like this:\n"
-                    "[-h] - if you want to read this help again\n"
-                    "[-a] - if you want to assembler file\n"
-                    "[-d] - if you want to disassembler file\n"
-                    "[-p] - if you want to evaluate expression\n"
-                    "For more information, go here: https://github.com/owl1234/MIPT_projects_1_sem/tree/master/CPU\n");
+                    "[-h]                                                               - if you want to read this help again\n"
+                    "[-a name_input_file_to_assembler name_output_file_to_assembler]    - if you want to assembler file\n"
+                    "[-p name_input_file_to_processor]                                  - if you want to follow instructions\n"
+                    "[-a -p name_input_file_to_assembler name_output_file_to_assembler] - if you want to assembler file and follow instructions"
+                    "For more information, go here: https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines\n");
 }
 
 int main(const int argc, const char* argv[]) {
-    assert(argc == 2);
+    assert(argc > 0);
 
-    if(!strcmp(argv[1], "-a")) {
-        assembling_file();
-    } else if(!strcmp(argv[1], "-d")) {
-        disassembling_file();
-    } else if(!strcmp(argv[1], "-p")) {
-        File input_file = {};
+    int status = OK;
 
-        int status = file_construct(&input_file, name_output_file_ass);
-        if(status != OK_FILE) {
-            return ERROR_NUMBER;
-        }
+    if(argc == 5 && !strcmp(argv[1], "-a") && !strcmp(argv[2], "-p")) {
+        CREATE_FILE(argv[3], "r");
+        assembling_file(&file, argv[4]);
 
-        file_handler(input_file);
+        CREATE_PROCESSOR(argv[4]);
+        file_handler(&processor);
+    } else if(argc == 4 && !strcmp(argv[1], "-a")) {
+        CREATE_FILE(argv[2], "r");
+        assembling_file(&file, argv[3]);
+    } else if(argc == 3 && !strcmp(argv[1], "-p")) {
+        CREATE_PROCESSOR(argv[2]);
+        file_handler(&processor);
     } else {
         help();
     }
 
-    return 0;
+    return OK;
 }
 

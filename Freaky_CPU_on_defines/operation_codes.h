@@ -150,7 +150,7 @@ const char RAM_TEXT_REGISTERS[][6] = {
     "[rdx]"
 };
 
-const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
+/*const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
     0,
     2,
     1,
@@ -159,7 +159,8 @@ const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
     0,
     0,
     0,
-    0
+    0,
+
 };
 
 const int LENGTH_OF_TEXT_OPERATION[] = {
@@ -172,5 +173,5 @@ const int LENGTH_OF_TEXT_OPERATION[] = {
     3,
     3,
     2
-};
+};*/
 

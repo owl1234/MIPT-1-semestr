@@ -2,7 +2,7 @@
 
 int is_right_command(const char* line, const char* command);
 
-void assembling_file();
+void assembling_file(File* input_file, const char* name_output_file);
 
 void find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
                                                                                             Label* go_to_labels, int* index_in_go_to_labels);
@@ -25,8 +25,6 @@ void put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_tex
 void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 
 void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
-
-void put_char_into_assembled_text(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 
 void create_label(char* text, Label* labels, int* index_in_labels, int index_in_assembled_text, int number_of_byte);
 

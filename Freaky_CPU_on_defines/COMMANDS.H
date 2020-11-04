@@ -31,9 +31,8 @@ DEFINE_COMMANDS ( PUSH, 1, 2,
     } else if(flag_of_registers == (IS_RAM | IS_ELEM_T)) {
         stack_push(&(processor->proc_stack), processor->ram[(int)now_value]);
     } else {
-        POPADOS();
+        ERROR("Unknown value to add to the stack"); // POPADOS();
     }
-    //printf("push: %lg\n\n", now_value);
 })
 
 DEFINE_COMMANDS ( POP, 2, 2,

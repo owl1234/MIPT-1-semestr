@@ -4,6 +4,10 @@
 #include <string.h>
 #include "common.h"
 
+void ERROR(const char* status) {
+    printf("%s\n", status);
+}
+
 int is_right_command(const char* line, const char* command) {
     int length_command = strlen(command);
 
@@ -32,7 +36,7 @@ int number_of_symbols(char* buffer, char separator) {
     return number;
 }
 
-int file_construct(File* file, const char* name_file) {
+int file_construct(File* file, const char* name_file, const char* reading_mode) {
     assert(file);
     assert(name_file);
 
@@ -42,9 +46,9 @@ int file_construct(File* file, const char* name_file) {
     file->text         = (char*)calloc(file->information.st_size + 2, sizeof(char));
     file->copy_of_text = (char*)calloc(file->information.st_size + 2, sizeof(char));
 
-    file->ptr_to_file = fopen(file->name, "r");
+    file->ptr_to_file = fopen(file->name, reading_mode);
     int status = fread(file->text, sizeof(char), file->information.st_size, file->ptr_to_file);
-    printf("%d\n", status);
+
     if(status != file->information.st_size) {
         printf("File don't read normal!\n");
         return ERROR_NUMBER;
@@ -54,7 +58,7 @@ int file_construct(File* file, const char* name_file) {
     fclose(file->ptr_to_file);
 
     file->lines = number_of_symbols(file->text, '\n');
-    return OK_FILE;
+    return OK;
 }
 
 
@@ -95,45 +99,4 @@ int get_number_of_register(const char* text) {
     }
 
     return ERROR_NUMBER;
-}
-
-double string_to_double(char* text) {
-    double whole_part = 0;
-    double fractional_part = 0;
-
-    int length = strlen(text);
-    int is_negative = 1;
-    int position = 0;
-
-    while(text[position] == '0') {
-        ++position;
-    }
-
-    if(text[position] == '-') {
-        ++position;
-        is_negative = -1;
-    }
-
-    for(; position<length; ++position) {
-        if(text[position] == '.') {
-            break;
-        }
-
-        whole_part += text[position] - 48;
-        whole_part *= 10;
-    }
-    whole_part /= 10;
-
-    if(text[position] == '.') {
-        for(int i=length-1; i>position; --i) {
-            fractional_part += text[i] - 48;
-            fractional_part /= 10;
-        }
-
-        whole_part += fractional_part;
-    }
-
-    whole_part *= is_negative;
-
-    return whole_part;
 }

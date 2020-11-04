@@ -6,7 +6,7 @@
 #include "operation_codes.h"
 #include "stack.h"
 
-#define DEFINE_COMMANDS(name, number, arg, code)                                                 \
+#define DEFINE_COMMANDS(name, number, arg, code)                                                   \
     if (!strcmp(command, #name))                                                                   \
     {                                                                                              \
         code = COM_##name;                                                                         \
@@ -14,20 +14,13 @@
     }
 
 
-const char name_input_file_ass[]  = "quadratic_equation.txt";
-const char name_output_file_ass[] = "output_ass.txt";
-
-const char name_input_file_disass[]  = "input_disass.txt";
-const char name_output_file_disass[] = "output_disass.txt";
-
 const int MAX_SIZE = 10;
 const int MAX_SIZE_RAM = 100000;
 const int ERROR_NUMBER = -3802;
 const double EPSILON = 1e-6;
-const int OK_FILE = 0;
 const int OK = 0;
 const int number_of_register_vars = 4;
-const int number_of_commands = 9;
+const int number_of_commands = sizeof(TEXT_OPERATION) / sizeof(TEXT_OPERATION[0]);
 const int MAX_COUNT_LABELS = 20;
 
 const char SEPARATORS[] = "\n ";
@@ -71,16 +64,16 @@ struct Label {
     int type_of_command;
 };
 
+void ERROR(const char* status);
+
 int is_right_command(const char* line, const char* command);
 
 int number_of_symbols(char* buffer, char separator);
 
-int file_construct(File* file, const char* name_file);
+int file_construct(File* file, const char* name_file, const char* reading_mode);
 
 int type_of_value(const char* operation);
 
 int get_number_of_register(const char* text);
-
-double string_to_double(char* text);
 
 #endif // COMMON_H
