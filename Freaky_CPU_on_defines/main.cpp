@@ -3,11 +3,13 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  November 5, 2020, 16:15:25
+ *                  November 6, 2020, 00:00:00
  *  @par What was changed?
- *                      1. Fixed factorial.txt
- *                      2. Fixed work with files
- *                      3. The output from the recursive function works fine
+ *                      1. Fixed disassembler
+ *                      2. Fixed command meow
+ *  @par To-do list
+ *                      1. Add functions related with labels to disassembler
+ *                      2. Fix the output to the file
  */
 
 #include <stdio.h>
@@ -15,7 +17,7 @@
 #include <assert.h>
 #include <string.h>
 #include "assembler.h"
-//#include "disassembler.h"
+#include "disassembler.h"
 #include "processor.h"
 #include "common.h"
 
@@ -62,6 +64,9 @@ int main(const int argc, const char* argv[]) {
     } else if(argc == 3 && !strcmp(argv[1], "-p")) {
         CREATE_PROCESSOR(argv[2]);
         file_handler(&processor);
+    } else if(argc == 4 && !strcmp(argv[1], "-d")){
+        CREATE_FILE(argv[2], "rb");
+        disassembling_file(&file, argv[3]);
     } else {
         help();
     }

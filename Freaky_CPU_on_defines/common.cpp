@@ -43,21 +43,29 @@ int file_construct(File* file, const char* name_file, const char* reading_mode) 
     file->name = name_file;
     stat(file->name, &(file->information));
 
-    file->text         = (char*)calloc(file->information.st_size + 2, sizeof(char));
-    file->copy_of_text = (char*)calloc(file->information.st_size + 2, sizeof(char));
-
     file->ptr_to_file = fopen(file->name, reading_mode);
-    int status = fread(file->text, sizeof(char), file->information.st_size, file->ptr_to_file);
+    int status = 0;
 
-    if(status != file->information.st_size) {
-        printf("File don't read normal!\n");
+    if(!strcmp(reading_mode, "r")) {
+        file->text_for_assembling    = (char*)calloc(file->information.st_size + 2, sizeof(char));
+        file->text_for_disassembling = nullptr;
+        status = fread(file->text_for_assembling, sizeof(char), file->information.st_size, file->ptr_to_file);
+        file->lines = number_of_symbols(file->text_for_assembling, '\n');
+    } else if(!strcmp(reading_mode, "rb")) {
+        file->text_for_assembling    = nullptr;
+        file->text_for_disassembling = (double*)calloc(file->information.st_size + 2, sizeof(double));
+        status = fread(file->text_for_disassembling, sizeof(double), file->information.st_size, file->ptr_to_file);
+        //file->lines = number_of_symbols(file->text_for_disassembling, '\n');
+    }
+
+    if(status * sizeof(char)   != file->information.st_size && !strcmp(reading_mode, "r") ||
+       status * sizeof(double) != file->information.st_size && !strcmp(reading_mode, "rb")) {
+        printf("File don't read normal! (%d %d)\n", status * 8, file->information.st_size);
         return ERROR_NUMBER;
     }
 
-    strcpy(file->copy_of_text, file->text);
     fclose(file->ptr_to_file);
 
-    file->lines = number_of_symbols(file->text, '\n');
     return OK;
 }
 

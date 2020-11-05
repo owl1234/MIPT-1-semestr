@@ -230,6 +230,9 @@ DEFINE_COMMANDS ( RET, 41, 0,
 
 DEFINE_COMMANDS ( MEOW, 99, 0,
 {
-    printf("meow\n");
+    for(int i=0; i<processor->proc_stack.size_stack; ++i) {
+        printf("meow ");
+    }
+    printf("\n");
 })
 

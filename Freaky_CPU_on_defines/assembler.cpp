@@ -8,14 +8,6 @@
 #include "common.h"
 
 void assembling_file(File* input_file, const char* name_output_file) {
-    /*File input_file = {};
-    printf("!!! %d\n", number_of_commands);
-    int status = file_construct(&input_file, name_input_file_ass);
-    if(status != OK) {
-        printf("PANIC (%d).....\n", status);
-        return;
-    }*/
-
     printf("Start assembling file.........................................\n");
 
     char symbol = '!';
@@ -31,7 +23,7 @@ void assembling_file(File* input_file, const char* name_output_file) {
 
     int index_in_go_to_labels = 0;
 
-    temp_string = strtok(input_file->text, SEPARATORS);
+    temp_string = strtok(input_file->text_for_assembling, SEPARATORS);
     while(temp_string != NULL) {
         //printf("now_command: %s (%d)\n", temp_string, number_of_byte);
         find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, &index_in_labels, &number_of_byte, go_to_labels, &index_in_go_to_labels);

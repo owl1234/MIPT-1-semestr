@@ -41,8 +41,8 @@ enum TYPE_OF_ARGUMENT {
 struct File {
     FILE* ptr_to_file;
     const char* name;
-    char* text;
-    char* copy_of_text;
+    char* text_for_assembling;
+    double* text_for_disassembling;
     int lines;
     struct stat information;
 };
