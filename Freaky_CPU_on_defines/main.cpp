@@ -3,9 +3,11 @@
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @version 1.0
  *  @par Last edition
- *                  November 4, 2020, 12:41:25
+ *                  November 5, 2020, 16:15:25
  *  @par What was changed?
- *                      1. Fixed some bugs
+ *                      1. Fixed factorial.txt
+ *                      2. Fixed work with files
+ *                      3. The output from the recursive function works fine
  */
 
 #include <stdio.h>

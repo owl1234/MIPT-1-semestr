@@ -15,7 +15,7 @@ factRec:
 push rax
 mul
 call decRax:
-cmp 1 rax
+cmp rax 1
 jae recret
 call factRec:
 ret

@@ -14,11 +14,14 @@
         code;                                       \
         break;
 
+#define IF_DEBUG(code)
+
 void POPADOS() {
     printf("popados  .....  (╯ ° □ °) ╯ (┻━┻) \n");
     abort();
 }
 
+IF_DEBUG(
 void print_regs(Elem_t* registers_variables, int number_of_register_vars) {
     for(int i=0; i<number_of_register_vars; ++i) {
         printf(identity, registers_variables[i]);
@@ -38,6 +41,7 @@ void print_stack(Stack_t* stack_) {
         printf("%lg ", stack_->data[i]);
     printf("\n\n");
 }
+)
 
 int initialization_proc(Processor* processor, const char* name_input_file) {
     FILE* input_file = fopen(name_input_file, "rb");
@@ -85,7 +89,7 @@ void file_handler(Processor* processor) {
 
     while(now_byte < processor->symbols && now_command != OPERATION_CODE_HLT) {
         now_command = processor->text[now_byte];
-        printf("> now_command: %d (byte: %d) \n", now_command, now_byte);
+        IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
 
        switch (now_command) {
             #include "COMMANDS.H"
@@ -93,7 +97,6 @@ void file_handler(Processor* processor) {
             default:
                 ERROR("popados (bad command) .....  (╯ ° □ °) ╯ (┻━┻) \n");
         }
-
         ++now_byte;
     }
 }

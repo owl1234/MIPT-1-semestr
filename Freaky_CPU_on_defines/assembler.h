@@ -28,7 +28,7 @@ void put_double_into_assembled_text(double code_of_operation, char* assembled_te
 
 void create_label(char* text, Label* labels, int* index_in_labels, int index_in_assembled_text, int number_of_byte);
 
-int create_assembling_file(const char* assembled_text, const int index_in_assembled_text);
+int create_assembling_file(const char* assembled_text, const int index_in_assembled_text, const char* name_output_file);
 
 int reversed_number(int value, int* length);
 

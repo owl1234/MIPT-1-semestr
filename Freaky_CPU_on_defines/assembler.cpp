@@ -16,7 +16,7 @@ void assembling_file(File* input_file, const char* name_output_file) {
         return;
     }*/
 
-    printf("Start to assembling file.........................................\n");
+    printf("Start assembling file.........................................\n");
 
     char symbol = '!';
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
@@ -40,7 +40,7 @@ void assembling_file(File* input_file, const char* name_output_file) {
 
     fill_array_by_machine_code(labels, index_in_labels, go_to_labels,  index_in_go_to_labels, assembled_text, index_in_assembled_text);
 
-    int status = create_assembling_file(assembled_text, index_in_assembled_text);
+    int status = create_assembling_file(assembled_text, index_in_assembled_text, name_output_file);
     if(status != OK) {
         printf("There are problems with the file %s\n", name_output_file);
         return;
@@ -199,8 +199,8 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
     ++(*index_in_labels);
 }
 
-int create_assembling_file(const char* assembled_text, const int index_in_assembled_text) {
-    FILE* output_file = fopen("out_asm.lst", "wb");
+int create_assembling_file(const char* assembled_text, const int index_in_assembled_text, const char* name_output_file) {
+    FILE* output_file = fopen(name_output_file, "wb");
     if(output_file == NULL) {
         return ERROR_NUMBER;
     }

@@ -8,6 +8,13 @@
         now_byte = address_label - 1;                                   \
     }
 
+#define RECURSIVE_RETURN                                                \
+    stack_pop(&(processor->call_stack));                                \
+    int go_to_address = stack_back(&(processor->call_stack));           \
+    IF_DEBUG(print_stack(&(processor->call_stack));)                    \
+    now_byte = go_to_address;                                           \
+
+
 DEFINE_COMMANDS ( HLT, 0, 0,
 {
     printf("End of work (hlt!)\n");
@@ -139,7 +146,10 @@ DEFINE_COMMANDS ( JE, 31, 1,
     if(fabs(first_comparison - second_comparison) < EPSILON) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        get_double_from_text(processor, &now_byte);
+        int address_label = get_double_from_text(processor, &now_byte);
+        if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
+            RECURSIVE_RETURN;
+        }
     }
 })
 
@@ -148,7 +158,10 @@ DEFINE_COMMANDS ( JNE, 32, 1,
     if(fabs(first_comparison - second_comparison) >= EPSILON) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        get_double_from_text(processor, &now_byte);
+        int address_label = get_double_from_text(processor, &now_byte);
+        if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
+            RECURSIVE_RETURN;
+        }
     }
 })
 
@@ -157,7 +170,10 @@ DEFINE_COMMANDS ( JA, 33, 1,
     if(first_comparison > second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        get_double_from_text(processor, &now_byte);
+        int address_label = get_double_from_text(processor, &now_byte);
+        if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
+            RECURSIVE_RETURN;
+        }
     }
 })
 
@@ -166,7 +182,10 @@ DEFINE_COMMANDS ( JAE, 34, 1,
     if(first_comparison >= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        get_double_from_text(processor, &now_byte);
+        int address_label = get_double_from_text(processor, &now_byte);
+        if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
+            RECURSIVE_RETURN;
+        }
     }
 })
 
@@ -175,7 +194,10 @@ DEFINE_COMMANDS ( JB, 35, 1,
     if(first_comparison < second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        get_double_from_text(processor, &now_byte);
+        int address_label = get_double_from_text(processor, &now_byte);
+        if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
+            RECURSIVE_RETURN;
+        }
     }
 })
 
@@ -184,7 +206,10 @@ DEFINE_COMMANDS ( JBE, 36, 1,
     if(first_comparison <= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        get_double_from_text(processor, &now_byte);
+        int address_label = get_double_from_text(processor, &now_byte);
+        if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
+            RECURSIVE_RETURN;
+        }
     }
 })
 

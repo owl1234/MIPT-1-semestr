@@ -88,9 +88,7 @@ void error_print_data(Stack_t* node, FILE* file) {
         } else {
             for(int i=0; i<stack_all_size; ++i) {
                 write_indent(file, base_indent - (get_len_indent(i) - len_indent));
-                if(node->data[i] == NULL) {
-                    fprintf(file, " [%d] - [%p] - !!!  NULL  !!! \t ( !!! ATTENTION !!! DATA IS NULL !!! )\n", i, &(node->data[i]));
-                } else if(node->data[i] == POISON) {
+                if(node->data[i] == POISON) {
                     fprintf(file, " [%d] - [%p] - !!! POISON !!!\n", i, &(node->data[i]));
                 } else {
                     fprintf(file, "*[%d] - [%p] \n", i, &(node->data[i]));
