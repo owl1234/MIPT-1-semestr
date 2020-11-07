@@ -36,40 +36,6 @@ int number_of_symbols(char* buffer, char separator) {
     return number;
 }
 
-int file_construct(File* file, const char* name_file, const char* reading_mode) {
-    assert(file);
-    assert(name_file);
-
-    file->name = name_file;
-    stat(file->name, &(file->information));
-
-    file->ptr_to_file = fopen(file->name, reading_mode);
-    int status = 0;
-
-    if(!strcmp(reading_mode, "r")) {
-        file->text_for_assembling    = (char*)calloc(file->information.st_size + 2, sizeof(char));
-        file->text_for_disassembling = nullptr;
-        status = fread(file->text_for_assembling, sizeof(char), file->information.st_size, file->ptr_to_file);
-        file->lines = number_of_symbols(file->text_for_assembling, '\n');
-    } else if(!strcmp(reading_mode, "rb")) {
-        file->text_for_assembling    = nullptr;
-        file->text_for_disassembling = (double*)calloc(file->information.st_size + 2, sizeof(double));
-        status = fread(file->text_for_disassembling, sizeof(double), file->information.st_size, file->ptr_to_file);
-        //file->lines = number_of_symbols(file->text_for_disassembling, '\n');
-    }
-
-    if(status * sizeof(char)   != file->information.st_size && !strcmp(reading_mode, "r") ||
-       status * sizeof(double) != file->information.st_size && !strcmp(reading_mode, "rb")) {
-        printf("File don't read normal! (%d %d)\n", status * 8, file->information.st_size);
-        return ERROR_NUMBER;
-    }
-
-    fclose(file->ptr_to_file);
-
-    return OK;
-}
-
-
 int type_of_value(const char* operation) {
     int length = strlen(operation);
     int flag_of_value = 0;
@@ -108,3 +74,25 @@ int get_number_of_register(const char* text) {
 
     return ERROR_NUMBER;
 }
+
+bool is_it_register(const char* text) {
+    if(get_number_of_register(text) == ERROR_NUMBER) {
+        return false;
+    }
+
+    return true;
+}
+
+/*double string_to_double(char* text) {
+    int length = strlen(text);
+
+    char* temp_text = (char*)calloc(length-2, sizeof(char));
+    for(int i=1; i<length-1; ++i) {
+        temp_text[i] = text[i];
+        printf("%c", temp_text[i]);
+    }
+    printf(" %lg\n", strtod(temp_text, NULL));
+
+
+    return strtod(temp_text, NULL);
+}*/

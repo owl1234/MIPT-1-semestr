@@ -6,7 +6,7 @@
 #include "common.h"
 #include "disassembler.h"
 
-#define IF_DEBUG(code) code
+//#define IF_DEBUG(code) code
 
 void disassembling_file(File* input_file, const char* name_output_file) {
     printf("Start disassembling file.........................................\n");

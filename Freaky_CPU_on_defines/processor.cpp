@@ -16,9 +16,17 @@
 
 #define IF_DEBUG(code)
 
-void POPADOS() {
+/*void POPADOS() {
     printf("popados  .....  (╯ ° □ °) ╯ (┻━┻) \n");
     abort();
+}*/
+
+void help() {
+    printf("That is my realisarion of softprocessor.\n"
+           "The required parameters look like this:\n"
+                    "[-h]                              - if you want to read this help again\n"
+                    "[-p name_input_file_to_processor] - if you want to follow instructions\n"
+                    "For more information, go here: https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines\n");
 }
 
 IF_DEBUG(
@@ -43,9 +51,17 @@ void print_stack(Stack_t* stack_) {
 }
 )
 
+/*void init_ram(Processor* processor) {
+    for(int i=0; i<MAX_SIZE; ++i) {
+        processor->ram[i] = i;
+        printf("%lg ", processor->ram[i]);
+    }
+    printf("\n");
+}*/
+
 int initialization_proc(Processor* processor, const char* name_input_file) {
     FILE* input_file = fopen(name_input_file, "rb");
-    int bytes_in_buffer = size_of_buffer(input_file); // bytes !!!
+    int bytes_in_buffer = size_of_buffer(input_file);
 
     processor->symbols = bytes_in_buffer / sizeof(double);
 
@@ -55,8 +71,8 @@ int initialization_proc(Processor* processor, const char* name_input_file) {
     stack_construct(&(processor->proc_stack));
     stack_construct(&(processor->call_stack));
     processor->registers_variables = (Elem_t*)calloc(number_of_register_vars, sizeof(Elem_t));
-    processor->ram = (Elem_t*)calloc(MAX_SIZE_RAM, sizeof(Elem_t));
-    //init_ram(ram);
+    //processor->ram = (Elem_t*)calloc(MAX_SIZE_RAM, sizeof(Elem_t));
+    //init_ram(processor);
 
     if(status != bytes_in_buffer / sizeof(double)) {
         return ERROR_NUMBER;
@@ -101,15 +117,13 @@ void file_handler(Processor* processor) {
     }
 }
 
-/*int check_commands() {
-    if(sizeof(NUMBER_ARGUMENTS_FOR_OPERATION) == sizeof(LENGTH_OF_TEXT_OPERATION) &&
-       sizeof(NUMBER_ARGUMENTS_FOR_OPERATION) == number_of_commands) {
-        return OK;
-    }
+void destruct_processor(Processor* processor) {
+    //free(processor->ram);
+    free(processor->text);
+    stack_destruct(&(processor->call_stack));
+    stack_destruct(&(processor->proc_stack));
+}
 
-    printf("The command system is outdated! (%d %d %d)\n", sizeof(NUMBER_ARGUMENTS_FOR_OPERATION), sizeof(LENGTH_OF_TEXT_OPERATION), number_of_commands);
-    return ERROR_NUMBER;
-}*/
 
 Elem_t get_value_to_compare(Processor* processor, int* now_byte) {
     int flag_of_register = get_double_from_text(processor, now_byte);
@@ -128,3 +142,23 @@ int get_double_from_text(Processor* processor, int* now_byte) {
 }
 
 #undef DEFINE_COMMANDS
+
+int main(const int argc, const char* argv[]) {
+    assert(argc > 0);
+
+    if(argc == 2) {
+        Processor processor = {};
+
+        int status = initialization_proc(&processor, argv[1]);
+        if(status != OK) {
+            return ERROR_NUMBER;
+        }
+
+        file_handler(&processor);
+        destruct_processor(&processor);
+    } else {
+        help();
+    }
+
+    return OK;
+}

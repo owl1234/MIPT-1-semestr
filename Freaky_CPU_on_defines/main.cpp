@@ -6,10 +6,10 @@
  *                  November 6, 2020, 00:00:00
  *  @par What was changed?
  *                      1. Fixed disassembler
- *                      2. Fixed command meow
+ *                      2. Broke listing
  *  @par To-do list
  *                      1. Add functions related with labels to disassembler
- *                      2. Fix the output to the file
+ *                      2. Fix listing !!!
  */
 
 #include <stdio.h>
@@ -29,13 +29,7 @@
         return ERROR_NUMBER;                                      \
     }
 
-#define CREATE_PROCESSOR(name_input_file)                         \
-    Processor processor = {};                                     \
-                                                                  \
-    status = initialization_proc(&processor, name_input_file);    \
-    if(status != OK) {                                            \
-        return ERROR_NUMBER;                                      \
-    }
+#define
 
 void help() {
     printf("That is my realisarion of softprocessor.\n"
@@ -58,12 +52,14 @@ int main(const int argc, const char* argv[]) {
 
         CREATE_PROCESSOR(argv[4]);
         file_handler(&processor);
+        destruct_processor(&processor);
     } else if(argc == 4 && !strcmp(argv[1], "-a")) {
         CREATE_FILE(argv[2], "r");
         assembling_file(&file, argv[3]);
     } else if(argc == 3 && !strcmp(argv[1], "-p")) {
         CREATE_PROCESSOR(argv[2]);
         file_handler(&processor);
+        destruct_processor(&processor);
     } else if(argc == 4 && !strcmp(argv[1], "-d")){
         CREATE_FILE(argv[2], "rb");
         disassembling_file(&file, argv[3]);

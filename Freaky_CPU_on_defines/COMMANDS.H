@@ -36,6 +36,7 @@ DEFINE_COMMANDS ( PUSH, 1, 2,
     } else if(flag_of_registers == (IS_RAM | IS_REGISTER)) {
         stack_push(&(processor->proc_stack), processor->ram[(int)(processor->registers_variables[(int)now_value])]);
     } else if(flag_of_registers == (IS_RAM | IS_ELEM_T)) {
+        printf("%d\n", (int)now_value);
         stack_push(&(processor->proc_stack), processor->ram[(int)now_value]);
     } else {
         ERROR("Unknown value to add to the stack"); // POPADOS();
@@ -108,7 +109,7 @@ DEFINE_COMMANDS ( OUT, 7, 0,
         printf("Stack is empty\n");
     } else {
         //print_stack(&proc_stack);
-        printf("Answer: (size = %d) ", processor->proc_stack.size_stack);
+        printf("Answer: (size_stack = %lu) ", processor->proc_stack.size_stack);
         printf(identity, stack_back(&(processor->proc_stack)));
         printf("\n\n");
     }
@@ -116,6 +117,7 @@ DEFINE_COMMANDS ( OUT, 7, 0,
 
 DEFINE_COMMANDS ( IN, 8, 0,
 {
+    printf("Enter your number: ");
     scanf(identity, &input_value);
     stack_push(&(processor->proc_stack), input_value);
 })
@@ -230,9 +232,6 @@ DEFINE_COMMANDS ( RET, 41, 0,
 
 DEFINE_COMMANDS ( MEOW, 99, 0,
 {
-    for(int i=0; i<processor->proc_stack.size_stack; ++i) {
-        printf("meow ");
-    }
-    printf("\n");
+    printf("meow\n");
 })
 
