@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 8, 2020, 22:45:25
+ *                  November 9, 2020, 01:38:25
  *  @par What was changed?
- *                      1. Add signature
+ *                      1. Made defines for functions
  *  @par To-do list
  *                      2. Make adequate listing !!!
  *
@@ -29,6 +29,12 @@ void help() {
                     "[-a name_input_file_to_assembler name_output_file_to_assembler]    - if you want to assembler file\n"
                     "For more information, go here: https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines\n");
 }
+
+#define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler, code_assembler)   \
+    case number:                                                         \
+        printf("find command %s\n", #name); \
+        code_assembler;                                                          \
+        break;
 
 int file_construct(File* file, char* name_file, const char* reading_mode) {
     assert(file);
@@ -65,45 +71,45 @@ int file_construct(File* file, char* name_file, const char* reading_mode) {
     return OK;
 }
 
-void listing(File* file, const char* symbols_to_output, const int flag_of_the_end) {
-    fprintf(file->listing_file, "%s%s", symbols_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
+void listing(FILE* listing_file, const char* symbols_to_output, FLAGS_OF_THE_END_LINE flag_of_the_end) {
+    fprintf(listing_file, "%s%s", symbols_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
-void listing_alignment(File* file, const int number_to_output, const int flag_of_the_end) {
-    fprintf(file->listing_file, "%#08d%s", number_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
+void listing_alignment(FILE* listing_file, const int number_to_output, FLAGS_OF_THE_END_LINE flag_of_the_end) {
+    fprintf(listing_file, "%#08d%s", number_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
-void listing(File* file, const int flag_of_the_end, int count_of_args, ...) {
+void listing(FILE* listing_file, const int flag_of_the_end, int count_of_args, ...) {
     va_list argptr;
     va_start(argptr, count_of_args);
 
     while(count_of_args > 0) {
-        fprintf(file->listing_file, "%d ", va_arg(argptr, int));
+        fprintf(listing_file, "%d ", va_arg(argptr, int));
         --count_of_args;
     }
 
     va_end(argptr);
 
-    fprintf(file->listing_file, "%s", TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
+    fprintf(listing_file, "%s", TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
-void listing(File* file, const int flag_of_the_end, double count_of_args, ...) {
+void listing(FILE* listing_file, const int flag_of_the_end, double count_of_args, ...) {
     va_list argptr;
     va_start(argptr, count_of_args);
 
     int int_count_of_args = (int)count_of_args;
     while(int_count_of_args > 0) {
-        fprintf(file->listing_file, "%lg ", va_arg(argptr, double));
+        fprintf(listing_file, "%lg ", va_arg(argptr, double));
         --int_count_of_args;
     }
 
     va_end(argptr);
 
-    fprintf(file->listing_file, "%s", TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
+    fprintf(listing_file, "%s", TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
-void listing(File* file, char symbol_to_output, int flag_of_the_end) {
-    fprintf(file->listing_file, "%c%s", symbol_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
+void listing(FILE* listing_file, char symbol_to_output, int flag_of_the_end) {
+    fprintf(listing_file, "%c%s", symbol_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
 int assembling_file(File* input_file, const char* name_output_file) {
@@ -116,19 +122,25 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
     Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
 
-    int status = 0, index_in_labels = 0;
+    int status = 0, index_in_labels = 0, number_of_condition = 0, number_of_command = 0;
+    int first_type_of_value = 0, second_type_of_value = 0;
 
     find_labels_into_text(input_file, labels, &index_in_labels, &number_of_byte);
 
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
     temp_string = strtok(input_file->text_for_assembling, SEPARATORS);
 
-    listing_alignment(input_file, number_of_byte, SPACE);
-    listing(input_file, "|", SPACE);
+    listing_alignment(input_file->listing_file, number_of_byte, SPACE);
+    listing(input_file->listing_file, "|", SPACE);
 
+    //printf("%s\n", temp_string);
     while(temp_string != NULL) {
-        //printf("now_command: %s (%d)\n", temp_string, number_of_byte);
-        status = find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, index_in_labels, &number_of_byte, input_file);
+        number_of_command = get_number_of_command(temp_string);
+        printf("now_command: %d\n", number_of_command);
+
+        switch(number_of_command) {
+            #include "COMMANDS.H"
+        }
 
         if(!is_it_label(temp_string)) {
             temp_string = strtok(NULL, SEPARATORS);
@@ -137,8 +149,8 @@ int assembling_file(File* input_file, const char* name_output_file) {
                 break;
             }
 
-            listing_alignment(input_file, number_of_byte, SPACE);
-            listing(input_file, "|", SPACE);
+            listing_alignment(input_file->listing_file, number_of_byte, SPACE);
+            listing(input_file->listing_file, "|", SPACE);
         } else {
             temp_string = strtok(NULL, SEPARATORS);
         }
@@ -209,25 +221,9 @@ bool is_it_label(const char* word) {
 }
 
 int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file) { // TO-DO DEFINES
-    int number_of_condition = 0;
 
-    if(!strcmp(text, "push")) {
-        assembler_push(text, assembled_text, index_in_assembled_text, number_of_byte, listing_file);
-    } else if(!strcmp(text, "pop")) {
-        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, listing_file);
-    } else if(!strcmp(text, "hlt")) {
-        put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte);
-
-        listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_HLT);
-        listing(listing_file, "| hlt", END_LINE);
-    } else if(is_text_connected_with_labels(text, &number_of_condition)) {
+    /*if(is_text_connected_with_labels(text, &number_of_condition)) {
         assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, labels, index_in_labels, number_of_condition, listing_file);
-    } else if(!strcmp(text, "cmp")) {
-        assembler_cmp(text, assembled_text, index_in_assembled_text, number_of_byte, listing_file);
-    } else if(!strcmp(text, "meow")) {
-        assembler_meow(assembled_text, index_in_assembled_text, number_of_byte, listing_file);
-    } else if(!strcmp(text, "sqrt")) {
-        assembler_sqrt(assembled_text, index_in_assembled_text, number_of_byte, listing_file);
     } else {
         for(int operation_code = OPERATION_CODE_ADD; operation_code<number_of_commands; ++operation_code) {
             if(!strcmp(text, TEXT_OPERATION[operation_code])) {
@@ -241,151 +237,25 @@ int find_and_write_command(char* text, char* assembled_text, int* index_in_assem
         }
 
         return ASM_BAD_COMMAND;
-    }
+    }*/
 
     return OK;
-
 }
 
-void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
-    put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, index_in_assembled_text, number_of_byte);
+int get_number_of_command(char* text) {
+    int length = sizeof(TEXT_OPERATION);
 
-    text = strtok(NULL, SEPARATORS);
-
-    int type_push_value = type_of_value(text);
-    put_int_into_assembled_text(type_push_value, assembled_text, index_in_assembled_text, number_of_byte);
-
-
-    if(type_push_value == IS_REGISTER || type_push_value == (IS_RAM | IS_REGISTER)) {
-
-        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte);
-
-        listing(listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_PUSH, type_push_value, get_number_of_register(text));
-        listing(listing_file, "| push", SPACE);
-        listing(listing_file, text, END_LINE);
-
-    } else if(type_push_value == IS_ELEM_T || type_push_value == (IS_RAM | IS_ELEM_T)) {
-        if(type_push_value == (IS_RAM | IS_ELEM_T)) {
-            text = strchr(text, '[') + 1;
-            reverse_string(text);
-            text = strchr(text, ']') + 1;
-            reverse_string(text);
+    for(int i=0; i<length; ++i) {
+        if(!strcmp(text, TEXT_OPERATION[i])) {
+            return i;
         }
-
-        double now_value = strtod(text, NULL);
-        put_double_into_assembled_text(now_value, assembled_text, index_in_assembled_text, number_of_byte);
-
-        listing(listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_PUSH, type_push_value);
-        listing(listing_file, NOTHING, (double)ONE_ARGUMENT, now_value);
-        listing(listing_file, "| push ", NOTHING);
-        listing(listing_file, END_LINE, (double)ONE_ARGUMENT, now_value);
-
-    } else {
-        printf("Bad type of push value! (%d)\n", type_push_value);
-        return;
     }
+
+    return ERROR_NUMBER;
 }
 
-void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file) {
-
-    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte);
-
-    text = strtok(NULL, SEPARATORS);
-
-    if(type_of_value(text) == IS_REGISTER) {
-
-        put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte);
-        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte);
-
-        listing(listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_POP, IS_REGISTER, get_number_of_register(text));
-        listing(listing_file, "| pop ", NOTHING);
-        listing(listing_file, text, END_LINE);
-
-    } else {
-
-        put_int_into_assembled_text(NOT_ARGS, assembled_text, index_in_assembled_text, number_of_byte);
-
-        listing(listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_POP, NOT_ARGS);
-        listing(listing_file, "| pop", END_LINE);
-
-        listing_alignment(listing_file, *number_of_byte, SPACE);
-        listing(listing_file, "| ", NOTHING);
-
-        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, listing_file);
-
-    }
-}
-
-void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
-    put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, index_in_assembled_text, number_of_byte);
-
-    int first_type_of_value = 0, second_type_of_value = 0;
-
-    char* first_string = (char*)calloc(MAX_SIZE, sizeof(char));
-    char* second_string = (char*)calloc(MAX_SIZE, sizeof(char));
-
-    int first_value  = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, first_string,  &first_type_of_value);
-    int second_value = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, second_string, &second_type_of_value);
-
-    listing(listing_file, NOTHING, FIVE_ARGUMENTS, OPERATION_CODE_CMP, first_type_of_value, first_value, second_type_of_value, second_value);
-    listing(listing_file, "|", SPACE);
-    listing(listing_file, "cmp", SPACE);
-    listing(listing_file, first_string, SPACE);
-    listing(listing_file, second_string, END_LINE);
-}
-
-void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
-    put_int_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, index_in_assembled_text, number_of_byte);
-
-    listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_MEOW);
-    listing(listing_file, "| meow", END_LINE);
-}
-
-void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
-    put_int_into_assembled_text(OPERATION_CODE_SQRT, assembled_text, index_in_assembled_text, number_of_byte);
-
-    listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_SQRT);
-    listing(listing_file, "| sqrt", END_LINE);
-}
-
-void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int index_in_labels, int number_of_condition,
-                                                                                                                                                            File* listing_file) {
-
-    if(strcmp(text, "ret")) {
-        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte);
-
-        text = strtok(NULL, SEPARATORS);
-        if(!strcmp(text, "recret")) {
-            put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, index_in_assembled_text, number_of_byte);
-
-            listing(listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);
-            listing(listing_file, "|", SPACE);
-            listing(listing_file, TEXT_OPERATION[number_of_condition], SPACE);
-            listing(listing_file, text, END_LINE);
-        } else {
-            for(int label=0; label<index_in_labels; ++label) {
-                if(is_equal_labels(text, labels[label].name)) {
-                    put_int_into_assembled_text(labels[label].byte_address + 1, assembled_text, index_in_assembled_text, number_of_byte);
-
-                    listing(listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, labels[label].byte_address);
-                    listing(listing_file, "|", SPACE);
-                    listing(listing_file, TEXT_OPERATION[number_of_condition], SPACE);
-                    listing(listing_file, text, END_LINE);
-                    break;
-                }
-            }
-        }
-    } else {
-        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte);
-
-        listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_RET);
-        listing(listing_file, "|", SPACE);
-        listing(listing_file, TEXT_OPERATION[OPERATION_CODE_RET], END_LINE);
-    }
-}
 
 bool is_equal_labels(const char* first, const char* second) {
-    //printf("\t%s\n", second);
     int length_first  = strlen(first);
     int length_second = strlen(second);
 
@@ -458,7 +328,6 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
     labels[*index_in_labels].name = (char*)calloc(MAX_SIZE, sizeof(char));
     strcpy(labels[*index_in_labels].name, text);
     labels[*index_in_labels].byte_address = number_of_byte;
-    labels[*index_in_labels].type_of_command = -1;
 
     ++(*index_in_labels);
 }
@@ -505,21 +374,6 @@ int reversed_number(int value, int* length) {
     }
 
     return reverse_number;
-}
-
-int length_of_number(int value) {
-    if(value == 0) {
-        return 1;
-    }
-
-    int length = 0;
-
-    while(value > 0) {
-        value /= 10;
-        ++length;
-    }
-
-    return length;
 }
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition) {

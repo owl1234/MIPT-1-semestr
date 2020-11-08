@@ -65,6 +65,21 @@ int get_number_of_register(const char* text) {
     return ERROR_NUMBER;
 }
 
+int length_of_number(int value) {
+    if(value == 0) {
+        return 1;
+    }
+
+    int length = 0;
+
+    while(value > 0) {
+        value /= 10;
+        ++length;
+    }
+
+    return length;
+}
+
 bool is_it_register(const char* text) {
     if(get_number_of_register(text) == ERROR_NUMBER) {
         return false;

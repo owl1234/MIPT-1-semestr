@@ -30,15 +30,15 @@ void help();
 
 int is_right_command(const char* line, const char* command);
 
-void listing(File* file, const char* symbols_to_output, const int flag_of_the_end);
+void listing(FILE* file, const char* symbols_to_output, FLAGS_OF_THE_END_LINE flag_of_the_end);
 
-void listing_alignment(File* file, const int number_to_output, const int flag_of_the_end);
+void listing_alignment(FILE* file, const int number_to_output, FLAGS_OF_THE_END_LINE flag_of_the_end);
 
-void listing(File* file, const int flag_of_the_end, int count_of_args, ...);
+void listing(FILE* file, const int flag_of_the_end, int count_of_args, ...);
 
-void listing(File* file, const int flag_of_the_end, double count_of_args, ...);
+void listing(FILE* file, const int flag_of_the_end, double count_of_args, ...);
 
-void listing(File* file, const char symbol_to_output, int flag_of_the_end);
+void listing(FILE* file, const char symbol_to_output, int flag_of_the_end);
 
 int assembling_file(File* input_file, const char* name_output_file);
 
@@ -49,6 +49,8 @@ void write_signature(char* assembled_text, int* index_in_assembled_text, int* nu
 bool is_it_label(const char* word);
 
 int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file);
+
+int get_number_of_command(char* text);
 
 void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
 

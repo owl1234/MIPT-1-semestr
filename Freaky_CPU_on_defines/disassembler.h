@@ -21,9 +21,9 @@ DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file)
 
 DISASM_ERRORS check_signature(File* file, int* now_byte);
 
-void disassembler_push(File* file, char* disassembled_text, int* index_in_disassembled_text, int* now_byte);
+void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels, int real_size);
 
-void disassembler_pop(File* file, char* disassembled_text, int* index_in_disassembled_text, int* now_byte);
+bool is_code_connected_with_labels(int command, int* number_of_condition);
 
 void put_char_into_disassembled_text(const char* command, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line);
 

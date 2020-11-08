@@ -52,7 +52,7 @@ enum TYPE_OF_ARGUMENT {
 struct Label {
     char* name;
     int byte_address;
-    int type_of_command;
+    //int type_of_command;
 };
 
 int size_of_buffer(FILE* file);
@@ -62,6 +62,8 @@ int is_right_command(const char* line, const char* command);
 int type_of_value(const char* operation);
 
 int get_number_of_register(const char* text);
+
+int length_of_number(int value);
 
 bool is_it_register(const char* text);
 

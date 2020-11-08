@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 8, 2020, 20:10:25
+ *                  November 9, 2020, 01:38:25
  *  @par What was changed?
- *                      1. Add signature
+ *                      1. Made defines for functions
 */
 
 #include <stdio.h>
@@ -19,7 +19,7 @@
 #include "processor.h"
 #include "enums.h"
 
-#define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler)   \
+#define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler, code_assembler)   \
     case COMMAND_##name:                                                         \
         code_processor;                                                          \
         break;
