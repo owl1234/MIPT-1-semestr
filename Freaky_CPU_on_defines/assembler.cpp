@@ -2,12 +2,11 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 8, 2020, 20:10:25
+ *                  November 8, 2020, 22:45:25
  *  @par What was changed?
- *                      1. Some rubbish removed
+ *                      1. Add signature
  *  @par To-do list
  *                      2. Make adequate listing !!!
- *                      3. Fix the signature
  *
  */
 
@@ -55,8 +54,6 @@ int file_construct(File* file, char* name_file, const char* reading_mode) {
     if(status != file->information.st_size) {
         return ASM_BAD_READ_FROM_FILE;
     }
-
-    file->lines = number_of_symbols(file->text_for_assembling, '\n');
 
     fclose(file->input_file);
 
@@ -112,7 +109,7 @@ void listing(File* file, char symbol_to_output, int flag_of_the_end) {
 int assembling_file(File* input_file, const char* name_output_file) {
     printf("Start assembling file.........................................\n");
 
-    char* assembled_text = (char*)calloc(3 * MAX_SIZE * input_file->lines + SIGNATURE_SIZE, sizeof(char));       // TO-DO CORRECT SIZE
+    char* assembled_text = (char*)calloc(3 * MAX_SIZE * input_file->information.st_size + SIGNATURE_SIZE, sizeof(char));       // TO-DO CORRECT SIZE
     int index_in_assembled_text = 0, number_of_byte = 0;
 
     write_signature(assembled_text, &index_in_assembled_text, &number_of_byte);
@@ -121,7 +118,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
     int status = 0, index_in_labels = 0;
 
-    find_labels_into_text(input_file, labels, &index_in_labels);
+    find_labels_into_text(input_file, labels, &index_in_labels, &number_of_byte);
 
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
     temp_string = strtok(input_file->text_for_assembling, SEPARATORS);
@@ -130,7 +127,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
     listing(input_file, "|", SPACE);
 
     while(temp_string != NULL) {
-        printf("now_command: %s (%d)\n", temp_string, number_of_byte);
+        //printf("now_command: %s (%d)\n", temp_string, number_of_byte);
         status = find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, index_in_labels, &number_of_byte, input_file);
 
         if(!is_it_label(temp_string)) {
@@ -161,15 +158,11 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
 void write_signature(char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     put_int_into_assembled_text(VERSION, assembled_text, index_in_assembled_text, number_of_byte);
-
-    //memcpy(assembled_text + *index_in_assembled_text, SIGNATURE_NAME, sizeof(SIGNATURE_NAME));
-    //printf("%s\n", assembled_text);
-    //(*index_in_assembled_text) += sizeof(SIGNATURE_NAME);
-    //(*number_of_byte)++;
+    put_int_into_assembled_text(SIGNATURE_NAME_HASH, assembled_text, index_in_assembled_text, number_of_byte);
 }
 
-void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels) {
-    int number_of_byte = 0;
+void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels, int* number_of_byte) {
+    int copy_number_of_byte = *number_of_byte;
 
     char* copy_of_text_for_assembling = (char*)calloc(input_file->information.st_size + 2, sizeof(char));
     strcpy(copy_of_text_for_assembling, input_file->text_for_assembling);
@@ -182,17 +175,17 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
         if(is_it_label(temp_string)) {
             labels[*index_in_labels].name = (char*)calloc(strlen(temp_string), sizeof(char));
             strcpy(labels[*index_in_labels].name, temp_string);
-            labels[*index_in_labels].byte_address = number_of_byte;
+            labels[*index_in_labels].byte_address = copy_number_of_byte;
             ++(*index_in_labels);
 
         } else if(!strcmp("push", temp_string)) {
-            number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_PUSH];
+            copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_PUSH];
         } else if(!strcmp("pop", temp_string)) {
-            number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_POP] + 1;
+            copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_POP] + 1;
         } else if(!strcmp("cmp", temp_string)) {
-            number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_CMP] - 1;
+            copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_CMP] - 1;
         } else {
-            ++number_of_byte;
+            ++copy_number_of_byte;
         }
 
 
@@ -215,34 +208,34 @@ bool is_it_label(const char* word) {
     return false;
 }
 
-int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file) { // TO-DO DEFINES
+int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file) { // TO-DO DEFINES
     int number_of_condition = 0;
 
     if(!strcmp(text, "push")) {
-        assembler_push(text, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        assembler_push(text, assembled_text, index_in_assembled_text, number_of_byte, listing_file);
     } else if(!strcmp(text, "pop")) {
-        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, input_file);
+        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, listing_file);
     } else if(!strcmp(text, "hlt")) {
-        put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte);
 
-        listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_HLT);
-        listing(input_file, "| hlt", END_LINE);
+        listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_HLT);
+        listing(listing_file, "| hlt", END_LINE);
     } else if(is_text_connected_with_labels(text, &number_of_condition)) {
-        assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, labels, index_in_labels, number_of_condition, input_file);
+        assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, labels, index_in_labels, number_of_condition, listing_file);
     } else if(!strcmp(text, "cmp")) {
-        assembler_cmp(text, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        assembler_cmp(text, assembled_text, index_in_assembled_text, number_of_byte, listing_file);
     } else if(!strcmp(text, "meow")) {
-        assembler_meow(assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        assembler_meow(assembled_text, index_in_assembled_text, number_of_byte, listing_file);
     } else if(!strcmp(text, "sqrt")) {
-        assembler_sqrt(assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        assembler_sqrt(assembled_text, index_in_assembled_text, number_of_byte, listing_file);
     } else {
         for(int operation_code = OPERATION_CODE_ADD; operation_code<number_of_commands; ++operation_code) {
             if(!strcmp(text, TEXT_OPERATION[operation_code])) {
-                put_int_into_assembled_text(operation_code, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+                put_int_into_assembled_text(operation_code, assembled_text, index_in_assembled_text, number_of_byte);
 
-                listing(input_file, NOTHING, ONE_ARGUMENT, operation_code);
-                listing(input_file, "|", SPACE);
-                listing(input_file, TEXT_OPERATION[operation_code], END_LINE);
+                listing(listing_file, NOTHING, ONE_ARGUMENT, operation_code);
+                listing(listing_file, "|", SPACE);
+                listing(listing_file, TEXT_OPERATION[operation_code], END_LINE);
                 return OK;
             }
         }
@@ -254,22 +247,22 @@ int find_and_write_command(char* text, char* assembled_text, int* index_in_assem
 
 }
 
-void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
-    put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
+    put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, index_in_assembled_text, number_of_byte);
 
     text = strtok(NULL, SEPARATORS);
 
     int type_push_value = type_of_value(text);
-    put_int_into_assembled_text(type_push_value, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+    put_int_into_assembled_text(type_push_value, assembled_text, index_in_assembled_text, number_of_byte);
 
 
     if(type_push_value == IS_REGISTER || type_push_value == (IS_RAM | IS_REGISTER)) {
 
-        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte);
 
-        listing(input_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_PUSH, type_push_value, get_number_of_register(text));
-        listing(input_file, "| push", SPACE);
-        listing(input_file, text, END_LINE);
+        listing(listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_PUSH, type_push_value, get_number_of_register(text));
+        listing(listing_file, "| push", SPACE);
+        listing(listing_file, text, END_LINE);
 
     } else if(type_push_value == IS_ELEM_T || type_push_value == (IS_RAM | IS_ELEM_T)) {
         if(type_push_value == (IS_RAM | IS_ELEM_T)) {
@@ -280,12 +273,12 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
         }
 
         double now_value = strtod(text, NULL);
-        put_double_into_assembled_text(now_value, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_double_into_assembled_text(now_value, assembled_text, index_in_assembled_text, number_of_byte);
 
-        listing(input_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_PUSH, type_push_value);
-        listing(input_file, NOTHING, (double)ONE_ARGUMENT, now_value);
-        listing(input_file, "| push ", NOTHING);
-        listing(input_file, END_LINE, (double)ONE_ARGUMENT, now_value);
+        listing(listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_PUSH, type_push_value);
+        listing(listing_file, NOTHING, (double)ONE_ARGUMENT, now_value);
+        listing(listing_file, "| push ", NOTHING);
+        listing(listing_file, END_LINE, (double)ONE_ARGUMENT, now_value);
 
     } else {
         printf("Bad type of push value! (%d)\n", type_push_value);
@@ -293,101 +286,101 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
     }
 }
 
-void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file) {
+void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file) {
 
-    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte);
 
     text = strtok(NULL, SEPARATORS);
 
     if(type_of_value(text) == IS_REGISTER) {
 
-        put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte, input_file);
-        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(IS_REGISTER, assembled_text, index_in_assembled_text, number_of_byte);
+        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte);
 
-        listing(input_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_POP, IS_REGISTER, get_number_of_register(text));
-        listing(input_file, "| pop ", NOTHING);
-        listing(input_file, text, END_LINE);
+        listing(listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_POP, IS_REGISTER, get_number_of_register(text));
+        listing(listing_file, "| pop ", NOTHING);
+        listing(listing_file, text, END_LINE);
 
     } else {
 
-        put_int_into_assembled_text(NOT_ARGS, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(NOT_ARGS, assembled_text, index_in_assembled_text, number_of_byte);
 
-        listing(input_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_POP, NOT_ARGS);
-        listing(input_file, "| pop", END_LINE);
+        listing(listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_POP, NOT_ARGS);
+        listing(listing_file, "| pop", END_LINE);
 
-        listing_alignment(input_file, *number_of_byte, SPACE);
-        listing(input_file, "| ", NOTHING);
+        listing_alignment(listing_file, *number_of_byte, SPACE);
+        listing(listing_file, "| ", NOTHING);
 
-        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, input_file);
+        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, listing_file);
 
     }
 }
 
-void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
-    put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
+    put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, index_in_assembled_text, number_of_byte);
 
     int first_type_of_value = 0, second_type_of_value = 0;
 
     char* first_string = (char*)calloc(MAX_SIZE, sizeof(char));
     char* second_string = (char*)calloc(MAX_SIZE, sizeof(char));
 
-    int first_value  = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, first_string,  &first_type_of_value, input_file);
-    int second_value = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, second_string, &second_type_of_value, input_file);
+    int first_value  = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, first_string,  &first_type_of_value);
+    int second_value = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, second_string, &second_type_of_value);
 
-    listing(input_file, NOTHING, FIVE_ARGUMENTS, OPERATION_CODE_CMP, first_type_of_value, first_value, second_type_of_value, second_value);
-    listing(input_file, "|", SPACE);
-    listing(input_file, "cmp", SPACE);
-    listing(input_file, first_string, SPACE);
-    listing(input_file, second_string, END_LINE);
+    listing(listing_file, NOTHING, FIVE_ARGUMENTS, OPERATION_CODE_CMP, first_type_of_value, first_value, second_type_of_value, second_value);
+    listing(listing_file, "|", SPACE);
+    listing(listing_file, "cmp", SPACE);
+    listing(listing_file, first_string, SPACE);
+    listing(listing_file, second_string, END_LINE);
 }
 
-void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
-    put_int_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
+    put_int_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, index_in_assembled_text, number_of_byte);
 
-    listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_MEOW);
-    listing(input_file, "| meow", END_LINE);
+    listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_MEOW);
+    listing(listing_file, "| meow", END_LINE);
 }
 
-void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
-    put_int_into_assembled_text(OPERATION_CODE_SQRT, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
+    put_int_into_assembled_text(OPERATION_CODE_SQRT, assembled_text, index_in_assembled_text, number_of_byte);
 
-    listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_SQRT);
-    listing(input_file, "| sqrt", END_LINE);
+    listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_SQRT);
+    listing(listing_file, "| sqrt", END_LINE);
 }
 
 void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int index_in_labels, int number_of_condition,
-                                                                                                                                                            File* input_file) {
+                                                                                                                                                            File* listing_file) {
 
     if(strcmp(text, "ret")) {
-        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte);
 
         text = strtok(NULL, SEPARATORS);
         if(!strcmp(text, "recret")) {
-            put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+            put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, index_in_assembled_text, number_of_byte);
 
-            listing(input_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);
-            listing(input_file, "|", SPACE);
-            listing(input_file, TEXT_OPERATION[number_of_condition], SPACE);
-            listing(input_file, text, END_LINE);
+            listing(listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);
+            listing(listing_file, "|", SPACE);
+            listing(listing_file, TEXT_OPERATION[number_of_condition], SPACE);
+            listing(listing_file, text, END_LINE);
         } else {
             for(int label=0; label<index_in_labels; ++label) {
                 if(is_equal_labels(text, labels[label].name)) {
-                    put_int_into_assembled_text(labels[label].byte_address + 1, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+                    put_int_into_assembled_text(labels[label].byte_address + 1, assembled_text, index_in_assembled_text, number_of_byte);
 
-                    listing(input_file, NOTHING, TWO_ARGUMENTS, number_of_condition, labels[label].byte_address);
-                    listing(input_file, "|", SPACE);
-                    listing(input_file, TEXT_OPERATION[number_of_condition], SPACE);
-                    listing(input_file, text, END_LINE);
+                    listing(listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, labels[label].byte_address);
+                    listing(listing_file, "|", SPACE);
+                    listing(listing_file, TEXT_OPERATION[number_of_condition], SPACE);
+                    listing(listing_file, text, END_LINE);
                     break;
                 }
             }
         }
     } else {
-        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte);
 
-        listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_RET);
-        listing(input_file, "|", SPACE);
-        listing(input_file, TEXT_OPERATION[OPERATION_CODE_RET], END_LINE);
+        listing(listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_RET);
+        listing(listing_file, "|", SPACE);
+        listing(listing_file, TEXT_OPERATION[OPERATION_CODE_RET], END_LINE);
     }
 }
 
@@ -419,24 +412,24 @@ int max(int first, int second) {
     return second;
 }
 
-int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, char* argument, int* type_of_argument, File* input_file) {
+int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, char* argument, int* type_of_argument) {
     text = strtok(NULL, SEPARATORS);
     strcpy(argument, text);
 
     *type_of_argument = type_of_value(text);
-    put_int_into_assembled_text(*type_of_argument, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+    put_int_into_assembled_text(*type_of_argument, assembled_text, index_in_assembled_text, number_of_byte);
 
     if(*type_of_argument == IS_REGISTER) {
-        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_int_into_assembled_text(get_number_of_register(text), assembled_text, index_in_assembled_text, number_of_byte);
         return get_number_of_register(text);
     } else {
         int now_value = strtod(text, NULL);
-        put_double_into_assembled_text(now_value, assembled_text, index_in_assembled_text, number_of_byte, input_file);
+        put_double_into_assembled_text(now_value, assembled_text, index_in_assembled_text, number_of_byte);
         return now_value;
     }
 }
 
-void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
+void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     double converted_code = (double)code_of_operation;
 
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(double)); //
@@ -445,7 +438,16 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
     ++(*number_of_byte);
 }
 
-void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file) {
+void put_int_into_assembled_text(long long code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+    double converted_code = (double)code_of_operation;
+
+    memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(double)); //
+    *index_in_assembled_text += sizeof(double);
+
+    ++(*number_of_byte);
+}
+
+void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     memcpy(assembled_text + *index_in_assembled_text, &code_of_operation, sizeof(double)); //
     *index_in_assembled_text += sizeof(double);
 

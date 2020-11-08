@@ -6,7 +6,6 @@ struct File {
     char* text_for_assembling;
     FILE* listing_file;
     char* text_for_listing;
-    int lines;
     struct stat information;
 };
 
@@ -43,36 +42,36 @@ void listing(File* file, const char symbol_to_output, int flag_of_the_end);
 
 int assembling_file(File* input_file, const char* name_output_file);
 
-void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels);
+void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels, int* number_of_byte);
 
 void write_signature(char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 
 bool is_it_label(const char* word);
 
-int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file);
+int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file);
 
-void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
+void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
 
-void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file);
+void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file);
 
-void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
+void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
 
-void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
+void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
 
-void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
+void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
 
 void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int index_in_labels, int number_of_condition,
-                                                                                                                                                            File* input_file);
+                                                                                                                                                            File* listing_file);
 
 bool is_equal_labels(const char* first, const char* second);
 
 int max(int first, int second);
 
-int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, char* argument, int* type_of_argument, File* input_file);
+int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, char* argument, int* type_of_argument);
 
-void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
+void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 
-void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
+void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 
 void create_label(char* text, Label* labels, int* index_in_labels, int index_in_assembled_text, int number_of_byte);
 

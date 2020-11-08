@@ -4,7 +4,7 @@
  *  @par Last edition
  *                  November 8, 2020, 20:10:25
  *  @par What was changed?
- *                      1. Some rubbish removed
+ *                      1. Add signature
 */
 
 #include <stdio.h>
@@ -19,9 +19,9 @@
 #include "processor.h"
 #include "enums.h"
 
-#define DEFINE_COMMANDS(name, number, args, code)   \
-    case COMMAND_##name:                            \
-        code;                                       \
+#define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler)   \
+    case COMMAND_##name:                                                         \
+        code_processor;                                                          \
         break;
 
 
@@ -179,7 +179,7 @@ PROCESSOR_ERRORS processing(Processor* processor) {
             #include "COMMANDS.H"
 
             default:
-                printf("popados (bad command) .....  (╯ ° □ °) ╯ (┻━┻) \n");
+                printf("popados (bad command %d, byte: %d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command, now_byte);
                 return PROC_UNKNOWN_COMMAND;
         }
         ++now_byte;
@@ -191,17 +191,13 @@ PROCESSOR_ERRORS processing(Processor* processor) {
 
 PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte) {
 
-    int now_version = get_double_from_text(processor, now_byte);
-    printf("now_version: %d\n", now_version);
-
-    if(now_version > VERSION) {
+    if(processor->text[(*now_byte)++] > VERSION) {
         return PROC_BAD_VERSION;
     }
 
-    /*if(memcmp(processor->text, SIGNATURE_NAME, sizeof(SIGNATURE_NAME)) != 0) {
-        printf("bad!\n");
+    if(processor->text[(*now_byte)++] != SIGNATURE_NAME_HASH) {
         return PROC_BAD_VERSION;
-    }*/
+    }
 
     return PROC_OKEY;
 }
@@ -236,6 +232,9 @@ int main(const int argc, const char* argv[]) {
         Processor processor = {};
 
         int status = initialization_proc(&processor, argv[1], argv[2]);
+        for(int i=0; i<processor.symbols; ++i)
+            printf("%lg ", processor.text[i]);
+        printf("\n");
 
         processor_dump(&processor, create_struct(__FILE__, __LINE__, __FUNCTION__));
         if(status != OK) {

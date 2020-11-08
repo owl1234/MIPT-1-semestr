@@ -1,6 +1,6 @@
 #include "processor.h"
 
-#define DEFINE_COMMANDS(name, number, arg, code) \
+#define DEFINE_COMMANDS(name, number, arg, code_assembler, code_disassembler) \
         COMMAND_##name = number,
 
 typedef enum my_commands_for_processor {

@@ -26,22 +26,6 @@ int is_right_command(const char* line, const char* command) {
     return 0;
 }
 
-int number_of_symbols(char* buffer, char separator) {
-    char now_symbol = *buffer;
-    int number = 0;
-
-    while(now_symbol != '\0') {
-        now_symbol = *buffer;
-        if(now_symbol == separator) {
-            ++number;
-        }
-
-        ++buffer;
-    }
-
-    return number;
-}
-
 int type_of_value(const char* operation) {
     int length = strlen(operation);
     //int flag_of_value = 0;

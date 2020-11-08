@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <limits.h>
 
 #ifndef COMMON_H
 #define COMMON_H
@@ -7,8 +8,8 @@
 #include "stack.h"
 
 const int VERSION = 1;
-const int SIGNATURE_SIZE = 10; // program system prefix
-const char SIGNATURE_NAME[] = "KolesnKS";
+const int SIGNATURE_SIZE = 10;
+const long long SIGNATURE_NAME_HASH = 1343871799; // 0x64F3F67CF65BE1CBA2C649705203B97E % ULLONG_MAX;
 
 const int MAX_SIZE = 11;
 const int MAX_SIZE_RAM = 10;
@@ -50,16 +51,13 @@ enum TYPE_OF_ARGUMENT {
 
 struct Label {
     char* name;
-    //int address; //symbol_address;
     int byte_address;
     int type_of_command;
 };
 
-void ERROR(const char* status);
+int size_of_buffer(FILE* file);
 
 int is_right_command(const char* line, const char* command);
-
-int number_of_symbols(char* buffer, char separator);
 
 int type_of_value(const char* operation);
 
