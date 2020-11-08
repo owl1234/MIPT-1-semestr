@@ -4,6 +4,16 @@
 #include <string.h>
 #include "common.h"
 
+int size_of_buffer(FILE* file) {
+    int length = 0;
+    if (!fseek(file, 0, SEEK_END)) {
+        length = ftell(file);
+    }
+    fseek(file, 0, SEEK_SET);
+
+    return length;
+}
+
 void ERROR(const char* status) {
     printf("%s\n", status);
 }

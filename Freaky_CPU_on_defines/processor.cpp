@@ -2,11 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 8, 2020, 13:14:25
+ *                  November 8, 2020, 14:10:25
  *  @par What was changed?
- *                      1. A dump for processor was made
- *                      2. The stack has been slightly modified
- *                      3. CPU errors was added
+ *                      1. Added ram (normally work!)
 */
 
 #include <stdio.h>
@@ -15,6 +13,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <math.h>
+#include <time.h>
 #include "common.h"
 #include "stack.h"
 #include "processor.h"
@@ -25,14 +24,12 @@
         code;                                       \
         break;
 
-//#define IF_DEBUG(code) code
 
 /*void POPADOS() {
     printf("popados  .....  (╯ ° □ °) ╯ (┻━┻) \n");
     abort();
 }*/
 
-const struct call_of_dump proc_proc_base_arguments_of_call = {__FILE__, -1, " "};
 
 void help() {
     printf("That is my realisarion of softprocessor.\n"
@@ -90,10 +87,10 @@ void processor_dump(Processor* processor, struct call_of_dump arguments_of_call 
     error_print_array_elem_t(processor->registers_variables, number_of_register_vars, log_errors);
     fprintf(log_errors, "\n\t}\n");
 
-    /*fprintf(log_errors, "\tram [%p]\n", processor->ram);
+    fprintf(log_errors, "\tram [%p]\n", processor->ram);
     fprintf(log_errors, "\t{");
-    error_print_data(processor->ram, MAX_SIZE_RAM, log_errors);
-    fprintf(log_errors, "\n\t}\n");*/
+    error_print_array_elem_t(processor->ram, MAX_SIZE_RAM, log_errors);
+    fprintf(log_errors, "\n\t}\n");
 
     fprintf(log_errors, "\n}\n");
     fprintf(log_errors, "\n\n");
@@ -119,18 +116,17 @@ void processor_verificator(Processor* processor, struct call_of_dump arguments_o
 }
 )
 
-/*void init_ram(Processor* processor) {
+void init_ram(Processor* processor) {
+    srand(time(NULL));
+
     for(int i=0; i<MAX_SIZE; ++i) {
-        processor->ram[i] = i;
-        printf("%lg ", processor->ram[i]);
+        processor->ram[i] = rand() % 20;
     }
-    printf("\n");
-}*/
+}
 
 int initialization_proc(Processor* processor, const char* name_input_file, const char* name_log_file) {
     FILE* input_file = fopen(name_input_file, "rb");
     int bytes_in_buffer = size_of_buffer(input_file);
-    //printf("ehjwkdfnm\n");
 
     processor->symbols = bytes_in_buffer / sizeof(double);
 
@@ -143,8 +139,8 @@ int initialization_proc(Processor* processor, const char* name_input_file, const
 
     processor->name_log_file = (char*)calloc(strlen(name_log_file), sizeof(char));
     strcpy(processor->name_log_file, name_log_file);
-    //processor->ram = (Elem_t*)calloc(MAX_SIZE_RAM, sizeof(Elem_t));
-    //init_ram(processor);
+    processor->ram = (Elem_t*)calloc(MAX_SIZE_RAM, sizeof(Elem_t));
+    init_ram(processor);
 
     if(status != bytes_in_buffer / sizeof(double)) {
         processor->status = PROC_BAD_READ_FROM_FILE;
@@ -156,16 +152,6 @@ int initialization_proc(Processor* processor, const char* name_input_file, const
     IF_DEBUG(processor_verificator(processor, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     return OK;
-}
-
-int size_of_buffer(FILE* file) {
-    int length = 0;
-    if (!fseek(file, 0, SEEK_END)) {
-        length = ftell(file);
-    }
-    fseek(file, 0, SEEK_SET);
-
-    return length;
 }
 
 void file_handler(Processor* processor) {
@@ -182,7 +168,7 @@ void file_handler(Processor* processor) {
 
     while(now_byte < processor->symbols && now_command != OPERATION_CODE_HLT) {
         now_command = processor->text[now_byte];
-        //sIF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
+        //IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
 
        switch (now_command) {
             #include "COMMANDS.H"
@@ -196,7 +182,7 @@ void file_handler(Processor* processor) {
 }
 
 void destruct_processor(Processor* processor) {
-    //free(processor->ram);
+    free(processor->ram);
     free(processor->text);
     stack_destruct(&(processor->call_stack));
     stack_destruct(&(processor->proc_stack));
@@ -228,7 +214,7 @@ int main(const int argc, const char* argv[]) {
         Processor processor = {};
 
         int status = initialization_proc(&processor, argv[1], argv[2]);
-        printf("here\n");
+
         processor_dump(&processor, create_struct(__FILE__, __LINE__, __FUNCTION__));
         if(status != OK) {
             return status;

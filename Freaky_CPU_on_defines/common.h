@@ -8,7 +8,7 @@
 
 
 const int MAX_SIZE = 10;
-const int MAX_SIZE_RAM = 100000;
+const int MAX_SIZE_RAM = 10;
 const int ERROR_NUMBER = -3802;
 const double EPSILON = 1e-6;
 const int OK = 0;
@@ -31,7 +31,7 @@ const char TEXT_FLAGS_OF_THE_END_LINE[][2] = {
 };
 
 typedef enum COUNT_OF_ARGS {
-    ONE_AGRUMENT    = 1,
+    ONE_ARGUMENT    = 1,
     TWO_ARGUMENTS   = 2,
     THREE_AGRUMENTS = 3,
     FOUR_ARGUMENTS  = 4,

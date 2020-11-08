@@ -15,6 +15,7 @@ typedef enum ASSEMBLER_ERROROS {
     ASM_BAD_MEMORY         = 2,
     ASM_BAD_READ_FROM_FILE = 3,
     ASM_BAD_COMMAND        = 4,
+    ASM_BAD_PUSH_VALUE     = 5,
 
 } ASM_ERRORS;
 
@@ -76,10 +77,10 @@ void create_label(char* text, Label* labels, int* index_in_labels, int index_in_
 
 int create_assembling_file(const char* assembled_text, const int index_in_assembled_text, const char* name_output_file);
 
+void reverse_string(char* text);
+
 int reversed_number(int value, int* length);
 
 void work_with_registers(int last_operation_code, int operation_code, char* assembled_text, int* index_in_assembled_text);
-
-void fill_array_by_machine_code(Label* labels, int count_of_labels, Label* go_to_labels, int count_of_go_to_labels, char* assembled_text, int length_of_assembled_text);
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition);

@@ -2,11 +2,11 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 7, 2020, 23:10:25
+ *                  November 8, 2020, 14:10:25
  *  @par What was changed?
- *                      1. The grandfather did not accept the task :(
- *                      2. Redesigned assembler and label processing.
- *                      3. Made listing (a bit sick ¯\_(ツ)_/¯ )
+ *                      1. Added ram (normally work!)
+ *  @par To-do list
+ *                      3. Make adequate listing !!!
  */
 
 
@@ -142,8 +142,6 @@ int assembling_file(File* input_file, const char* name_output_file) {
         }
     }
 
-    fill_array_by_machine_code(labels, index_in_labels, go_to_labels,  index_in_go_to_labels, assembled_text, index_in_assembled_text);
-
     fclose(input_file->listing_file);
 
     status = create_assembling_file(assembled_text, index_in_assembled_text, name_output_file);
@@ -187,9 +185,9 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
         temp_string = strtok(NULL, SEPARATORS);
     }
 
-    for(int i=0; i<*index_in_labels; ++i) {
+    /*for(int i=0; i<*index_in_labels; ++i) {
         printf("label %s %d\n", labels[i].name, labels[i].byte_address);
-    }
+    }*/
 
     strcpy(input_file->text_for_assembling, copy_of_text_for_assembling);
 
@@ -217,9 +215,8 @@ int find_and_write_command(char* text, char* assembled_text, int* index_in_assem
     } else if(!strcmp(text, "hlt")) {
         put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
-        listing(input_file, NOTHING, ONE_AGRUMENT, OPERATION_CODE_HLT);
+        listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_HLT);
         listing(input_file, "| hlt", END_LINE);
-        //print_ram(ram);
     } else if(is_text_connected_with_labels(text, &number_of_condition)) {
         assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, labels, index_in_labels, number_of_condition, input_file);
     } else if(!strcmp(text, "cmp")) {
@@ -233,7 +230,7 @@ int find_and_write_command(char* text, char* assembled_text, int* index_in_assem
             if(!strcmp(text, TEXT_OPERATION[operation_code])) {
                 put_int_into_assembled_text(operation_code, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
-                listing(input_file, NOTHING, ONE_AGRUMENT, operation_code);
+                listing(input_file, NOTHING, ONE_ARGUMENT, operation_code);
                 listing(input_file, "|", SPACE);
                 listing(input_file, TEXT_OPERATION[operation_code], END_LINE);
                 return OK;
@@ -251,7 +248,6 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
     put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
     text = strtok(NULL, SEPARATORS);
-    printf("push: %s\n", text);
 
     int type_push_value = type_of_value(text);
     put_int_into_assembled_text(type_push_value, assembled_text, index_in_assembled_text, number_of_byte, input_file);
@@ -266,17 +262,23 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
         listing(input_file, text, END_LINE);
 
     } else if(type_push_value == IS_ELEM_T || type_push_value == (IS_RAM | IS_ELEM_T)) {
+        if(type_push_value == (IS_RAM | IS_ELEM_T)) {
+            text = strchr(text, '[') + 1;
+            reverse_string(text);
+            text = strchr(text, ']') + 1;
+            reverse_string(text);
+        }
 
         double now_value = strtod(text, NULL);
         put_double_into_assembled_text(now_value, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
         listing(input_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_PUSH, type_push_value);
-        listing(input_file, NOTHING, (double)ONE_AGRUMENT, now_value);
+        listing(input_file, NOTHING, (double)ONE_ARGUMENT, now_value);
         listing(input_file, "| push ", NOTHING);
-        listing(input_file, END_LINE, ONE_AGRUMENT, now_value);
+        listing(input_file, END_LINE, (double)ONE_ARGUMENT, now_value);
 
     } else {
-        printf("goodbye... (%d)\n", type_push_value);
+        printf("Bad type of push value! (%d)\n", type_push_value);
         abort();
     }
 }
@@ -320,14 +322,8 @@ void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_tex
     char* first_string = (char*)calloc(MAX_SIZE, sizeof(char));
     char* second_string = (char*)calloc(MAX_SIZE, sizeof(char));
 
-    int first_value = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, first_string, &first_type_of_value, input_file);
-
-    printf("%s %s\n", first_string, text);
-
+    int first_value  = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, first_string,  &first_type_of_value, input_file);
     int second_value = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, second_string, &second_type_of_value, input_file);
-
-
-    printf("%s %s\n", second_string, text);
 
     listing(input_file, NOTHING, FIVE_ARGUMENTS, OPERATION_CODE_CMP, first_type_of_value, first_value, second_type_of_value, second_value);
     listing(input_file, "|", SPACE);
@@ -340,15 +336,14 @@ void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_tex
 void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
     put_int_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
-    listing(input_file, NOTHING, ONE_AGRUMENT, OPERATION_CODE_MEOW);
-
+    listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_MEOW);
     listing(input_file, "| meow", END_LINE);
 }
 
 void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
     put_int_into_assembled_text(OPERATION_CODE_SQRT, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
-    listing(input_file, NOTHING, ONE_AGRUMENT, OPERATION_CODE_SQRT);
+    listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_SQRT);
     listing(input_file, "| sqrt", END_LINE);
 }
 
@@ -356,7 +351,6 @@ void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_
                                                                                                                                                             File* input_file) {
 
     int now_command = 0;
-    printf("!!!\n");
 
     if(strcmp(text, "ret")) {
         put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, input_file);
@@ -384,7 +378,7 @@ void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_
     } else {
         put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
-        listing(input_file, NOTHING, ONE_AGRUMENT, OPERATION_CODE_RET);
+        listing(input_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_RET);
         listing(input_file, "|", SPACE);
         listing(input_file, TEXT_OPERATION[OPERATION_CODE_RET], END_LINE);
     }
@@ -472,6 +466,17 @@ int create_assembling_file(const char* assembled_text, const int index_in_assemb
     return OK;
 }
 
+void reverse_string(char* text) {
+    int length = strlen(text);
+    char* copy_of_text = (char*)calloc(length, sizeof(char));
+
+    for(int i=0; i<length; ++i) {
+        copy_of_text[i] = text[length - i - 1];
+    }
+
+    strcpy(text, copy_of_text);
+}
+
 int reversed_number(int value, int* length) {
     int reverse_number = 0;
 
@@ -502,17 +507,6 @@ int length_of_number(int value) {
     }
 
     return length;
-}
-
-void fill_array_by_machine_code(Label* labels, int count_of_labels, Label* go_to_labels, int count_of_go_to_labels, char* assembled_text, int length_of_assembled_text) {
-    for(int i=0; i<count_of_go_to_labels; ++i) {
-        for(int j=0; j<count_of_labels; ++j) {
-            if(!strcmp(labels[j].name, go_to_labels[i].name)) {
-                double copy_label_byte_address = (double)labels[j].byte_address;
-                memcpy(assembled_text + go_to_labels[i].address, &copy_label_byte_address, sizeof(double));
-            }
-        }
-    }
 }
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition) {

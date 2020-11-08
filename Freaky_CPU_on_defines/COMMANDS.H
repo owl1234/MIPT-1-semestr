@@ -18,7 +18,6 @@
 DEFINE_COMMANDS ( HLT, 0, 0,
 {
     printf("End of work (hlt!)\n");
-    //print_ram(ram);
     break;
 })
 

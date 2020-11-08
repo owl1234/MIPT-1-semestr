@@ -1,0 +1,58 @@
+Processor [0x7ffdaae994a0], status is Processor is okey
+File from which the dump is called processor.cpp from line 220 (called the function main)
+{
+	symbols = 12
+	proc_stack_size = 0
+	proc_capacity = 8
+	proc_stack [0x7ffdaae994b0]
+	{
+            *[0] - [0x56326d27d7a0] - 0
+             [1] - [0x56326d27d7a8] - !!! POISON !!!
+             [2] - [0x56326d27d7b0] - !!! POISON !!!
+             [3] - [0x56326d27d7b8] - !!! POISON !!!
+             [4] - [0x56326d27d7c0] - !!! POISON !!!
+             [5] - [0x56326d27d7c8] - !!! POISON !!!
+             [6] - [0x56326d27d7d0] - !!! POISON !!!
+             [7] - [0x56326d27d7d8] - !!! POISON !!!
+
+	}
+	call_stack_size = 0
+	call_capacity = 8
+	call_stack [0x7ffdaae994e8]
+	{
+            *[0] - [0x56326d27d810] - 0
+             [1] - [0x56326d27d818] - !!! POISON !!!
+             [2] - [0x56326d27d820] - !!! POISON !!!
+             [3] - [0x56326d27d828] - !!! POISON !!!
+             [4] - [0x56326d27d830] - !!! POISON !!!
+             [5] - [0x56326d27d838] - !!! POISON !!!
+             [6] - [0x56326d27d840] - !!! POISON !!!
+             [7] - [0x56326d27d848] - !!! POISON !!!
+
+	}
+	registers_variables [0x56326d27d880]
+	{
+            *[0] - [0x56326d27d880] = 0
+            *[1] - [0x56326d27d888] = 0
+            *[2] - [0x56326d27d890] = 0
+            *[3] - [0x56326d27d898] = 0
+
+	}
+	ram [0x56326d27d8d0]
+	{
+            *[0] - [0x56326d27d8d0] = 17
+            *[1] - [0x56326d27d8d8] = 10
+            *[2] - [0x56326d27d8e0] = 9
+            *[3] - [0x56326d27d8e8] = 17
+            *[4] - [0x56326d27d8f0] = 5
+            *[5] - [0x56326d27d8f8] = 16
+            *[6] - [0x56326d27d900] = 19
+            *[7] - [0x56326d27d908] = 3
+            *[8] - [0x56326d27d910] = 5
+            *[9] - [0x56326d27d918] = 8
+
+	}
+
+}
+
+
