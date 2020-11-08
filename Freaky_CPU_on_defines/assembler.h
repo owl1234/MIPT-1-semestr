@@ -11,10 +11,10 @@ struct File {
 };
 
 typedef enum ASSEMBLER_ERROROS {
-    OK                     = 0,
     ASM_BAD_FILE           = 1,
     ASM_BAD_MEMORY         = 2,
     ASM_BAD_READ_FROM_FILE = 3,
+    ASM_BAD_COMMAND        = 4,
 
 } ASM_ERRORS;
 
@@ -39,13 +39,13 @@ void listing(File* file, const int flag_of_the_end, double count_of_args, ...);
 
 void listing(File* file, const char symbol_to_output, int flag_of_the_end);
 
-void assembling_file(File* input_file, const char* name_output_file);
+int assembling_file(File* input_file, const char* name_output_file);
 
 void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels);
 
 bool is_it_label(const char* word);
 
-void find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
+int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
                                                                                             Label* go_to_labels, int* index_in_go_to_labels, File* input_file);
 
 void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);

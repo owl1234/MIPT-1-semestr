@@ -3,7 +3,7 @@
 
 #define IF_CANARY_PROTECTION(code) code
 #define IF_HASH_PROTECTION(code) code
-#define IF_DEBUG(code) //code
+#define IF_DEBUG(code) code
 
 typedef double Elem_t;
 const char identity[] = "%lg";
@@ -33,6 +33,7 @@ struct Stack_t {
     size_t capacity;
     stack_t_status stack_status;
     int stack_hash;
+    char* name_log_file;
     IF_CANARY_PROTECTION(int canary_right[1] = { CANARY };)
 };
 
@@ -106,26 +107,7 @@ bool is_canary(Elem_t value);
 
 void error_print_data(Stack_t* node, FILE* file);
 
-/**
-*   \brief This function gets the number of digits of a number
-*
-*   @param number Number
-*
-*   @return Number of digits
-*/
-
-int get_len_indent(size_t number);
-
-/**
-*   \brief This function prints indetns (tabulations and space bars to file
-*
-*   @param count_indent Number of space bars
-*   @param file The file to which the data will be written
-*
-*   @return Nothing
-*/
-
-void write_indent(FILE* file, int count_indent);
+void error_print_array_elem_t(Elem_t* array_elem_t, const int length, FILE* file);
 
 /**
 *   \brief This function displays all information about the stack and the reason for calling it
@@ -192,7 +174,7 @@ int stack_capacity(Stack_t* node);
 *   @return Nothing
 */
 
-void stack_construct(Stack_t* node);
+void stack_construct(Stack_t* node, const char* name_log_file);
 
 /**
 *   \brief This function destructs the stack

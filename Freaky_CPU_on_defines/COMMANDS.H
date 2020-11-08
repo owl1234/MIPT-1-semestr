@@ -133,7 +133,7 @@ DEFINE_COMMANDS ( SQRT, 9, 0,
 DEFINE_COMMANDS ( JMP, 10, 1,
 {
     int address_label = get_double_from_text(processor, &now_byte);
-    now_byte = address_label - 1;
+    now_byte = address_label - 2;
 })
 
 DEFINE_COMMANDS ( CMP, 30, 4,
@@ -220,7 +220,7 @@ DEFINE_COMMANDS ( CALL, 40, 1,
     int address_label = get_double_from_text(processor, &now_byte);
 
     stack_push(&(processor->call_stack), now_byte);
-    now_byte = address_label - 1;
+    now_byte = address_label - 2;
 })
 
 DEFINE_COMMANDS ( RET, 41, 0,

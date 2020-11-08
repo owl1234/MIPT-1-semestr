@@ -11,7 +11,7 @@ const int MAX_SIZE = 10;
 const int MAX_SIZE_RAM = 100000;
 const int ERROR_NUMBER = -3802;
 const double EPSILON = 1e-6;
-//const int OK = 0;
+const int OK = 0;
 const int number_of_register_vars = 4;
 const int number_of_commands = sizeof(TEXT_OPERATION) / sizeof(TEXT_OPERATION[0]);
 const int MAX_COUNT_LABELS = 20;
@@ -43,25 +43,6 @@ enum TYPE_OF_ARGUMENT {
     IS_ELEM_T   = 1,
     IS_REGISTER = 2,
     IS_RAM      = 4,
-};
-
-/*struct File {
-    FILE* ptr_to_file;
-    const char* name;
-    char* text_for_assembling;
-    double* text_for_disassembling;
-    char* text_for_listing;
-    int lines;
-    struct stat information;
-};*/
-
-struct Processor {
-    double* text;
-    int symbols;
-    Stack_t proc_stack;
-    Stack_t call_stack;
-    Elem_t* registers_variables;
-    Elem_t* ram;
 };
 
 struct Label {

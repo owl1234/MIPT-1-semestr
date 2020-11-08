@@ -1,10 +1,10 @@
-jmp main:
+jmp main
 
 factN:
 pop rax
 push rax
 push 1
-call factRec:
+call factRec
 ret
 
 fact1:
@@ -14,10 +14,10 @@ ret
 factRec:
 push rax
 mul
-call decRax:
+call decRax
 cmp rax 1
 jae recret
-call factRec:
+call factRec
 ret
 
 decRax:
@@ -37,16 +37,16 @@ pop rax
 push rax
 
 cmp rax 0
-jb nosol:
+jb nosol
 
 cmp rax 0
-je fact1:
+je fact1
 
 cmp rax 1
-je fact1:
+je fact1
 
 cmp rax 1
-ja factN:
+ja factN
 
 out
 
