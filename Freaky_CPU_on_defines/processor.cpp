@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 8, 2020, 14:10:25
+ *                  November 8, 2020, 20:10:25
  *  @par What was changed?
- *                      1. Added ram (normally work!)
+ *                      1. Some rubbish removed
 */
 
 #include <stdio.h>
@@ -154,8 +154,8 @@ int initialization_proc(Processor* processor, const char* name_input_file, const
     return OK;
 }
 
-void file_handler(Processor* processor) {
-    assert(processor != nullptr);
+PROCESSOR_ERRORS processing(Processor* processor) {
+    assert(processor != NULL);
 
     int now_command = OPERATION_CODE_MEOW;
     double now_value = 0.0;
@@ -163,22 +163,47 @@ void file_handler(Processor* processor) {
     Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0;
     int flag_of_registers = -1, number_of_register = -1, now_byte = 0;
 
+    PROCESSOR_ERRORS status = check_signature(processor, &now_byte);
+    if(status != PROC_OKEY) {
+        return status;
+    }
+
     Elem_t first_comparison = 0.0, second_comparison = 0.0;
     int number_of_condition = -1;
 
     while(now_byte < processor->symbols && now_command != OPERATION_CODE_HLT) {
         now_command = processor->text[now_byte];
-        //IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
+        IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
 
        switch (now_command) {
             #include "COMMANDS.H"
 
             default:
-                ERROR("popados (bad command) .....  (╯ ° □ °) ╯ (┻━┻) \n");
+                printf("popados (bad command) .....  (╯ ° □ °) ╯ (┻━┻) \n");
+                return PROC_UNKNOWN_COMMAND;
         }
         ++now_byte;
         IF_DEBUG(processor_verificator(processor, create_struct(__FILE__, __LINE__, __FUNCTION__));)
     }
+
+    return PROC_OKEY;
+}
+
+PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte) {
+
+    int now_version = get_double_from_text(processor, now_byte);
+    printf("now_version: %d\n", now_version);
+
+    if(now_version > VERSION) {
+        return PROC_BAD_VERSION;
+    }
+
+    /*if(memcmp(processor->text, SIGNATURE_NAME, sizeof(SIGNATURE_NAME)) != 0) {
+        printf("bad!\n");
+        return PROC_BAD_VERSION;
+    }*/
+
+    return PROC_OKEY;
 }
 
 void destruct_processor(Processor* processor) {
@@ -187,7 +212,6 @@ void destruct_processor(Processor* processor) {
     stack_destruct(&(processor->call_stack));
     stack_destruct(&(processor->proc_stack));
 }
-
 
 Elem_t get_value_to_compare(Processor* processor, int* now_byte) {
     int flag_of_register = get_double_from_text(processor, now_byte);
@@ -200,7 +224,7 @@ Elem_t get_value_to_compare(Processor* processor, int* now_byte) {
     }
 }
 
-int get_double_from_text(Processor* processor, int* now_byte) {
+Elem_t get_double_from_text(Processor* processor, int* now_byte) {
     ++(*now_byte);
     return processor->text[*now_byte];
 }
@@ -208,8 +232,6 @@ int get_double_from_text(Processor* processor, int* now_byte) {
 #undef DEFINE_COMMANDS
 
 int main(const int argc, const char* argv[]) {
-    assert(argc > 0);
-
     if(argc == 3) {
         Processor processor = {};
 
@@ -217,10 +239,11 @@ int main(const int argc, const char* argv[]) {
 
         processor_dump(&processor, create_struct(__FILE__, __LINE__, __FUNCTION__));
         if(status != OK) {
+            printf("%s\n", TEXT_PROCESSOR_ERRORS[status]);
             return status;
         }
 
-        file_handler(&processor);
+        processing(&processor);
         destruct_processor(&processor);
     } else {
         help();

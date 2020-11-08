@@ -68,7 +68,6 @@ bool is_canary(Elem_t value) {
 
 void error_print_data(Stack_t* node, FILE* file) {
     int stack_all_size  = node->capacity;
-    int stack_real_size = node->size_stack;
     const int base_indent = 2 * TABULATION_IN_PROBELS;
 
     if(node->stack_status == STACK_BAD_CAPACITY) {
@@ -217,7 +216,7 @@ void fell(Stack_t* node) {
     abort();
 }
 
-int stack_size(Stack_t* node) {
+size_t stack_size(Stack_t* node) {
     return node->size_stack;
 }
 

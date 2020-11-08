@@ -14,10 +14,6 @@ int size_of_buffer(FILE* file) {
     return length;
 }
 
-void ERROR(const char* status) {
-    printf("%s\n", status);
-}
-
 int is_right_command(const char* line, const char* command) {
     int length_command = strlen(command);
 
@@ -48,7 +44,7 @@ int number_of_symbols(char* buffer, char separator) {
 
 int type_of_value(const char* operation) {
     int length = strlen(operation);
-    int flag_of_value = 0;
+    //int flag_of_value = 0;
 
     for(int registr=0; registr<number_of_register_vars; ++registr) {
         if(!strcmp(TEXT_REGISTERS[registr], operation)) {

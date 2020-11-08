@@ -5,7 +5,7 @@
         COMMAND_RET;                                                    \
     } else {                                                            \
         stack_push(&(processor->call_stack), now_byte);                 \
-        now_byte = address_label - 1;                                   \
+        now_byte = address_label - 2;                                   \
     }
 
 #define RECURSIVE_RETURN                                                \
@@ -38,7 +38,8 @@ DEFINE_COMMANDS ( PUSH, 1, 2,
         printf("%d\n", (int)now_value);
         stack_push(&(processor->proc_stack), processor->ram[(int)now_value]);
     } else {
-        ERROR("Unknown value to add to the stack"); // POPADOS();
+        printf("Unknown value to add to the stack"); // POPADOS();
+        return PROC_UNKNOWN_COMMAND;
     }
 })
 

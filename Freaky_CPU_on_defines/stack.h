@@ -154,7 +154,7 @@ void fell(Stack_t* node);
 *   @return Size of stack
 */
 
-int stack_size(Stack_t* node);
+size_t stack_size(Stack_t* node);
 
 /**
 *   \brief This function returns capacity of the stack

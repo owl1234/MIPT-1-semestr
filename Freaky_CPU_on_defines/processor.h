@@ -5,20 +5,25 @@
 
 const struct call_of_dump proc_base_arguments_of_call = {__FILE__, -1, " "};
 
-typedef enum MY_PROCESSOR_ERRORS {
-    PROC_OKEY     = 0,
-    PROC_BAD_PTR_TO_PROC = 1,
+typedef enum {
+    PROC_OKEY                = 0,
+    PROC_BAD_PTR_TO_PROC     = 1,
     PROC_BAD_SIZE_PROC_STACK = 2,
     PROC_BAD_SIZE_CALL_STACK = 3,
-    PROC_BAD_RAM  = 4,
-    PROC_BAD_READ_FROM_FILE = 5,
+    PROC_BAD_RAM             = 4,
+    PROC_BAD_READ_FROM_FILE  = 5,
+    PROC_UNKNOWN_COMMAND     = 6,
+    PROC_BAD_VERSION         = 7,
 } PROCESSOR_ERRORS;
 
 const char TEXT_PROCESSOR_ERRORS[][30] = {
     "Processor is okey",
+    "Bad ptr of processor",
     "Bad size of processor stack",
     "Bad size of call stack",
-    "Bad ram"
+    "Bad ram",
+    "Unknown command",
+    "Bad version"
 };
 
 struct Processor {
@@ -44,7 +49,7 @@ int initialization_proc(Processor* processor, const char* name_input_file, const
 
 void init_ram(Processor* processor);
 
-void file_handler(Processor* processor);
+PROCESSOR_ERRORS processing(Processor* processor);
 
 int size_of_buffer(FILE* file);
 
@@ -54,8 +59,10 @@ void print_ram(Elem_t* ram);
 
 Elem_t get_value_to_compare(Processor* processor, int* now_byte);
 
-int get_double_from_text(Processor* processor, int* now_byte);
+Elem_t get_double_from_text(Processor* processor, int* now_byte);
 
 void destruct_processor(Processor* processor);
+
+PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte);
 
 #endif // PROCESSOR_H

@@ -6,8 +6,11 @@
 #include "operation_codes.h"
 #include "stack.h"
 
+const int VERSION = 1;
+const int SIGNATURE_SIZE = 10; // program system prefix
+const char SIGNATURE_NAME[] = "KolesnKS";
 
-const int MAX_SIZE = 10;
+const int MAX_SIZE = 11;
 const int MAX_SIZE_RAM = 10;
 const int ERROR_NUMBER = -3802;
 const double EPSILON = 1e-6;
@@ -47,7 +50,7 @@ enum TYPE_OF_ARGUMENT {
 
 struct Label {
     char* name;
-    int address; //symbol_address;
+    //int address; //symbol_address;
     int byte_address;
     int type_of_command;
 };

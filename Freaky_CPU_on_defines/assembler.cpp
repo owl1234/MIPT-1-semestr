@@ -2,11 +2,13 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 8, 2020, 14:10:25
+ *                  November 8, 2020, 20:10:25
  *  @par What was changed?
- *                      1. Added ram (normally work!)
+ *                      1. Some rubbish removed
  *  @par To-do list
- *                      3. Make adequate listing !!!
+ *                      2. Make adequate listing !!!
+ *                      3. Fix the signature
+ *
  */
 
 
@@ -17,6 +19,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <unistd.h>
 #include "assembler.h"
 #include "common.h"
 
@@ -28,7 +31,7 @@ void help() {
                     "For more information, go here: https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines\n");
 }
 
-int file_construct(File* file, const char* name_file, const char* reading_mode) {
+int file_construct(File* file, char* name_file, const char* reading_mode) {
     assert(file);
     assert(name_file);
 
@@ -109,12 +112,14 @@ void listing(File* file, char symbol_to_output, int flag_of_the_end) {
 int assembling_file(File* input_file, const char* name_output_file) {
     printf("Start assembling file.........................................\n");
 
-    char* assembled_text = (char*)calloc(2 * MAX_SIZE * input_file->lines, sizeof(char));
+    char* assembled_text = (char*)calloc(3 * MAX_SIZE * input_file->lines + SIGNATURE_SIZE, sizeof(char));       // TO-DO CORRECT SIZE
+    int index_in_assembled_text = 0, number_of_byte = 0;
+
+    write_signature(assembled_text, &index_in_assembled_text, &number_of_byte);
 
     Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
-    Label* go_to_labels = (Label*)calloc(MAX_SIZE * input_file->lines, sizeof(Label));
 
-    int index_in_assembled_text = 0, index_in_labels = 0, number_of_byte = 0, index_in_go_to_labels = 0, status = 0;
+    int status = 0, index_in_labels = 0;
 
     find_labels_into_text(input_file, labels, &index_in_labels);
 
@@ -126,10 +131,10 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
     while(temp_string != NULL) {
         printf("now_command: %s (%d)\n", temp_string, number_of_byte);
-        status = find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, &index_in_labels, &number_of_byte, go_to_labels, &index_in_go_to_labels, input_file);
+        status = find_and_write_command(temp_string, assembled_text, &index_in_assembled_text, labels, index_in_labels, &number_of_byte, input_file);
 
         if(!is_it_label(temp_string)) {
-            temp_string = strtok(0, SEPARATORS);
+            temp_string = strtok(NULL, SEPARATORS);
 
             if(temp_string == NULL) {
                 break;
@@ -150,8 +155,17 @@ int assembling_file(File* input_file, const char* name_output_file) {
         return ASM_BAD_FILE;
     }
 
-    printf("End to assembling file...........................................\n");
+    printf("Assembling file finished...........................................\n");
     return OK;
+}
+
+void write_signature(char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
+    put_int_into_assembled_text(VERSION, assembled_text, index_in_assembled_text, number_of_byte);
+
+    //memcpy(assembled_text + *index_in_assembled_text, SIGNATURE_NAME, sizeof(SIGNATURE_NAME));
+    //printf("%s\n", assembled_text);
+    //(*index_in_assembled_text) += sizeof(SIGNATURE_NAME);
+    //(*number_of_byte)++;
 }
 
 void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels) {
@@ -166,7 +180,8 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
 
     while(temp_string != NULL) {
         if(is_it_label(temp_string)) {
-            labels[*index_in_labels].name = temp_string;
+            labels[*index_in_labels].name = (char*)calloc(strlen(temp_string), sizeof(char));
+            strcpy(labels[*index_in_labels].name, temp_string);
             labels[*index_in_labels].byte_address = number_of_byte;
             ++(*index_in_labels);
 
@@ -185,10 +200,6 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
         temp_string = strtok(NULL, SEPARATORS);
     }
 
-    /*for(int i=0; i<*index_in_labels; ++i) {
-        printf("label %s %d\n", labels[i].name, labels[i].byte_address);
-    }*/
-
     strcpy(input_file->text_for_assembling, copy_of_text_for_assembling);
 
     free(temp_string);
@@ -204,14 +215,13 @@ bool is_it_label(const char* word) {
     return false;
 }
 
-int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
-                                                                                            Label* go_to_labels, int* index_in_go_to_labels, File* input_file) {
+int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file) { // TO-DO DEFINES
     int number_of_condition = 0;
 
     if(!strcmp(text, "push")) {
         assembler_push(text, assembled_text, index_in_assembled_text, number_of_byte, input_file);
     } else if(!strcmp(text, "pop")) {
-        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, go_to_labels, index_in_go_to_labels, input_file);
+        assembler_pop(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, input_file);
     } else if(!strcmp(text, "hlt")) {
         put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
@@ -279,12 +289,11 @@ void assembler_push(char* text, char* assembled_text, int* index_in_assembled_te
 
     } else {
         printf("Bad type of push value! (%d)\n", type_push_value);
-        abort();
+        return;
     }
 }
 
-void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
-                                                                                   Label* go_to_labels, int* index_in_go_to_labels, File* input_file) {
+void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file) {
 
     put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
@@ -309,7 +318,7 @@ void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_tex
         listing_alignment(input_file, *number_of_byte, SPACE);
         listing(input_file, "| ", NOTHING);
 
-        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, go_to_labels, index_in_go_to_labels, input_file);
+        find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, input_file);
 
     }
 }
@@ -330,7 +339,6 @@ void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_tex
     listing(input_file, "cmp", SPACE);
     listing(input_file, first_string, SPACE);
     listing(input_file, second_string, END_LINE);
-
 }
 
 void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
@@ -347,10 +355,8 @@ void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* num
     listing(input_file, "| sqrt", END_LINE);
 }
 
-void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int* index_in_labels, int number_of_condition,
+void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int index_in_labels, int number_of_condition,
                                                                                                                                                             File* input_file) {
-
-    int now_command = 0;
 
     if(strcmp(text, "ret")) {
         put_int_into_assembled_text(number_of_condition, assembled_text, index_in_assembled_text, number_of_byte, input_file);
@@ -364,7 +370,7 @@ void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_
             listing(input_file, TEXT_OPERATION[number_of_condition], SPACE);
             listing(input_file, text, END_LINE);
         } else {
-            for(int label=0; label<*index_in_labels; ++label) {
+            for(int label=0; label<index_in_labels; ++label) {
                 if(is_equal_labels(text, labels[label].name)) {
                     put_int_into_assembled_text(labels[label].byte_address + 1, assembled_text, index_in_assembled_text, number_of_byte, input_file);
 
@@ -372,6 +378,7 @@ void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_
                     listing(input_file, "|", SPACE);
                     listing(input_file, TEXT_OPERATION[number_of_condition], SPACE);
                     listing(input_file, text, END_LINE);
+                    break;
                 }
             }
         }
@@ -385,7 +392,15 @@ void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_
 }
 
 bool is_equal_labels(const char* first, const char* second) {
-    int length = min(strlen(first), strlen(second));
+    //printf("\t%s\n", second);
+    int length_first  = strlen(first);
+    int length_second = strlen(second);
+
+    if(abs(length_first - length_second) > 1) {
+        return false;
+    }
+
+    int length = max(length_first, length_second) - 1;
 
     for(int i=0; i<length; ++i) {
         if(first[i] != second[i]) {
@@ -396,8 +411,8 @@ bool is_equal_labels(const char* first, const char* second) {
     return true;
 }
 
-int min(int first, int second) {
-    if(first < second) {
+int max(int first, int second) {
+    if(first > second) {
         return first;
     }
 
@@ -422,9 +437,6 @@ int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text
 }
 
 void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file) {
-    int length_code = 0;
-    int reverse_code = reversed_number(code_of_operation, &length_code);
-
     double converted_code = (double)code_of_operation;
 
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(double)); //
@@ -443,7 +455,6 @@ void put_double_into_assembled_text(double code_of_operation, char* assembled_te
 void create_label(char* text, Label* labels, int* index_in_labels, int index_in_assembled_text, int number_of_byte) {
     labels[*index_in_labels].name = (char*)calloc(MAX_SIZE, sizeof(char));
     strcpy(labels[*index_in_labels].name, text);
-    labels[*index_in_labels].address = number_of_byte;
     labels[*index_in_labels].byte_address = number_of_byte;
     labels[*index_in_labels].type_of_command = -1;
 
@@ -538,7 +549,23 @@ bool is_text_connected_with_labels(char* text, int* number_of_condition) {
     return command_is_condition;
 }
 
-int main(const int argc, const char* argv[]) {
+ASM_ERRORS destruct_file(File* file) {
+    if(!file->text_for_assembling) {
+        return ASM_BAD_MEMORY;
+    }
+
+    free(file->text_for_assembling);
+
+    if(!file->text_for_listing) {
+        return ASM_BAD_MEMORY;
+    }
+
+    free(file->text_for_listing);
+
+    return ASM_OKEY;
+}
+
+int main(const int argc, char* argv[]) {
     assert(argc > 0);
 
     int status = OK;
@@ -550,9 +577,11 @@ int main(const int argc, const char* argv[]) {
         if(status == OK) {
             assembling_file(&file, argv[2]);
         } else {
-            printf("%s. The program was stopped.\n");
+            printf("The program was stopped.\n");
             return status;
         }
+
+        destruct_file(&file);
     } else {
         help();
     }

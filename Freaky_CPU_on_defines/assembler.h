@@ -2,7 +2,7 @@
 
 struct File {
     FILE* input_file;
-    const char* name;
+    char* name;
     char* text_for_assembling;
     FILE* listing_file;
     char* text_for_listing;
@@ -10,7 +10,8 @@ struct File {
     struct stat information;
 };
 
-typedef enum ASSEMBLER_ERROROS {
+typedef enum {
+    ASM_OKEY               = 0,
     ASM_BAD_FILE           = 1,
     ASM_BAD_MEMORY         = 2,
     ASM_BAD_READ_FROM_FILE = 3,
@@ -44,15 +45,15 @@ int assembling_file(File* input_file, const char* name_output_file);
 
 void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels);
 
+void write_signature(char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
+
 bool is_it_label(const char* word);
 
-int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
-                                                                                            Label* go_to_labels, int* index_in_go_to_labels, File* input_file);
+int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file);
 
 void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
 
-void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int* index_in_labels, int* number_of_byte,
-                                                                                   Label* go_to_labels, int* index_in_go_to_labels, File* input_file);
+void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* input_file);
 
 void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
 
@@ -60,12 +61,12 @@ void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* num
 
 void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* input_file);
 
-void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* go_labels, int* index_in_labels, int number_of_condition,
+void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int index_in_labels, int number_of_condition,
                                                                                                                                                             File* input_file);
 
 bool is_equal_labels(const char* first, const char* second);
 
-int min(int first, int second);
+int max(int first, int second);
 
 int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, char* argument, int* type_of_argument, File* input_file);
 
@@ -84,3 +85,5 @@ int reversed_number(int value, int* length);
 void work_with_registers(int last_operation_code, int operation_code, char* assembled_text, int* index_in_assembled_text);
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition);
+
+ASM_ERRORS destruct_file(File* file);
