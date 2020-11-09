@@ -7,7 +7,7 @@
 #include "operation_codes.h"
 #include "stack.h"
 
-const int VERSION = 1;
+const int VERSION = 6;
 const int SIGNATURE_SIZE = 10;
 const long long SIGNATURE_NAME_HASH = 1343871799; // 0x64F3F67CF65BE1CBA2C649705203B97E % ULLONG_MAX;
 

@@ -1,3 +1,13 @@
+#define GET_ADDRESS_LABEL_GO_TO                                         \
+    int address_label = get_double_from_text(processor, &now_byte);     \
+                                                                        \
+    if(address_label == OPERATION_CODE_RECURSIVE_RET) {                 \
+        COMMAND_ret;                                                    \
+    } else {                                                            \
+        stack_push(&(processor->call_stack), now_byte);                 \
+        now_byte = address_label - 2;                                   \
+    }
+
 #define PUT_ADDRESS_LABEL_GO_TO(code_of_operation)                                                                                      \
     put_char_into_disassembled_text(TEXT_OPERATION[code_of_operation], disassembled_text, &index_in_disassembled_text, SPACE);          \
     printf("\t# %d, label: %d\n", now_byte, labels[now_position_in_labels].byte_address); \
@@ -30,6 +40,7 @@
 
 
 #define CONDITION_COMMANDS(number_of_condition)                                             \
+    bool is_find_label = false;                                                                         \
     put_int_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);  \
                                                                                                         \
     temp_string = strtok(NULL, SEPARATORS);                                                                    \
@@ -41,11 +52,22 @@
             listing(input_file->listing_file, "|", SPACE);                                                                  \
             listing(input_file->listing_file, TEXT_OPERATION[number_of_condition], SPACE);                                       \
             listing(input_file->listing_file, temp_string, END_LINE);                                                                  \
+                                                                                                                                       \
+            is_find_label = true;                                                                               \
             break;                                                                                              \
         }                                                                                                       \
+    }                                                                                                           \
+                                                                                                                \
+    if(!is_find_label && !strcmp(temp_string, "recret")) {                                                                              \
+        put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);   \
+                                                                                                        \
+        listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);     \
+        listing(input_file->listing_file, "|", SPACE);                                                                  \
+        listing(input_file->listing_file, TEXT_OPERATION[number_of_condition], SPACE);                                       \
+        listing(input_file->listing_file, temp_string, END_LINE);                                                                        \
     }
 
-DEFINE_COMMANDS ( RECURSIVE_RETURN, -1, 0,
+DEFINE_COMMANDS ( recursive_return, -1, 0,
 {
 
 },
@@ -84,7 +106,7 @@ DEFINE_COMMANDS ( HLT, 0, 0,
 )
 
 
-DEFINE_COMMANDS ( PUSH, 1, 2,
+DEFINE_COMMANDS ( push, 1, 2,
 {
     Elem_t flag_of_registers = get_double_from_text(processor, &now_byte);
 
@@ -155,7 +177,7 @@ DEFINE_COMMANDS ( PUSH, 1, 2,
 }
 )
 
-DEFINE_COMMANDS ( POP, 2, 2,
+DEFINE_COMMANDS ( pop, 2, 2,
 {
     double back_element = 0.0;
 
@@ -205,13 +227,12 @@ DEFINE_COMMANDS ( POP, 2, 2,
         listing_alignment(input_file->listing_file, number_of_byte, SPACE);
         listing(input_file->listing_file, "| ", NOTHING);
 
-        //find_and_write_command(text, assembled_text, index_in_assembled_text, labels, index_in_labels, number_of_byte, listing_file);
-
+        flag_of_pop_without_args = true;
     }
 }
 )
 
-DEFINE_COMMANDS ( ADD, 3, 0,
+DEFINE_COMMANDS ( add, 3, 0,
 {
     double last = stack_back(&(processor->proc_stack));
     stack_pop(&(processor->proc_stack));
@@ -229,7 +250,7 @@ DEFINE_COMMANDS ( ADD, 3, 0,
 }
 )
 
-DEFINE_COMMANDS ( SUB, 4, 0,
+DEFINE_COMMANDS ( sub, 4, 0,
 {
     double last = stack_back(&(processor->proc_stack));
     stack_pop(&(processor->proc_stack));
@@ -248,7 +269,7 @@ DEFINE_COMMANDS ( SUB, 4, 0,
 
 )
 
-DEFINE_COMMANDS ( MUL, 5, 0,
+DEFINE_COMMANDS ( mul, 5, 0,
 {
     double last = stack_back(&(processor->proc_stack));
     stack_pop(&(processor->proc_stack));
@@ -267,7 +288,7 @@ DEFINE_COMMANDS ( MUL, 5, 0,
 
 )
 
-DEFINE_COMMANDS ( DIV, 6, 0,
+DEFINE_COMMANDS ( div, 6, 0,
 {
     double last = stack_back(&(processor->proc_stack));
     stack_pop(&(processor->proc_stack));
@@ -286,7 +307,7 @@ DEFINE_COMMANDS ( DIV, 6, 0,
 
 )
 
-DEFINE_COMMANDS ( OUT, 7, 0,
+DEFINE_COMMANDS ( out, 7, 0,
 {
     if(processor->proc_stack.size_stack == 0) {
         printf("Stack is empty\n");
@@ -306,7 +327,7 @@ DEFINE_COMMANDS ( OUT, 7, 0,
 
 )
 
-DEFINE_COMMANDS ( IN, 8, 0,
+DEFINE_COMMANDS ( in, 8, 0,
 {
     printf("Enter your number: ");
     scanf(identity, &input_value);
@@ -321,7 +342,7 @@ DEFINE_COMMANDS ( IN, 8, 0,
 
 )
 
-DEFINE_COMMANDS ( SQRT, 9, 0,
+DEFINE_COMMANDS ( sqrt, 9, 0,
 {
     double last = stack_back(&(processor->proc_stack));
     stack_pop(&(processor->proc_stack));
@@ -336,7 +357,7 @@ DEFINE_COMMANDS ( SQRT, 9, 0,
 }
 )
 
-DEFINE_COMMANDS ( JMP, 10, 1,
+DEFINE_COMMANDS ( jmp, 10, 1,
 {
     int address_label = get_double_from_text(processor, &now_byte);
     now_byte = address_label - 2;
@@ -351,7 +372,7 @@ DEFINE_COMMANDS ( JMP, 10, 1,
 }
 )
 
-DEFINE_COMMANDS ( CMP, 30, 4,
+DEFINE_COMMANDS ( cmp, 30, 4,
 {
     first_comparison  = get_value_to_compare(processor, &now_byte);
 
@@ -364,21 +385,21 @@ DEFINE_COMMANDS ( CMP, 30, 4,
 {
     put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, &index_in_assembled_text, &number_of_byte);
 
-    /*char* first_string = (char*)calloc(MAX_SIZE, sizeof(char));
+    char* first_string = (char*)calloc(MAX_SIZE, sizeof(char));
     char* second_string = (char*)calloc(MAX_SIZE, sizeof(char));
 
-    int first_value  = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, first_string,  &first_type_of_value);
-    int second_value = put_cmp_value(text, assembled_text, index_in_assembled_text, number_of_byte, second_string, &second_type_of_value);
+    int first_value  = put_cmp_value(temp_string, assembled_text, &index_in_assembled_text, &number_of_byte, first_string,  &first_type_of_value);
+    int second_value = put_cmp_value(temp_string, assembled_text, &index_in_assembled_text, &number_of_byte, second_string, &second_type_of_value);
 
     listing(input_file->listing_file, NOTHING, FIVE_ARGUMENTS, OPERATION_CODE_CMP, first_type_of_value, first_value, second_type_of_value, second_value);
     listing(input_file->listing_file, "|", SPACE);
     listing(input_file->listing_file, "cmp", SPACE);
     listing(input_file->listing_file, first_string, SPACE);
-    listing(input_file->listing_file, second_string, END_LINE);*/
+    listing(input_file->listing_file, second_string, END_LINE);
 }
 )
 
-DEFINE_COMMANDS ( JE, 31, 1,
+DEFINE_COMMANDS ( je, 31, 1,
 {
     if(fabs(first_comparison - second_comparison) < EPSILON) {
         GET_ADDRESS_LABEL_GO_TO
@@ -397,7 +418,7 @@ DEFINE_COMMANDS ( JE, 31, 1,
 }
 )
 
-DEFINE_COMMANDS ( JNE, 32, 1,
+DEFINE_COMMANDS ( jne, 32, 1,
 {
     if(fabs(first_comparison - second_comparison) >= EPSILON) {
         GET_ADDRESS_LABEL_GO_TO
@@ -416,7 +437,7 @@ DEFINE_COMMANDS ( JNE, 32, 1,
 }
 )
 
-DEFINE_COMMANDS ( JA, 33, 1,
+DEFINE_COMMANDS ( ja, 33, 1,
 {
     if(first_comparison > second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
@@ -435,7 +456,7 @@ DEFINE_COMMANDS ( JA, 33, 1,
 }
 )
 
-DEFINE_COMMANDS ( JAE, 34, 1,
+DEFINE_COMMANDS ( jae, 34, 1,
 {
     if(first_comparison >= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
@@ -450,11 +471,12 @@ DEFINE_COMMANDS ( JAE, 34, 1,
     PUT_ADDRESS_LABEL_GO_TO(OPERATION_CODE_JAE)
 },
 {
+    printf("----------------------------------------------------------------\n");
     CONDITION_COMMANDS(OPERATION_CODE_JAE)
 }
 )
 
-DEFINE_COMMANDS ( JB, 35, 1,
+DEFINE_COMMANDS ( jb, 35, 1,
 {
     if(first_comparison < second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
@@ -473,7 +495,7 @@ DEFINE_COMMANDS ( JB, 35, 1,
 }
 )
 
-DEFINE_COMMANDS ( JBE, 36, 1,
+DEFINE_COMMANDS ( jbe, 36, 1,
 {
     if(first_comparison <= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
@@ -492,7 +514,7 @@ DEFINE_COMMANDS ( JBE, 36, 1,
 }
 )
 
-DEFINE_COMMANDS ( CALL, 40, 1,
+DEFINE_COMMANDS ( call, 40, 1,
 {
     int address_label = get_double_from_text(processor, &now_byte);
 
@@ -507,7 +529,7 @@ DEFINE_COMMANDS ( CALL, 40, 1,
 }
 )
 
-DEFINE_COMMANDS ( RET, 41, 0,
+DEFINE_COMMANDS ( ret, 41, 0,
 {
     int go_to_address = stack_back(&(processor->call_stack));
     stack_pop(&(processor->call_stack));
@@ -517,7 +539,7 @@ DEFINE_COMMANDS ( RET, 41, 0,
     put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_RET], disassembled_text, &index_in_disassembled_text, END_LINE);
 },
 {
-    put_int_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_int_into_assembled_text(OPERATION_CODE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_RET);
     listing(input_file->listing_file, "|", SPACE);
@@ -525,7 +547,7 @@ DEFINE_COMMANDS ( RET, 41, 0,
 }
 )
 
-DEFINE_COMMANDS ( MEOW, 99, 0,
+DEFINE_COMMANDS ( meow, 99, 0,
 {
     printf("meow\n");
 },

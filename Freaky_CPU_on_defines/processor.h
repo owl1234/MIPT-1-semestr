@@ -14,6 +14,7 @@ typedef enum {
     PROC_BAD_READ_FROM_FILE  = 5,
     PROC_UNKNOWN_COMMAND     = 6,
     PROC_BAD_VERSION         = 7,
+    PROC_BAD_FILE            = 8,
 } PROCESSOR_ERRORS;
 
 const char TEXT_PROCESSOR_ERRORS[][30] = {
@@ -22,6 +23,7 @@ const char TEXT_PROCESSOR_ERRORS[][30] = {
     "Bad size of processor stack",
     "Bad size of call stack",
     "Bad ram",
+    "Don't read from file",
     "Unknown command",
     "Bad version"
 };

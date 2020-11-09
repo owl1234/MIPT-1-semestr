@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 9, 2020, 01:38:25
+ *                  November 9, 2020, 09:58:25
  *  @par What was changed?
- *                      1. Made defines for functions
+ *                      1. Defines work fine!
 */
 
 #include <stdio.h>
@@ -126,6 +126,10 @@ void init_ram(Processor* processor) {
 
 int initialization_proc(Processor* processor, const char* name_input_file, const char* name_log_file) {
     FILE* input_file = fopen(name_input_file, "rb");
+    if(input_file == NULL) {
+        return PROC_BAD_FILE;
+    }
+
     int bytes_in_buffer = size_of_buffer(input_file);
 
     processor->symbols = bytes_in_buffer / sizeof(double);
@@ -151,7 +155,7 @@ int initialization_proc(Processor* processor, const char* name_input_file, const
 
     IF_DEBUG(processor_verificator(processor, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
-    return OK;
+    return PROC_OKEY;
 }
 
 PROCESSOR_ERRORS processing(Processor* processor) {
@@ -199,6 +203,8 @@ PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte) {
         return PROC_BAD_VERSION;
     }
 
+    printf("Okey signature");
+
     return PROC_OKEY;
 }
 
@@ -228,13 +234,15 @@ Elem_t get_double_from_text(Processor* processor, int* now_byte) {
 #undef DEFINE_COMMANDS
 
 int main(const int argc, const char* argv[]) {
+    int status = ERROR_NUMBER;
+
     if(argc == 3) {
         Processor processor = {};
 
-        int status = initialization_proc(&processor, argv[1], argv[2]);
-        for(int i=0; i<processor.symbols; ++i)
+        status = initialization_proc(&processor, argv[1], argv[2]);
+        /*for(int i=0; i<processor.symbols; ++i)
             printf("%lg ", processor.text[i]);
-        printf("\n");
+        printf("\n");*/
 
         processor_dump(&processor, create_struct(__FILE__, __LINE__, __FUNCTION__));
         if(status != OK) {
@@ -242,11 +250,13 @@ int main(const int argc, const char* argv[]) {
             return status;
         }
 
-        processing(&processor);
+        status = processing(&processor);
+        printf("%s\n", TEXT_PROCESSOR_ERRORS[status]);
+
         destruct_processor(&processor);
     } else {
         help();
     }
 
-    return OK;
+    return status;
 }

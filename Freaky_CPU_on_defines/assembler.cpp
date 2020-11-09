@@ -4,7 +4,7 @@
  *  @par Last edition
  *                  November 9, 2020, 01:38:25
  *  @par What was changed?
- *                      1. Made defines for functions
+ *                      1. Defines work fine!
  *  @par To-do list
  *                      2. Make adequate listing !!!
  *
@@ -32,7 +32,7 @@ void help() {
 
 #define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler, code_assembler)   \
     case number:                                                         \
-        printf("find command %s\n", #name); \
+        flag_of_pop_without_args = false;                                       \
         code_assembler;                                                          \
         break;
 
@@ -124,6 +124,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
     int status = 0, index_in_labels = 0, number_of_condition = 0, number_of_command = 0;
     int first_type_of_value = 0, second_type_of_value = 0;
+    bool flag_of_pop_without_args = false;
 
     find_labels_into_text(input_file, labels, &index_in_labels, &number_of_byte);
 
@@ -133,26 +134,27 @@ int assembling_file(File* input_file, const char* name_output_file) {
     listing_alignment(input_file->listing_file, number_of_byte, SPACE);
     listing(input_file->listing_file, "|", SPACE);
 
-    //printf("%s\n", temp_string);
     while(temp_string != NULL) {
         number_of_command = get_number_of_command(temp_string);
-        printf("now_command: %d\n", number_of_command);
+        IF_DEBUG(printf("now_command: %d\n", number_of_command);)
 
         switch(number_of_command) {
             #include "COMMANDS.H"
         }
 
-        if(!is_it_label(temp_string)) {
-            temp_string = strtok(NULL, SEPARATORS);
+        if(!flag_of_pop_without_args) {
+            if(!is_it_label(temp_string)) {
+                temp_string = strtok(NULL, SEPARATORS);
 
-            if(temp_string == NULL) {
-                break;
+                if(temp_string == NULL) {
+                    break;
+                }
+
+                listing_alignment(input_file->listing_file, number_of_byte, SPACE);
+                listing(input_file->listing_file, "|", SPACE);
+            } else {
+                temp_string = strtok(NULL, SEPARATORS);
             }
-
-            listing_alignment(input_file->listing_file, number_of_byte, SPACE);
-            listing(input_file->listing_file, "|", SPACE);
-        } else {
-            temp_string = strtok(NULL, SEPARATORS);
         }
     }
 
@@ -218,28 +220,6 @@ bool is_it_label(const char* word) {
     }
 
     return false;
-}
-
-int find_and_write_command(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file) { // TO-DO DEFINES
-
-    /*if(is_text_connected_with_labels(text, &number_of_condition)) {
-        assembler_labels(text, assembled_text, index_in_assembled_text, number_of_byte, labels, index_in_labels, number_of_condition, listing_file);
-    } else {
-        for(int operation_code = OPERATION_CODE_ADD; operation_code<number_of_commands; ++operation_code) {
-            if(!strcmp(text, TEXT_OPERATION[operation_code])) {
-                put_int_into_assembled_text(operation_code, assembled_text, index_in_assembled_text, number_of_byte);
-
-                listing(listing_file, NOTHING, ONE_ARGUMENT, operation_code);
-                listing(listing_file, "|", SPACE);
-                listing(listing_file, TEXT_OPERATION[operation_code], END_LINE);
-                return OK;
-            }
-        }
-
-        return ASM_BAD_COMMAND;
-    }*/
-
-    return OK;
 }
 
 int get_number_of_command(char* text) {

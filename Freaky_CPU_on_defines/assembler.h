@@ -52,19 +52,6 @@ int find_and_write_command(char* text, char* assembled_text, int* index_in_assem
 
 int get_number_of_command(char* text);
 
-void assembler_push(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
-
-void assembler_pop(char* text, char* assembled_text, int* index_in_assembled_text, Label* labels, int index_in_labels, int* number_of_byte, File* listing_file);
-
-void assembler_cmp(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
-
-void assembler_meow(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
-
-void assembler_sqrt(char* assembled_text, int* index_in_assembled_text, int* number_of_byte, File* listing_file);
-
-void assembler_labels(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, Label* labels, int index_in_labels, int number_of_condition,
-                                                                                                                                                            File* listing_file);
-
 bool is_equal_labels(const char* first, const char* second);
 
 int max(int first, int second);
