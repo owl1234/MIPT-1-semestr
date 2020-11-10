@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 9, 2020, 01:38:25
+ *                  November 10, 2020, 20:12:25
  *  @par What was changed?
- *                      1. Defines work fine!
+ *                      1. Add new defines
  *  @par To-do list
  *                      2. Make adequate listing !!!
  *
@@ -31,10 +31,11 @@ void help() {
 }
 
 #define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler, code_assembler)   \
-    case number:                                                         \
-        flag_of_pop_without_args = false;                                       \
-        code_assembler;                                                          \
-        break;
+    case number: {                                                                               \
+        flag_of_pop_without_args = false;                                                        \
+        code_assembler;                                                                          \
+        break;                                                                                   \
+    }
 
 int file_construct(File* file, char* name_file, const char* reading_mode) {
     assert(file);
@@ -76,34 +77,34 @@ void listing(FILE* listing_file, const char* symbols_to_output, FLAGS_OF_THE_END
 }
 
 void listing_alignment(FILE* listing_file, const int number_to_output, FLAGS_OF_THE_END_LINE flag_of_the_end) {
-    fprintf(listing_file, "%#08d%s", number_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
+    fprintf(listing_file, "%08d%s", number_to_output, TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
 void listing(FILE* listing_file, const int flag_of_the_end, int count_of_args, ...) {
-    va_list argptr;
-    va_start(argptr, count_of_args);
+    va_list arguments;
+    va_start(arguments, count_of_args);
 
     while(count_of_args > 0) {
-        fprintf(listing_file, "%d ", va_arg(argptr, int));
+        fprintf(listing_file, "%d ", va_arg(arguments, int));
         --count_of_args;
     }
 
-    va_end(argptr);
+    va_end(arguments);
 
     fprintf(listing_file, "%s", TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
 
 void listing(FILE* listing_file, const int flag_of_the_end, double count_of_args, ...) {
-    va_list argptr;
-    va_start(argptr, count_of_args);
+    va_list arguments;
+    va_start(arguments, count_of_args);
 
     int int_count_of_args = (int)count_of_args;
     while(int_count_of_args > 0) {
-        fprintf(listing_file, "%lg ", va_arg(argptr, double));
+        fprintf(listing_file, "%lg ", va_arg(arguments, double));
         --int_count_of_args;
     }
 
-    va_end(argptr);
+    va_end(arguments);
 
     fprintf(listing_file, "%s", TEXT_FLAGS_OF_THE_END_LINE[flag_of_the_end]);
 }
@@ -115,20 +116,20 @@ void listing(FILE* listing_file, char symbol_to_output, int flag_of_the_end) {
 int assembling_file(File* input_file, const char* name_output_file) {
     printf("Start assembling file.........................................\n");
 
-    char* assembled_text = (char*)calloc(3 * MAX_SIZE * input_file->information.st_size + SIGNATURE_SIZE, sizeof(char));       // TO-DO CORRECT SIZE
+    char* assembled_text = (char*)calloc(MAX_COUNT_OF_ARGUMENTS * MAX_SIZE * input_file->information.st_size + SIGNATURE_SIZE, sizeof(char));
     int index_in_assembled_text = 0, number_of_byte = 0;
 
     write_signature(assembled_text, &index_in_assembled_text, &number_of_byte);
 
     Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
-
-    int status = 0, index_in_labels = 0, number_of_condition = 0, number_of_command = 0;
-    int first_type_of_value = 0, second_type_of_value = 0;
-    bool flag_of_pop_without_args = false;
+    int status = 0, index_in_labels = 0, number_of_condition = 0, number_of_command = 0, first_type_of_value = 0, second_type_of_value = 0;
+    double now_value = 0;
+    bool flag_of_pop_without_args = false, is_find_label = false;
 
     find_labels_into_text(input_file, labels, &index_in_labels, &number_of_byte);
 
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
+    char* handle_ram_variable = (char*)calloc(MAX_SIZE - 2, sizeof(char)); // -2 because of [value]
     temp_string = strtok(input_file->text_for_assembling, SEPARATORS);
 
     listing_alignment(input_file->listing_file, number_of_byte, SPACE);
@@ -136,7 +137,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
     while(temp_string != NULL) {
         number_of_command = get_number_of_command(temp_string);
-        IF_DEBUG(printf("now_command: %d\n", number_of_command);)
+        //IF_DEBUG(printf("now_command: %d\n", number_of_command);)
 
         switch(number_of_command) {
             #include "COMMANDS.H"
@@ -166,7 +167,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
         return ASM_BAD_FILE;
     }
 
-    printf("Assembling file finished...........................................\n");
+    printf("Assembling file finished......................................\n");
     return OK;
 }
 
@@ -413,14 +414,18 @@ int main(const int argc, char* argv[]) {
         if(status == OK) {
             assembling_file(&file, argv[2]);
         } else {
-            printf("The program was stopped.\n");
+            printf("The program was stopped (%s).\n", TEXT_ASM_ERRORS[status]);
             return status;
         }
 
-        destruct_file(&file);
+        status = destruct_file(&file);
+        if(status != OK) {
+            printf("The program was stopped (%s).\n", TEXT_ASM_ERRORS[status]);
+            return status;
+        }
     } else {
         help();
     }
 
-    return OK;
+    return status;
 }

@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 9, 2020, 09:58:25
+ *                  November 10, 2020, 20:12:25
  *  @par What was changed?
- *                      1. Defines work fine!
+ *                      1. Add new defines
 */
 
 #include <stdio.h>
@@ -20,9 +20,10 @@
 #include "enums.h"
 
 #define DEFINE_COMMANDS(name, number, args, code_processor, code_disassembler, code_assembler)   \
-    case COMMAND_##name:                                                         \
-        code_processor;                                                          \
-        break;
+    case COMMAND_##name: {                                                                       \
+        code_processor;                                                                          \
+        break;                                                                                   \
+    }
 
 
 /*void POPADOS() {
@@ -164,8 +165,8 @@ PROCESSOR_ERRORS processing(Processor* processor) {
     int now_command = OPERATION_CODE_MEOW;
     double now_value = 0.0;
 
-    Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0;
-    int flag_of_registers = -1, number_of_register = -1, now_byte = 0;
+    Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0, now_value = 0;
+    int flag_of_registers = -1, number_of_register = -1, now_byte = 0, ram_index = 0;
 
     PROCESSOR_ERRORS status = check_signature(processor, &now_byte);
     if(status != PROC_OKEY) {
@@ -177,13 +178,13 @@ PROCESSOR_ERRORS processing(Processor* processor) {
 
     while(now_byte < processor->symbols && now_command != OPERATION_CODE_HLT) {
         now_command = processor->text[now_byte];
-        IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
+        //IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
 
        switch (now_command) {
             #include "COMMANDS.H"
 
             default:
-                printf("popados (bad command %d, byte: %d) .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command, now_byte);
+                printf("Bad command %d, byte: %d .....  (╯ ° □ °) ╯ (┻━┻) \n", now_command, now_byte);
                 return PROC_UNKNOWN_COMMAND;
         }
         ++now_byte;
@@ -203,7 +204,7 @@ PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte) {
         return PROC_BAD_VERSION;
     }
 
-    printf("Okey signature");
+    printf("Okey signature\n");
 
     return PROC_OKEY;
 }

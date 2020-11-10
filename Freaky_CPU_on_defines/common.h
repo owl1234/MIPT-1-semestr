@@ -13,6 +13,7 @@ const long long SIGNATURE_NAME_HASH = 1343871799; // 0x64F3F67CF65BE1CBA2C649705
 
 const int MAX_SIZE = 11;
 const int MAX_SIZE_RAM = 10;
+const int MAX_COUNT_OF_ARGUMENTS = 3;
 const int ERROR_NUMBER = -3802;
 const double EPSILON = 1e-6;
 const int OK = 0;
@@ -52,7 +53,6 @@ enum TYPE_OF_ARGUMENT {
 struct Label {
     char* name;
     int byte_address;
-    //int type_of_command;
 };
 
 int size_of_buffer(FILE* file);

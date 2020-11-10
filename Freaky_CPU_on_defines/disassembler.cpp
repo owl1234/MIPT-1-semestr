@@ -2,11 +2,12 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 9, 2020, 01:38:25
+ *                  November 10, 2020, 20:12:25
  *  @par What was changed?
- *                      1. Made defines for functions
+ *                      1. Add new defines
  *  @par To-do list
  *                      1. Fix write to the file
+ *                      2. Fix crash of disassembler
  *
  */
 
@@ -28,11 +29,12 @@ void help() {
 }
 
 #define DEFINE_COMMANDS(name, number, arg, code_processor, code_disassembler, code_assembler)       \
-    case number:                                                                    \
-        code_disassembler;                                                          \
-        break;
+    case number: {                                                                                  \
+        code_disassembler;                                                                          \
+        break;                                                                                      \
+    }
 
-int file_construct(File* file, const char* name_file, const char* reading_mode) {
+DISASM_ERRORS file_construct(File* file, const char* name_file, const char* reading_mode) {
     assert(file);
     assert(name_file);
 
@@ -58,7 +60,17 @@ int file_construct(File* file, const char* name_file, const char* reading_mode) 
 
     fclose(file->input_file);
 
-    return OK;
+    return DISASM_OKEY;
+}
+
+DISASM_ERRORS destruct_file(File* file) {
+    if(!file->text_for_disassembling) {
+        return DISASM_BAD_MEMORY;
+    }
+
+    free(file->text_for_disassembling);
+
+    return DISASM_OKEY;
 }
 
 
@@ -87,8 +99,6 @@ DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file)
 
     while(now_byte < real_size) {
         now_command = input_file->text_for_disassembling[now_byte];
-        printf("now_pos_in_balels: %d\n", now_position_in_labels);
-        printf("%d, label: %d\n", now_byte, labels[now_position_in_labels].byte_address);
         IF_DEBUG(printf("> now_command: %d (byte: %d) \n", (int)now_command, now_byte);)
 
         switch((int)now_command) {
@@ -99,18 +109,13 @@ DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file)
                 printf("popados (bad command) .....  (╯ ° □ °) ╯ (┻━┻) \n");
         }
 
-        printf("now_pos_in_balels: %d\n", now_position_in_labels);
-        printf("%d, label: %d\n", now_byte, labels[now_position_in_labels].byte_address);
         if(now_position_in_labels < index_in_labels && now_byte == labels[now_position_in_labels].byte_address) {
             put_char_into_disassembled_text(labels[now_position_in_labels].name, disassembled_text, &index_in_disassembled_text, NOTHING);
             put_char_into_disassembled_text(":", disassembled_text, &index_in_disassembled_text, END_LINE);
             ++now_position_in_labels;
         }
 
-
         ++now_byte;
-        printf("now_pos_in_balels: %d\n", now_position_in_labels);
-        printf("%d, label: %d\n", now_byte, labels[now_position_in_labels].byte_address);
     }
 
     status = create_disassembling_file(disassembled_text, index_in_disassembled_text, name_output_file);
@@ -161,9 +166,6 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
         ++number_of_byte;
     }
 
-    for(int i=0; i<*index_in_labels; ++i)
-        printf("%s %d\n", labels[i].name, labels[i].byte_address);
-
 }
 
 bool is_code_connected_with_labels(int command, int* number_of_condition) {
@@ -202,7 +204,6 @@ bool is_code_connected_with_labels(int command, int* number_of_condition) {
 }
 
 void put_char_into_disassembled_text(const char* command, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line) {
-    printf("\t\t%s\n", command);
     int length_command = strlen(command);
 
     for(int i=0; i<length_command; ++i) {
@@ -211,14 +212,15 @@ void put_char_into_disassembled_text(const char* command, char* disassembled_tex
     }
 
     if(flag_of_the_end_line == END_LINE) {
-        disassembled_text[*index_in_disassembled_text] = '\n';
+        disassembled_text[(*index_in_disassembled_text)++] = '\n';
     } else {
-        disassembled_text[*index_in_disassembled_text] = ' ';
+        disassembled_text[(*index_in_disassembled_text)++] = ' ';
     }
 
-    if(flag_of_the_end_line != NOTHING) {
+    /*if(flag_of_the_end_line != NOTHING) {
         ++(*index_in_disassembled_text);
-    }printf("\t\t%s\n", command);
+    }*/
+
 }
 
 void put_int_into_disassembled_text(Elem_t value, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line) {
@@ -241,10 +243,7 @@ DISASM_ERRORS create_disassembling_file(const char* disassembled_text, const int
     }
 
     for(int i=0; i<index_in_disassembled_text; ++i)
-        printf("%c", disassembled_text[i]);
-
-    //printf("%d\n", index_in_disassembled_text);
-    //fwrite(disassembled_text, sizeof(char), index_in_disassembled_text, output_file);
+        fprintf(output_file, "%c", disassembled_text[i]);
 
     int status = fclose(output_file);
     if(status == EOF) {
@@ -262,11 +261,17 @@ int main(const int argc, const char* argv[]) {
     if(argc == 3) {
         File file = {};
 
-        status = file_construct(&file, argv[1], "rb");
+        status = file_construct(&file, argv[1], "r");
         if(status == OK) {
             disassembling_file(&file, argv[2]);
         } else {
-            printf("The program was stopped.\n");
+            printf("The program was stopped (%s).\n", TEXT_DISASM_ERRORS[status]);
+            return status;
+        }
+
+        status = destruct_file(&file);
+        if(status != OK) {
+            printf("The program was stopped (%s).\n", TEXT_DISASM_ERRORS[status]);
             return status;
         }
     } else {

@@ -28,7 +28,6 @@ int is_right_command(const char* line, const char* command) {
 
 int type_of_value(const char* operation) {
     int length = strlen(operation);
-    //int flag_of_value = 0;
 
     for(int registr=0; registr<number_of_register_vars; ++registr) {
         if(!strcmp(TEXT_REGISTERS[registr], operation)) {
@@ -87,17 +86,3 @@ bool is_it_register(const char* text) {
 
     return true;
 }
-
-/*double string_to_double(char* text) {
-    int length = strlen(text);
-
-    char* temp_text = (char*)calloc(length-2, sizeof(char));
-    for(int i=1; i<length-1; ++i) {
-        temp_text[i] = text[i];
-        printf("%c", temp_text[i]);
-    }
-    printf(" %lg\n", strtod(temp_text, NULL));
-
-
-    return strtod(temp_text, NULL);
-}*/

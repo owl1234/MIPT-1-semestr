@@ -9,6 +9,17 @@ typedef enum {
 
 } DISASM_ERRORS;
 
+const char* TEXT_DISASM_ERRORS[] = {
+    "Okey",
+    "File din't open",
+    "Memory wasn't allocated",
+    "The text wasn't read from the file",
+    "Bad command",
+    "Bad value to push",
+    "Bad version of commands"
+};
+
+
 struct File {
     FILE* input_file;
     const char* name;
@@ -16,6 +27,10 @@ struct File {
     int lines;
     struct stat information;
 };
+
+DISASM_ERRORS file_construct(File* file, const char* name_file, const char* reading_mode);
+
+DISASM_ERRORS destruct_file(File* file);
 
 DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file);
 

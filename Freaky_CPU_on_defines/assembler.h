@@ -23,10 +23,14 @@ const char* TEXT_ASM_ERRORS[] = {
     "Okey",
     "File din't open",
     "Memory wasn't allocated",
-    "The text wasn't read from the file"
+    "The text wasn't read from the file",
+    "Bad command",
+    "Bad value to push"
 };
 
 void help();
+
+int file_construct(File* file, char* name_file, const char* reading_mode);
 
 int is_right_command(const char* line, const char* command);
 
