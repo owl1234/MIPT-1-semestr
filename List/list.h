@@ -1,0 +1,94 @@
+#include <stdio.h>
+
+#define Elem_type int
+
+const Elem_type POISON = -3802;
+const int BEGIN_INIT_SIZE = 8;
+const int MAX_VALUE_SIZE_T = (size_t)-1;
+
+struct call_of_dump {
+    const char* name_file;
+    int number_of_line;
+    const char* name_function;
+};
+
+typedef enum {
+    LIST_OK                = 0,
+    LIST_ERROR             = 1,
+    LIST_EMPTY             = 2,
+    LIST_OVERFLOW          = 3,
+    LIST_CAPACITY_OVERFLOW = 4,
+    LIST_BAD_CAPACITY      = 5,
+    LIST_IS_CREATED        = 6,
+    LIST_BAD_MEMORY        = 7,
+    LIST_BAD_SIZE          = 8,
+    LIST_IS_DECTRUCT       = 9,
+    LIST_NO_CONSTRUCT      = 10,
+    LIST_DATA_NULL         = 11,
+} LIST_STATUSES;
+
+const char TEXT_LIST_STATUSES[][30] {
+    "List is okey",
+    "Error!",
+    "List is empty",
+    "Size of list is very big",
+    "Capacity of list is very big",
+    "Capacity is lower then size",
+    "List is created now",
+    "Data is null",
+    "Size is bad",
+    "List is destructed",
+    "List don't construct",
+    "Data is null",
+};
+
+struct Node {
+    long long prev;
+    long long next;
+    Elem_type value;
+};
+
+struct List {
+    Node* data;
+    size_t capacity;
+    size_t size_list;
+    int head;
+    int tail;
+    LIST_STATUSES list_status;
+    bool flag_of_sorted;
+    long long nearest_free;
+};
+
+int comparator_node(const void* first, const void* second);
+
+void sort_by_next(List* my_list);
+
+struct call_of_dump create_struct(const char* file_name, int number, const char* function_name);
+
+void list_dump(List* my_list, struct call_of_dump arguments_of_call);
+
+void list_verifier(List* my_list);
+
+void draw_graph(List* my_list);
+
+void print_list(List* my_list);
+
+void list_print(List* my_list);
+
+LIST_STATUSES list_construct(List* my_list);
+
+void list_initializate(List* my_list, int begin_position = 0);
+
+void list_destruct(List* my_list);
+
+LIST_STATUSES list_insert(List* my_list, int position, Elem_type value);
+
+LIST_STATUSES list_resize(List* my_list);
+
+void list_push_first_element(List* my_list, Elem_type value);
+
+void list_pop_back(List* my_list, Elem_type* element);
+
+void list_delete_element(List* my_list, int position);
+
+Elem_type list_get_element(List* my_list, int position);
