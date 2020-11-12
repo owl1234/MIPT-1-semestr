@@ -54,6 +54,17 @@ struct call_of_dump create_struct(const char* file_name, int number, const char*
 
 void list_dump(List* my_list, struct call_of_dump arguments_of_call = base_arguments_of_call) {
     printf("popados .....  (╯ ° □ °) ╯ (┻━┻) \n");
+
+    FILE* log_file = fopen("list_dump.html", "wb");
+    fprintf(log_file, "<pre><tt>\n");
+    fprintf(log_file, "   size_list: %d\n", my_list->size_list);
+    fprintf(log_file, "    capacity: %d\n", my_list->capacity);
+    fprintf(log_file, "      status: %d (%s)\n", my_list->list_status, TEXT_LIST_STATUSES[my_list->list_status]);
+    fprintf(log_file, "        head: %d\n", my_list->head);
+    fprintf(log_file, "        tail: %d\n", my_list->tail);
+    fprintf(log_file, "nearest_free: %d\n", my_list->nearest_free);
+    fprintf(log_file, "<img src=new.dot.png/>");
+    fclose(log_file);
     //abort();
 }
 
@@ -80,6 +91,7 @@ void draw_graph(List* my_list) {
 
     int now_position = my_list->head, old_position = my_list->head;
     now_position = my_list->data[now_position].next;
+    printf("tail: %d\n", my_list->tail);
 
     do {
         fprintf(file, "node%d [shape=\"record\",color=\"#FF0EDD\",label=\"%d|{%d|%d}|%d\"]\n", old_position, my_list->data[old_position].prev, my_list->data[old_position].next, my_list->data[old_position].value, old_position);
@@ -91,6 +103,7 @@ void draw_graph(List* my_list) {
 
         old_position = now_position;
         now_position = my_list->data[now_position].next;
+
 
     } while(now_position != my_list->tail);
 
@@ -117,7 +130,7 @@ void print_list(List* my_list) {
     for(int i=0; i<my_list->capacity; ++i) {
         printf("%d ", my_list->data[i].prev);
     }
-    printf("\nhead: %d, tail: %d\. nearest_free: %d\nsize_list: %d, capacity: %d\n\n", my_list->head, my_list->tail, my_list->nearest_free, my_list->size_list, my_list->capacity);
+    printf("\nhead: %d, tail: %d\. nearest_free: %d\nsize_list: %ld, capacity: %ld\n\n", my_list->head, my_list->tail, my_list->nearest_free, my_list->size_list, my_list->capacity);
 }
 
 void list_print(List* my_list) {
@@ -307,19 +320,18 @@ void list_delete_element(List* my_list, int position) {
     if(my_list->head == position) {
         my_list->head = next_index;
     }
-}
+}*/
 
 Elem_type list_get_element(List* my_list, int position) {
-    if(position > my_list->size_list) {
-        printf("No such element exists\n");
-        return POISON;
+    if(position > my_list->capacity) {
+        REPORT_ABOUT_ERROR(LIST_NO_SUCH_ELEMENT)
+        return my_list->list_status;
     }
+
     int begin_position = my_list->head;
-    printf("pos: %d ", begin_position);
     for(int number_of_element = 0; number_of_element < position; ++number_of_element) {
         begin_position = my_list->data[begin_position].next;
-        printf("%d ", begin_position);
     }
 
     return my_list->data[begin_position].value;
-}*/
+}

@@ -1,3 +1,17 @@
+/**
+ *  @file
+ *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
+ *  @par Last edition
+ *                  November 13, 2020, 00:30:25
+ *  @par What was changed?
+ *                      1. Add dump
+ *  @par To-do list
+ *                      1. Make insert for 0
+ *                      2. Make other functions
+ *                      3. Make a colorful output
+ *                      4. Strange output!
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
@@ -18,24 +32,16 @@ int main() {
     list_insert(my_list, 7, 70);
     list_insert(my_list, 7, 80);
     list_insert(my_list, 2, 90);
+    list_insert(my_list, 1, 1000);
 
-    /*list_print(my_list);*/
+    printf("%d\n", list_get_element(my_list, 2));
+    printf("%d\n", list_get_element(my_list, 7));
+
+    list_dump(my_list, create_struct(__FILE__, __LINE__, __FUNCTION__));
+
+    //list_insert(my_list, 0, 3802);
+
     draw_graph(my_list);
 
-    //int el = 0;
-    //list_pop_back(my_list, &el);
-    //printf("%d\n", el);
-
-    /*list_print(my_list);
-    list_delete_element(my_list, 4);
-    list_delete_element(my_list, 1);
-
-    list_print(my_list);
-    print_list(my_list);
-
-    sort_by_next(my_list);
-    print_list(my_list);*/
-
-    //printf("%d\n", list_get_element(my_list, 1));
     return 0;
 }
