@@ -25,6 +25,7 @@ typedef enum {
     LIST_IS_DECTRUCT       = 9,
     LIST_NO_CONSTRUCT      = 10,
     LIST_DATA_NULL         = 11,
+    LIST_NO_SUCH_ELEMENT   = 12,
 } LIST_STATUSES;
 
 const char TEXT_LIST_STATUSES[][30] {
@@ -40,6 +41,7 @@ const char TEXT_LIST_STATUSES[][30] {
     "List is destructed",
     "List don't construct",
     "Data is null",
+    "No such element in list",
 };
 
 struct Node {
@@ -59,6 +61,10 @@ struct List {
     long long nearest_free;
 };
 
+const char COLOR_FOR_ALL_ELEMENTS[]     = "black";
+const char COLOR_FOR_VALID_ELEMENTS[]   = "blue";
+const char COLOR_FOR_UNVALID_ELEMENTS[] = "red";
+
 int comparator_node(const void* first, const void* second);
 
 void sort_by_next(List* my_list);
@@ -77,18 +83,18 @@ void list_print(List* my_list);
 
 LIST_STATUSES list_construct(List* my_list);
 
-void list_initializate(List* my_list, int begin_position = 0);
+void list_initializate(List* my_list, const long long begin_position = 0);
 
 void list_destruct(List* my_list);
 
-LIST_STATUSES list_insert(List* my_list, int position, Elem_type value);
+LIST_STATUSES list_insert(List* my_list, const long long position, Elem_type value);
 
-LIST_STATUSES list_resize(List* my_list);
+LIST_STATUSES list_resize(List* my_list, const double quantity);
 
 void list_push_first_element(List* my_list, Elem_type value);
 
 void list_pop_back(List* my_list, Elem_type* element);
 
-void list_delete_element(List* my_list, int position);
+LIST_STATUSES list_delete_element(List* my_list, long long position, Elem_type* delete_value);
 
-Elem_type list_get_element(List* my_list, int position);
+Elem_type list_get_element(List* my_list, const long long position);
