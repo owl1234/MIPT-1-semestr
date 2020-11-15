@@ -2,16 +2,14 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 14, 2020, 03:01:25
+ *                  November 15, 2020, 23:22:25
  *  @par What was changed?
  *                      1. Fixed insert
- *                      2. Add delete
- *                      3. Stast formed unit-tests
- *                      4. Friday 13 is over :)
+ *                      2. Fixed delete
+ *                      3. Fixed the find of free positions
  *  @par To-do list
- *                      1. Make insert for 0
- *                      2. Make other functions
- *                      3. Make a colorful output (started)
+ *                      1. Make other functions
+ *                      2. Make a colorful output (started)
 */
 
 #include <stdio.h>
@@ -72,10 +70,18 @@ int main() {
         list_insert(my_list, 3, 30);
         list_insert(my_list, 4, 40);
         list_insert(my_list, 5, 50);
+        list_insert(my_list, 6, 60);
+        list_insert(my_list, 7, 70);
+        list_insert(my_list, 8, 80);
+        list_insert(my_list, 9, 90);
 
         int delete_value = -1;
-        //list_delete_element(my_list, 3, &delete_value);
+        list_delete_element(my_list, 3, &delete_value);
         printf("Delete value: %d\n", delete_value);
+        list_delete_element(my_list, 6, &delete_value);
+        printf("Delete value: %d\n", delete_value);
+
+        list_insert(my_list, 1, 2000);
 
         END_TEST(SECOND_TEST)
     }

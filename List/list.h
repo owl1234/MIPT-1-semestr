@@ -47,6 +47,7 @@ const char TEXT_LIST_STATUSES[][30] {
 struct Node {
     long long prev;
     long long next;
+    bool is_used;
     Elem_type value;
 };
 
@@ -61,9 +62,12 @@ struct List {
     long long nearest_free;
 };
 
-const char COLOR_FOR_ALL_ELEMENTS[]     = "black";
-const char COLOR_FOR_VALID_ELEMENTS[]   = "blue";
-const char COLOR_FOR_UNVALID_ELEMENTS[] = "red";
+const char LABEL_COLOR_FOR_ALL_ELEMENTS[]     = "black";
+const char LABEL_COLOR_FOR_VALID_ELEMENTS[]   = "blue";
+const char LABEL_COLOR_FOR_UNVALID_ELEMENTS[] = "red";
+
+const char ARROW_COLOR_FOR_VALID_ELEMENTS[]   = "purple";
+const char ARROW_COLOR_FOR_UNVALID_ELEMENTS[] = "green";
 
 int comparator_node(const void* first, const void* second);
 
@@ -98,3 +102,9 @@ void list_pop_back(List* my_list, Elem_type* element);
 LIST_STATUSES list_delete_element(List* my_list, long long position, Elem_type* delete_value);
 
 Elem_type list_get_element(List* my_list, const long long position);
+
+void put_free_position(List* my_list, long long position);
+
+long long get_min_free_position(List* my_list);
+
+long long get_max_free_position(List* my_list);

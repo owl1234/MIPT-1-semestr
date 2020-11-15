@@ -90,44 +90,40 @@ void draw_graph(List* my_list) {
     fprintf(file, "digraph graphname {\n rankdir = LR;\n");
 
     long long now_position = my_list->head, old_position = my_list->head;
-    bool flag_of_empty_node = false;
+    bool previous_is_bad = false;
 
-    for(int i=0; i<=my_list->size_list; ++i) {
+    for(int i=0; i<my_list->capacity; ++i) {
         fprintf(file, "node%ld [shape=\"record\", ", i);
 
-        /*if(now_position != my_list->data[my_list->data[now_position].next].prev) {
-            flag_of_empty_node = true;
-        }*/
-
-        if(my_list->data[now_position].prev != my_list->data[my_list->data[my_list->data[now_position].prev].next].prev) {
-            fprintf(file, "color=\"%s\", ", COLOR_FOR_UNVALID_ELEMENTS);
+        printf("%d %d %d\n", i, my_list->data[my_list->data[i].prev].next, previous_is_bad);
+        if(i != my_list->data[my_list->data[i].prev].next || !my_list->data[i].is_used) { // my_list->data[now_position].prev != my_list->data[my_list->data[my_list->data[now_position].prev].next].prev
+            fprintf(file, "color=\"%s\", ", LABEL_COLOR_FOR_UNVALID_ELEMENTS);
+            previous_is_bad = true;
         } else {
-            fprintf(file, "color=\"%s\", ", COLOR_FOR_VALID_ELEMENTS);
+            fprintf(file, "color=\"%s\", ", LABEL_COLOR_FOR_VALID_ELEMENTS);
+            previous_is_bad = false;
         }
 
         fprintf(file, "label=\"%d|{%d|%d}|%d\"]\n", i, my_list->data[i].prev, my_list->data[i].next, my_list->data[i].value);
-        if(i < my_list->size_list) {
-            fprintf(file, "node%d->node%d [color=green]\n", i, i+1);
+        if(i < my_list->capacity - 1) {
+            fprintf(file, "node%d->node%d [color=%s]\n", i, i+1, ARROW_COLOR_FOR_UNVALID_ELEMENTS);
         }
     }
 
+    now_position = 0;
+    int now_length = 0;
     do {
-        //fprintf(file, "node%d [shape=\"record\",color=\"#FF0EDD\",label=\"%d|{%d|%d}|%d\"]\n", old_position, my_list->data[old_position].prev, my_list->data[old_position].next, my_list->data[old_position].value, old_position);
-        //fprintf(file, "node%d [shape=\"record\",color=\"#FF0EDD\",label=\"%d|{%d|%d}|%d\"]\n", now_position, my_list->data[now_position].prev, my_list->data[now_position].next, my_list->data[now_position].value, now_position);
-
         fprintf(file, "node%d->", now_position);
+
+        if(now_position == -1) {
+            now_position += my_list->size_list;
+        }
         now_position = my_list->data[now_position].next;
+        ++now_length;
 
+    } while(now_length < my_list->size_list); // now_position != my_list->tail
 
-    } while(now_position != my_list->tail);
-
-    //fprintf(file, "node%d [shape=\"record\",color=\"#FF0EDD\",label=\"%d|{%d|%d}|%d\"]\n", old_position, my_list->data[old_position].prev, my_list->data[old_position].next, my_list->data[old_position].value, old_position);
-    //fprintf(file, "node%d [shape=\"record\",color=\"#FF0EDD\",label=\"%d|{%d|%d}|%d\"]\n", now_position, my_list->data[now_position].prev, my_list->data[now_position].next, my_list->data[now_position].value, now_position);
-    //printf("%d\n", now_position);
-
-    fprintf(file, "node%d [color=%s]\n", now_position, COLOR_FOR_VALID_ELEMENTS);
-
-
+    fprintf(file, "node%d [color=%s]\n", now_position, ARROW_COLOR_FOR_VALID_ELEMENTS);
     fprintf(file, "}");
     system("dot new.dot -Tpng -O");
 }
@@ -143,6 +139,10 @@ void print_list(List* my_list) {
     printf("\n");
     for(int i=0; i<my_list->capacity; ++i) {
         printf("%d ", my_list->data[i].prev);
+    }
+    printf("\n");
+    for(int i=0; i<my_list->capacity; ++i) {
+        printf("%d ", my_list->data[i].is_used);
     }
     printf("\nhead: %d, tail: %d\. nearest_free: %d\nsize_list: %ld, capacity: %ld\n\n", my_list->head, my_list->tail, my_list->nearest_free, my_list->size_list, my_list->capacity);
 }
@@ -193,9 +193,10 @@ LIST_STATUSES list_construct(List* my_list) {
 
 void list_initializate(List* my_list, const long long begin_position) {
     for(int now_position = begin_position; now_position <= my_list->capacity; ++now_position) {
-        my_list->data[now_position].value = POISON;
-        my_list->data[now_position].next  = now_position + 1;
-        my_list->data[now_position].prev  = now_position - 1;
+        my_list->data[now_position].value   = POISON;
+        my_list->data[now_position].next    = now_position + 1;
+        my_list->data[now_position].prev    = now_position - 1;
+        my_list->data[now_position].is_used = false;
     }
 }
 
@@ -231,9 +232,10 @@ LIST_STATUSES list_insert(List* my_list, const long long position, Elem_type val
 
     if(my_list->size_list == 0) {
         my_list->head = temporary_free;
-        my_list->data[my_list->head].value = value;
-        my_list->data[my_list->head].next  = 1;
-        my_list->data[my_list->head].prev  = my_list->nearest_free;
+        my_list->data[my_list->head].value   = value;
+        my_list->data[my_list->head].next    = 1;
+        my_list->data[my_list->head].prev    = my_list->nearest_free;
+        my_list->data[my_list->head].is_used = true;
         my_list->nearest_free = 1;
 
         ++(my_list->size_list);
@@ -263,9 +265,12 @@ LIST_STATUSES list_insert(List* my_list, const long long position, Elem_type val
         if(temporary_free - my_list->size_list == 1)
             temporary_free = -1;
         my_list->tail = temporary_free;
-        my_list->data[temporary_free].next = temporary_free;
+        my_list->data[temporary_free].next = my_list->head; //temporary_free;
         my_list->data[my_list->head].prev = my_list->tail;
     }
+
+    my_list->data[temporary_free].is_used = true;
+    my_list->nearest_free = get_min_free_position(my_list);
 
     ++(my_list->size_list);
     print_list(my_list);//sleep(2);
@@ -290,8 +295,7 @@ LIST_STATUSES list_resize(List* my_list, const double quantity) {
     my_list->capacity = new_capacity;
 
     if(quantity > 1) {
-        list_initializate(my_list, old_capacity);
-        my_list->data[new_capacity].next = -1;
+        list_initializate(my_list, old_capacity + 1);
     }
 
     print_list(my_list);
@@ -299,32 +303,7 @@ LIST_STATUSES list_resize(List* my_list, const double quantity) {
     return LIST_OK;
 }
 
-/*int get_next_free_position(List* my_list) {
-    if(my_list->size_list + 1 < my_list->capacity) {
-        list_resize(my_list);
-    }
-
-    ++(my_list->size_list);
-    return my_list->size_list;
-}*/
-
-/*void list_pop_back(List* my_list, Elem_type* element) {
-    *element = my_list->data[my_list->tail].value;
-
-    int new_tail = my_list->data[my_list->tail].prev;
-    my_list->data[my_list->tail].value = POISON;
-    my_list->data[my_list->tail].next  = get_next_free_position(my_list);
-    my_list->data[my_list->tail].prev  = POISON;
-    my_list->tail = new_tail;
-}*/
-
 LIST_STATUSES list_delete_element(List* my_list, long long position, Elem_type* delete_value) {
-
-    /*int begin_position = my_list->head;
-
-    while(my_list->data[begin_position].next - 1 != position) {
-        begin_position = my_list->data[begin_position].next;
-    }*/
 
     if(position < 0) {
         REPORT_ABOUT_ERROR(LIST_NO_SUCH_ELEMENT)
@@ -352,28 +331,95 @@ LIST_STATUSES list_delete_element(List* my_list, long long position, Elem_type* 
     my_list->data[my_list->data[position].prev].next = my_list->data[position].next;
     my_list->data[my_list->data[position].next].prev = my_list->data[position].prev;
 
-    my_list->data[position].next = my_list->nearest_free;
-    my_list->nearest_free = position;
+    my_list->data[position].is_used = false;
+
+    //////////////////////////////////////////////// GET FEE POSITION ///////////////////////////////
+    put_free_position(my_list, position);
+    //my_list->data[my_list->nearest_free].next = position;
+
 
     --my_list->size_list;
-
-    //int prev_index = my_list->data[begin_position].prev, next_index = my_list->data[begin_position].next;
-    //printf("prev_index: %d\t %d %d\n", prev_index, my_list->data[prev_index].prev, my_list->data[prev_index].next);
-    //printf("next_index: %d\t %d %d\n", next_index, my_list->data[next_index].prev, my_list->data[next_index].next);
-    //my_list->data[begin_position].next = get_next_free_position(my_list);
-    //my_list->data[begin_position].prev = POISON;
-
-    /*if(position != 1) {
-        my_list->data[prev_index].next = next_index;
-    }
-    my_list->data[next_index].prev = prev_index;
-
-    if(my_list->head == position) {
-        my_list->head = next_index;
-    }*/
+    print_list(my_list);
 
     return LIST_OK;
 }
+
+void put_free_position(List* my_list, long long position) {
+    if(position >= my_list->capacity) {
+        REPORT_ABOUT_ERROR(LIST_NO_SUCH_ELEMENT)
+        return;
+    }
+
+    int now_position = my_list->nearest_free;
+
+    while(now_position < position) {
+        now_position = my_list->data[now_position].next;
+    }
+    //printf("|||||||||||||||||||||||||||||||||||||||||||||||||||    %d\n", now_position);
+
+    int prev_position = my_list->data[now_position].prev; // ставим в следующий индекс
+    int next_position = now_position;
+
+    int prev_of_prev_position = my_list->data[prev_position].prev;
+    int next_of_prev_position = my_list->data[prev_position].next;
+
+    int prev_of_next_position = my_list->data[next_position].prev;
+    int next_of_next_position = my_list->data[next_position].next;
+
+    //printf("\t\t\tnext: %d, prev: %d\n", next_position, prev_position);
+    //printf("\t\t\tprev_of_prev_position: %d, next_of_prev_position: %d\n", prev_of_prev_position, next_of_prev_position);
+    //printf("\t\t\tprev_of_next_position: %d, next_of_next_position: %d\n", prev_of_next_position, next_of_next_position);
+
+    my_list->data[next_position].prev = position;
+    my_list->data[position].next = next_position;
+
+    if(my_list->data[prev_of_next_position].is_used == false) { // my_list->data[position].prev
+        my_list->data[prev_position].next = position;
+        my_list->data[position].prev = prev_position;
+    } else {
+        //my_list->data[position].prev = prev_of_next_position;
+    }
+
+    my_list->nearest_free = get_min_free_position(my_list);
+    //my_list->data[my_list->nearest_free].prev = get_max_free_position(my_list);
+    //printf("get_min_pos: %d\n", my_list->nearest_free);
+}
+
+long long get_min_free_position(List* my_list) {
+    long long now_position = my_list->nearest_free;
+    //printf("\t---------------get_min-----------\n\t%d\n", now_position);
+
+    while(my_list->data[my_list->data[now_position].prev].is_used == false && now_position > my_list->data[now_position].prev) {
+        now_position = my_list->data[now_position].prev;
+         //printf("\t! %d\n", now_position);
+         //sleep(1);
+    }
+
+    //my_list->data[now_position].prev = get_max_free_position(my_list);
+    printf("%d\n", my_list->data[now_position].prev);
+
+    return now_position;
+}
+
+long long get_max_free_position(List* my_list) {
+    long long now_position = my_list->nearest_free;
+    //sleep(4);
+
+    while(my_list->data[now_position].is_used == false && my_list->data[now_position].next < my_list->capacity) {
+        now_position = my_list->data[now_position].next;
+        //printf("\t\tnow_pos: %d, !! %d !!\n", now_position, my_list->data[now_position].next);
+        //sleep(1);
+    }
+    //if(my_list->data[now_position].is_used == true)
+    //    now_position = my_list->data[now_position].next;
+
+    return now_position;
+}
+
+/*if()
+        my_list->data[now_position].next = my_list->nearest_free;
+        my_list->data[my_list->nearest_free].prev = now_position;
+        my_list->nearest_free = now_position;*/
 
 /*Elem_type list_get_element(List* my_list, const long long position) {
     if(position > my_list->capacity) {
