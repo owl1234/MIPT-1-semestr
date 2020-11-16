@@ -4,7 +4,8 @@
 
 const Elem_type POISON = -3802;
 const int BEGIN_INIT_SIZE = 8;
-const int MAX_VALUE_SIZE_T = (size_t)-1;
+const int SIZE_OF_NAME_FILES = 30;
+const size_t MAX_VALUE_SIZE_T = (size_t)-1;
 
 const char name_input_html_file[] = "list_dump.html";
 
@@ -49,8 +50,8 @@ const char TEXT_LIST_STATUSES[][100] {
 };
 
 struct Node {
-    long long prev;
-    long long next;
+    size_t prev;
+    size_t next;
     bool is_used;
     Elem_type value;
 };
@@ -59,11 +60,12 @@ struct List {
     Node* data;
     size_t capacity;
     size_t size_list;
-    int head;
-    int tail;
+    size_t head;
+    size_t tail;
     LIST_STATUSES list_status;
     bool flag_of_sorted;
-    long long nearest_free;
+    size_t nearest_free;
+    int number_of_draw_graph_call;
 };
 
 const char LABEL_COLOR_FOR_VALID_ELEMENTS[]   = "blue";
@@ -83,19 +85,25 @@ void list_verifier(List* my_list);
 
 void draw_graph(List* my_list);
 
+char* get_string_to_draw_graph(List* my_list);
+
+char* concatenate_strings_for_draw_graph(List* my_list);
+
 void file_print_list(FILE* log_file, List* my_list);
 
 void list_print(List* my_list);
 
+void print_list(List* my_list);
+
 LIST_STATUSES list_construct(List* my_list);
 
-void list_initializate(List* my_list, const long long begin_position = 0);
+void list_initializate(List* my_list, const size_t begin_position = 0);
 
 void list_destruct(List* my_list);
 
-LIST_STATUSES list_insert(List* my_list, const long long physical_position, Elem_type value);
+LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_type value);
 
-LIST_STATUSES push_first_element(List* my_list, long long temporary_free, Elem_type value);
+LIST_STATUSES push_first_element(List* my_list, size_t temporary_free, Elem_type value);
 
 LIST_STATUSES list_resize(List* my_list, const double quantity);
 
@@ -105,18 +113,20 @@ LIST_STATUSES list_push_back(List* my_list, Elem_type value);
 
 LIST_STATUSES list_push_front(List* my_list, Elem_type value);
 
-void list_pop_back(List* my_list, Elem_type* element);
+LIST_STATUSES list_delete_element(List* my_list, size_t position, Elem_type* delete_value);
 
-LIST_STATUSES list_delete_element(List* my_list, long long position, Elem_type* delete_value);
+LIST_STATUSES list_pop_front(List* my_list, Elem_type* value);
 
-Elem_type list_get_logical_element(List* my_list, const long long position);
+LIST_STATUSES list_pop_back(List* my_list, Elem_type* value);
 
-void put_free_position(List* my_list, long long position);
+Elem_type list_get_logical_element(List* my_list, const size_t position);
 
-long long get_min_free_position(List* my_list);
+void put_free_position(List* my_list, size_t position);
 
-long long get_max_free_position(List* my_list);
+size_t get_min_free_position(List* my_list);
 
-Elem_type list_get_physical_element(List* my_list, const long long position);
+size_t get_max_free_position(List* my_list);
+
+Elem_type list_get_physical_element(List* my_list, const size_t position);
 
 LIST_STATUSES list_slow_sort(List* my_list);

@@ -2,14 +2,12 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 16, 2020, 03:26:25
+ *                  November 16, 2020, 13:03:25
  *  @par What was changed?
- *                      1. Add sort
- *                      2. Add more tests
- *                      3. Add push_back and push_front
+ *                      1. Add pop_back and pop_front
+ *                      2. Add check for list validity everywhere
  *  @par To-do list
- *                      1. Add check for list validity everywhere
- *                      2. Get enough sleep well.....
+ *                      1. Fix the function call (that is, drawing the picture manually)
 */
 
 #include <stdio.h>
@@ -35,7 +33,6 @@
     END_WORK_WITH_LIST
 
 #define END_WORK_WITH_LIST                                                  \
-    draw_graph(my_list);                                                    \
     list_dump(my_list, create_struct(__FILE__, __LINE__, __FUNCTION__));    \
     list_destruct(my_list);                                                 \
 
@@ -55,11 +52,11 @@ int main() {
         list_insert(my_list, 6, 60);
         list_insert(my_list, 7, 70);
         list_insert(my_list, 7, 80);
-        /*list_insert(my_list, 2, 90);
+        list_insert(my_list, 2, 90);
         list_insert(my_list, 1, 1000);
         list_insert(my_list, 0, 1234);
         list_insert(my_list, 11, 1812);
-        list_insert(my_list, 11, 912387);*/
+        list_insert(my_list, 11, 912387);
 
         END_TEST(FIRST_TEST)
     }
@@ -148,6 +145,13 @@ int main() {
         list_push_back(my_list, 90);
 
         list_push_front(my_list, 200);
+
+        int delete_value = -1;
+        list_pop_front(my_list, &delete_value);
+        printf("Delete value: %d\n", delete_value);
+
+        list_pop_back(my_list, &delete_value);
+        printf("Delete value: %d\n", delete_value);
 
         END_TEST(FIFTH_TEST)
     }
