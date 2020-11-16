@@ -6,6 +6,8 @@ const Elem_type POISON = -3802;
 const int BEGIN_INIT_SIZE = 8;
 const int MAX_VALUE_SIZE_T = (size_t)-1;
 
+const char name_input_html_file[] = "list_dump.html";
+
 struct call_of_dump {
     const char* name_file;
     int number_of_line;
@@ -26,9 +28,10 @@ typedef enum {
     LIST_NO_CONSTRUCT      = 10,
     LIST_DATA_NULL         = 11,
     LIST_NO_SUCH_ELEMENT   = 12,
+    LIST_BAD_DATA          = 13,
 } LIST_STATUSES;
 
-const char TEXT_LIST_STATUSES[][30] {
+const char TEXT_LIST_STATUSES[][100] {
     "List is okey",
     "Error!",
     "List is empty",
@@ -42,6 +45,7 @@ const char TEXT_LIST_STATUSES[][30] {
     "List don't construct",
     "Data is null",
     "No such element in list",
+    "Data is bad (maybe, there was a confusion with pointers)"
 };
 
 struct Node {
@@ -62,16 +66,14 @@ struct List {
     long long nearest_free;
 };
 
-const char LABEL_COLOR_FOR_ALL_ELEMENTS[]     = "black";
 const char LABEL_COLOR_FOR_VALID_ELEMENTS[]   = "blue";
 const char LABEL_COLOR_FOR_UNVALID_ELEMENTS[] = "red";
 
 const char ARROW_COLOR_FOR_VALID_ELEMENTS[]   = "purple";
 const char ARROW_COLOR_FOR_UNVALID_ELEMENTS[] = "green";
+const char ARROW_COLOR_FOR_FREE_ELEMENTS[] = "black";
 
-int comparator_node(const void* first, const void* second);
-
-void sort_by_next(List* my_list);
+void delete_old_information_from_file();
 
 struct call_of_dump create_struct(const char* file_name, int number, const char* function_name);
 
@@ -81,7 +83,7 @@ void list_verifier(List* my_list);
 
 void draw_graph(List* my_list);
 
-void print_list(List* my_list);
+void file_print_list(FILE* log_file, List* my_list);
 
 void list_print(List* my_list);
 
@@ -91,20 +93,30 @@ void list_initializate(List* my_list, const long long begin_position = 0);
 
 void list_destruct(List* my_list);
 
-LIST_STATUSES list_insert(List* my_list, const long long position, Elem_type value);
+LIST_STATUSES list_insert(List* my_list, const long long physical_position, Elem_type value);
+
+LIST_STATUSES push_first_element(List* my_list, long long temporary_free, Elem_type value);
 
 LIST_STATUSES list_resize(List* my_list, const double quantity);
 
 void list_push_first_element(List* my_list, Elem_type value);
 
+LIST_STATUSES list_push_back(List* my_list, Elem_type value);
+
+LIST_STATUSES list_push_front(List* my_list, Elem_type value);
+
 void list_pop_back(List* my_list, Elem_type* element);
 
 LIST_STATUSES list_delete_element(List* my_list, long long position, Elem_type* delete_value);
 
-Elem_type list_get_element(List* my_list, const long long position);
+Elem_type list_get_logical_element(List* my_list, const long long position);
 
 void put_free_position(List* my_list, long long position);
 
 long long get_min_free_position(List* my_list);
 
 long long get_max_free_position(List* my_list);
+
+Elem_type list_get_physical_element(List* my_list, const long long position);
+
+LIST_STATUSES list_slow_sort(List* my_list);
