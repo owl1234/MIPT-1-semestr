@@ -2,12 +2,10 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 16, 2020, 13:03:25
+ *                  November 20, 2020, 07:50:25
  *  @par What was changed?
- *                      1. Add pop_back and pop_front
- *                      2. Add check for list validity everywhere
- *  @par To-do list
- *                      1. Fix the function call (that is, drawing the picture manually)
+ *                      1. Add insert before/after
+ *                      2. Fixed beautiful print of warnings
 */
 
 #include <stdio.h>
@@ -18,7 +16,10 @@
 //#define SECOND_TEST  2
 //#define THIRD_TEST   3
 //#define FOURTH_TEST  4
-#define FIFTH_TEST 5
+//#define FIFTH_TEST 5
+//#define SIXTH_TEST 6
+//#define SEVENTH_TEST 7
+//#define EIGHTH_TEST 8
 
 #define BEGIN_TEST(number_of_test)                                          \
     delete_old_information_from_file();                                     \
@@ -66,24 +67,25 @@ int main() {
     {
         BEGIN_TEST(SECOND_TEST)
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 10);
-        list_insert(my_list, 2, 20);
-        list_insert(my_list, 3, 30);
-        list_insert(my_list, 4, 40);
-        list_insert(my_list, 5, 50);
-        list_insert(my_list, 6, 60);
-        list_insert(my_list, 7, 70);
-        list_insert(my_list, 8, 80);
-        list_insert(my_list, 9, 90);
+        list_insert_before(my_list, 0, 100);
+        list_insert_before(my_list, 1, 10);
+        list_insert_before(my_list, 2, 20);
+        list_insert_before(my_list, 3, 30);
+        list_insert_before(my_list, 4, 40);
+        list_insert_before(my_list, 5, 50);
+        list_insert_before(my_list, 6, 60);
+        list_insert_before(my_list, 7, 70);
+        list_insert_before(my_list, 8, 80);
+        list_insert_before(my_list, 9, 90);
 
         int delete_value = -1;
         list_delete_element(my_list, 3, &delete_value);
         printf("Delete value: %d\n", delete_value);
+
         list_delete_element(my_list, 6, &delete_value);
         printf("Delete value: %d\n", delete_value);
 
-        list_insert(my_list, 1, 2000);
+        list_insert_before(my_list, 1, 2000);
 
         END_TEST(SECOND_TEST)
     }
@@ -93,15 +95,15 @@ int main() {
     {
         BEGIN_TEST(THIRD_TEST)
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 10);
-        list_insert(my_list, 2, 20);
-        list_insert(my_list, 3, 30);
-        list_insert(my_list, 4, 40);
+        list_insert_before(my_list, 0, 100);
+        list_insert_before(my_list, 1, 10);
+        list_insert_before(my_list, 2, 20);
+        list_insert_before(my_list, 3, 30);
+        list_insert_before(my_list, 4, 40);
 
         printf("There is an element %d in logical position %d, (%d in physical position)\n", list_get_logical_element(my_list, 1), 1, list_get_physical_element(my_list, 1));
 
-        list_insert(my_list, 1, 7024);
+        list_insert_before(my_list, 1, 7024);
         printf("There is an element %d in logical position %d, (%d in physical position)\n", list_get_logical_element(my_list, 1), 1, list_get_physical_element(my_list, 1));
 
         int delete_value = -1;
@@ -117,10 +119,10 @@ int main() {
     {
         BEGIN_TEST(FOURTH_TEST)
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 50);
-        list_insert(my_list, 1, 60);
-        list_insert(my_list, 1, 70);
+        list_insert_before(my_list, 0, 100);
+        list_insert_before(my_list, 1, 50);
+        list_insert_before(my_list, 1, 60);
+        list_insert_before(my_list, 1, 70);
 
         printf("There is %d on the %d logical position (before sort)\n", list_get_logical_element(my_list, 2));
 
@@ -136,15 +138,15 @@ int main() {
     {
         BEGIN_TEST(FIFTH_TEST)
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 50);
-        list_insert(my_list, 2, 60);
-        list_insert(my_list, 3, 70);
+        list_insert_before(my_list, 0, 100);
+        list_insert_before(my_list, 1, 50);
+        list_insert_before(my_list, 2, 60);
+        list_insert_before(my_list, 3, 70);
 
-        list_push_back(my_list, 80);
-        list_push_back(my_list, 90);
+        list_insert_back(my_list, 80);
+        list_insert_back(my_list, 90);
 
-        list_push_front(my_list, 200);
+        list_insert_front(my_list, 200);
 
         int delete_value = -1;
         list_pop_front(my_list, &delete_value);
@@ -156,6 +158,41 @@ int main() {
         END_TEST(FIFTH_TEST)
     }
     #endif // FIFTH_TEST
+
+    #ifdef SIXTH_TEST
+    {
+        BEGIN_TEST(SIXTH_TEST)
+
+        list_insert_before(my_list, 0, 10);
+        list_insert_before(my_list, 1, 339);
+        list_insert_before(my_list, 2, 910);
+
+        END_TEST(SIXTH_TEST)
+    }
+    #endif // SIXTH_TEST
+
+    #ifdef SEVENTH_TEST
+    {
+        assertion(my_list);
+    }
+    #endif // SEVENTH_TEST
+
+    #ifdef EIGHTH_TEST
+    {
+        BEGIN_TEST(EIGHTH_TEST)
+
+        list_insert_before(my_list, 0, 615);
+        list_insert_after(my_list, 0, 120);
+        list_insert_after(my_list, 0, 291);
+        list_insert_before(my_list, 0, 410);
+
+        int delete_value = 0;
+        list_delete_element(my_list, 0, &delete_value);
+        printf("Delete value: %d\n", delete_value);
+
+        END_TEST(EIGHTH_TEST)
+    }
+    #endif // EIGHTH_TEST
 
 
     return 0;

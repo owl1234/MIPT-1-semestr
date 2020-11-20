@@ -32,7 +32,7 @@ typedef enum {
     LIST_BAD_DATA          = 13,
 } LIST_STATUSES;
 
-const char TEXT_LIST_STATUSES[][100] {
+const char TEXT_LIST_STATUSES[][80] {
     "List is okey",
     "Error!",
     "List is empty",
@@ -85,6 +85,12 @@ void list_verifier(List* my_list);
 
 void draw_graph(List* my_list);
 
+void draw_all_elements(FILE* file, List* my_list);
+
+void draw_list_elements(FILE* file, List* my_list);
+
+void draw_free_elements(FILE* file, List* my_list);
+
 char* get_string_to_draw_graph(List* my_list);
 
 char* concatenate_strings_for_draw_graph(List* my_list);
@@ -101,17 +107,17 @@ void list_initializate(List* my_list, const size_t begin_position = 0);
 
 void list_destruct(List* my_list);
 
-LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_type value);
+LIST_STATUSES list_insert_before(List* my_list, const size_t physical_position, Elem_type value);
 
-LIST_STATUSES push_first_element(List* my_list, size_t temporary_free, Elem_type value);
+LIST_STATUSES list_insert_after(List* my_list, const size_t physical_position, Elem_type value);
 
 LIST_STATUSES list_resize(List* my_list, const double quantity);
 
-void list_push_first_element(List* my_list, Elem_type value);
+LIST_STATUSES list_insert_first_element(List* my_list, size_t temporary_free, Elem_type value);
 
-LIST_STATUSES list_push_back(List* my_list, Elem_type value);
+LIST_STATUSES list_insert_front(List* my_list, Elem_type value);
 
-LIST_STATUSES list_push_front(List* my_list, Elem_type value);
+LIST_STATUSES list_insert_back(List* my_list, Elem_type value);
 
 LIST_STATUSES list_delete_element(List* my_list, size_t position, Elem_type* delete_value);
 
@@ -130,3 +136,5 @@ size_t get_max_free_position(List* my_list);
 Elem_type list_get_physical_element(List* my_list, const size_t position);
 
 LIST_STATUSES list_slow_sort(List* my_list);
+
+void assertion(List* my_list);

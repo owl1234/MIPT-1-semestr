@@ -7,12 +7,13 @@
 
 #define IF_DEBUG(code) code
 
-#define ASSERTION                                                                                    \
-    /*system("[\033[01;32m\]");*/                                                                    \
-    fprintf(stderr, "\n-----------------!WARNING!----------------\n");                               \
-    fprintf(stderr, "IN FILE %s\nIN LINE %d (FUNCTION %s)\n", __FILE__, __LINE__, __FUNCTION__);     \
-    printf("%s\n\n", TEXT_LIST_STATUSES[my_list->list_status]);                                      \
-    /*system("\033[32\n");*/
+#define ASSERTION                                                                                                                            \
+    system("echo \e[31m-----------------!WARNING!----------------\e[0m");                                                                    \
+    char warning_info[150] = "";                                                                                                             \
+    sprintf(warning_info, "echo \"\\e[31mIN FILE %s (FUNCTION %s, LINE %d)\\e[0m\"", __FILE__, __FUNCTION__, __LINE__);                      \
+    system(warning_info);                                                                                                                    \
+    sprintf(warning_info, "echo \"\\e[31mList status: %s\\e[0m\"", TEXT_LIST_STATUSES[my_list->list_status]);                                \
+    system(warning_info);
 
 #define REPORT_ABOUT_ERROR(code_of_error)                                                            \
     my_list->list_status = code_of_error;                                                            \
@@ -30,7 +31,7 @@ const struct call_of_dump base_arguments_of_call = {__FILE__, -1, " "};
 void delete_old_information_from_file() {
     FILE* file = fopen("new.dot", "wb");
     fclose(file);
-    file = fopen("list_dump.html", "wb");
+    file = fopen(name_input_html_file, "wb");
     fclose(file);
 }
 
@@ -58,13 +59,13 @@ void list_dump(List* my_list, struct call_of_dump arguments_of_call = base_argum
     file_print_list(log_file, my_list);
 
     draw_graph(my_list);
-    fprintf(log_file, "<img src=picture%d.dot.png/>\n\n", my_list->number_of_draw_graph_call - 1);
+    fprintf(log_file, "<img src=picture%d.png/>\n\n", my_list->number_of_draw_graph_call - 1);
 
     fclose(log_file);
 }
 
 void list_verifier(List* my_list, struct call_of_dump arguments_of_call = base_arguments_of_call) {
-    if(my_list == nullptr) {
+    if(nullptr == my_list) {
         my_list->list_status = LIST_DATA_NULL;
         list_dump(my_list, arguments_of_call);
     } else if((my_list->size_list) > (my_list->capacity)) {
@@ -95,7 +96,24 @@ void draw_graph(List* my_list) {
     FILE* file = fopen(concatenate_strings_for_draw_graph(my_list), "wb");
     fprintf(file, "digraph graphname {\nrankdir = LR;\n");
 
-    size_t now_position = my_list->head, old_position = my_list->head;
+    draw_all_elements(file, my_list);
+    draw_list_elements(file, my_list);
+    draw_free_elements(file, my_list);
+
+    char result_string[] = "dot picture0.dot -T png -o picture0.png"; // | eog picture0.png"; //, my_list->number_of_draw_graph_call);
+
+    ++my_list->number_of_draw_graph_call;
+
+    fclose(file);
+
+    system(result_string); // "dot new.dot -Tpng -O" //get_string_to_draw_graph(my_list)
+
+    printf("get_string_to_draw_graph: %s\n", result_string);
+    //system("echo a");
+}
+
+void draw_all_elements(FILE* file, List* my_list) {
+    size_t now_position = 0;
 
     for(size_t i=0; i<my_list->capacity; ++i) {
         fprintf(file, "node%lu [shape=\"record\", ", i);
@@ -107,51 +125,57 @@ void draw_graph(List* my_list) {
         }
 
         fprintf(file, "label=\"%lu|{%lu|%lu}|%d\"]\n", i, my_list->data[i].prev, my_list->data[i].next, my_list->data[i].value);
-        if(i < my_list->capacity - 1) {
+
+        if(i + 1 < my_list->capacity) {
             fprintf(file, "node%lu->node%lu [color=%s]\n", i, i+1, ARROW_COLOR_FOR_UNVALID_ELEMENTS);
         }
     }
 
-    now_position = my_list->head;
-    size_t now_length = 0;
+    fprintf(file, "node%lu->node0 [color=%s]\n", my_list->capacity - 1, ARROW_COLOR_FOR_UNVALID_ELEMENTS);
+}
 
-    do {
-        fprintf(file, "node%lu->", now_position);
+void draw_list_elements(FILE* file, List* my_list) {
+    size_t now_position = my_list->head;
 
-        if(now_position == -1) {
-            now_position += my_list->size_list;
-        }
+    fprintf(file, "node%lu\n", now_position);
+    if(my_list->size_list > 1) {
         now_position = my_list->data[now_position].next;
-        ++now_length;
 
-    } while(now_position != my_list->head);
+        while(now_position != my_list->head) {
+            fprintf(file, "->node%lu", now_position);
 
-    fprintf(file, "node%lu [color=%s]\n", now_position, ARROW_COLOR_FOR_VALID_ELEMENTS);
+            if(-1 == now_position) {
+                now_position += my_list->size_list;
+            }
+            now_position = my_list->data[now_position].next;
 
-    now_position = my_list->nearest_free;
+        }
+    }
+
+    fprintf(file, "->node%lu [color=%s]\n", now_position, ARROW_COLOR_FOR_VALID_ELEMENTS);
+}
+
+void draw_free_elements(FILE* file, List* my_list) {
+    size_t now_position = my_list->nearest_free;
     fprintf(file, "node%lu", now_position);
 
     while(my_list->data[now_position].next < my_list->capacity) {
-        if(now_position == -1) {
+        if(-1 == now_position) {
             now_position += my_list->size_list;
         }
         now_position = my_list->data[now_position].next;
         fprintf(file, "->node%lu", now_position);
     }
 
-    fprintf(file, "[color=%s]\n}\n", ARROW_COLOR_FOR_FREE_ELEMENTS);
-
-    system(get_string_to_draw_graph(my_list)); // "dot new.dot -Tpng -O"
+    fprintf(file, "->node%lu [color=%s]\n}\n", my_list->nearest_free, ARROW_COLOR_FOR_FREE_ELEMENTS);
 }
 
-char* get_string_to_draw_graph(List* my_list) {
+/*char* get_string_to_draw_graph(List* my_list) {
     char* result_string = (char*)calloc(SIZE_OF_NAME_FILES, sizeof(char));
-    sprintf(result_string,  "dot picture%d.dot -Tpng -O", my_list->number_of_draw_graph_call);
-    printf("get_string_to_draw_graph: %s\n", result_string);
 
-    ++my_list->number_of_draw_graph_call;
+
     return result_string;
-}
+}*/
 
 char* concatenate_strings_for_draw_graph(List* my_list) {
     char* result_string = (char*)calloc(SIZE_OF_NAME_FILES, sizeof(char));
@@ -207,13 +231,13 @@ void print_list(List* my_list) {
 LIST_STATUSES list_construct(List* my_list) {
     if(!my_list) {
         REPORT_ABOUT_ERROR(LIST_NO_CONSTRUCT)
-        return my_list->list_status;
+        return LIST_NO_CONSTRUCT;
     }
 
     my_list->data = (Node*)calloc(BEGIN_INIT_SIZE + 1, sizeof(Node));
     if(!my_list->data) {
         REPORT_ABOUT_ERROR(LIST_BAD_MEMORY)
-        return my_list->list_status;
+        return LIST_BAD_MEMORY;
     }
 
     my_list->capacity = BEGIN_INIT_SIZE;
@@ -227,7 +251,7 @@ LIST_STATUSES list_construct(List* my_list) {
     my_list->nearest_free              = 0;
     my_list->number_of_draw_graph_call = 0;
 
-    my_list->data[my_list->tail].next = -1;
+    my_list->data[my_list->tail].next = 0;
     my_list->data[my_list->head].prev = my_list->size_list;
 
     my_list->list_status = LIST_OK;
@@ -257,7 +281,7 @@ void list_destruct(List* my_list) {
     free(my_list);
 }
 
-LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_type value) {
+LIST_STATUSES list_insert_before(List* my_list, const size_t physical_position, Elem_type value) {
     IF_DEBUG(list_verifier(my_list, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     if(my_list->size_list + 1 >= my_list->capacity) {
@@ -270,15 +294,15 @@ LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_ty
     }
 
     size_t temporary_free = my_list->nearest_free;
-    if(temporary_free == -1) {
+    if(-1 == temporary_free) {
         temporary_free = my_list->nearest_free + my_list->size_list;
         my_list->nearest_free += my_list->size_list;
     }
 
     my_list->nearest_free = my_list->data[my_list->nearest_free].next;
 
-    if(my_list->size_list == 0) {
-        return push_first_element(my_list, temporary_free, value);
+    if(0 == my_list->size_list) {
+        return list_insert_first_element(my_list, temporary_free, value);
     }
 
     my_list->data[temporary_free].value = value;
@@ -290,17 +314,17 @@ LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_ty
         my_list->data[physical_position].prev = temporary_free;
     }
 
-    if(physical_position == 0) {
+    if(0 == physical_position) {
         my_list->head = temporary_free;
         my_list->data[temporary_free].prev = my_list->tail;
         my_list->data[my_list->tail].next = temporary_free;
     }
 
     if(physical_position == my_list->size_list) {
-        if(temporary_free - my_list->size_list == 1)
+        if(1 == temporary_free - my_list->size_list)
             temporary_free = -1;
         my_list->tail = temporary_free;
-        my_list->data[temporary_free].next = my_list->head; //temporary_free;
+        my_list->data[temporary_free].next = my_list->head;
         my_list->data[my_list->head].prev = my_list->tail;
     }
 
@@ -314,11 +338,17 @@ LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_ty
     return LIST_OK;
 }
 
-LIST_STATUSES push_first_element(List* my_list, size_t temporary_free, Elem_type value) {
+LIST_STATUSES list_insert_after(List* my_list, const size_t physical_position, Elem_type value) {
+    IF_DEBUG(list_verifier(my_list, create_struct(__FILE__, __LINE__, __FUNCTION__));)
+
+    return list_insert_before(my_list, physical_position + 1, value);
+}
+
+LIST_STATUSES list_insert_first_element(List* my_list, size_t temporary_free, Elem_type value) {
     my_list->head = temporary_free;
     my_list->data[my_list->head].value   = value;
     my_list->data[my_list->head].next    = 1;
-    my_list->data[my_list->head].prev    = -1;
+    my_list->data[my_list->head].prev    = my_list->tail;
     my_list->data[my_list->head].is_used = true;
     my_list->nearest_free = 1;
 
@@ -329,8 +359,8 @@ LIST_STATUSES push_first_element(List* my_list, size_t temporary_free, Elem_type
     return LIST_OK;
 }
 
-LIST_STATUSES list_push_back(List* my_list, Elem_type value) {
-    LIST_STATUSES status = list_insert(my_list, my_list->size_list, value);
+LIST_STATUSES list_insert_back(List* my_list, Elem_type value) {
+    LIST_STATUSES status = list_insert_before(my_list, my_list->size_list, value);
 
     VERIFY_LIST_STATUS
 
@@ -339,8 +369,8 @@ LIST_STATUSES list_push_back(List* my_list, Elem_type value) {
     return LIST_OK;
 }
 
-LIST_STATUSES list_push_front(List* my_list, Elem_type value) {
-    LIST_STATUSES status = list_insert(my_list, 0, value);
+LIST_STATUSES list_insert_front(List* my_list, Elem_type value) {
+    LIST_STATUSES status = list_insert_before(my_list, 0, value);
 
     VERIFY_LIST_STATUS
 
@@ -362,7 +392,7 @@ LIST_STATUSES list_resize(List* my_list, const double quantity) {
     my_list->data = (Node*)realloc(my_list->data, (new_capacity + 1) * sizeof(Node));
     if(!my_list->data) {
         REPORT_ABOUT_ERROR(LIST_BAD_MEMORY)
-        return my_list->list_status;
+        return LIST_BAD_MEMORY;
     }
 
     my_list->capacity = new_capacity;
@@ -381,11 +411,11 @@ LIST_STATUSES list_delete_element(List* my_list, size_t position, Elem_type* del
 
     if(position < 0) {
         REPORT_ABOUT_ERROR(LIST_NO_SUCH_ELEMENT)
-        return my_list->list_status;
+        return LIST_NO_SUCH_ELEMENT;
     }
 
-    if(my_list->size_list * 2 <= my_list->capacity) {
-        list_resize(my_list, 0.5);
+    if(my_list->size_list * 4 <= my_list->capacity) {
+        list_resize(my_list, 0.25);
     }
 
     if(my_list->size_list != position) {
@@ -463,7 +493,7 @@ void put_free_position(List* my_list, size_t position) {
     my_list->data[next_position].prev = position;
     my_list->data[position].next = next_position;
 
-    if(my_list->data[prev_of_next_position].is_used == false) {
+    if(!my_list->data[prev_of_next_position].is_used) {
         my_list->data[prev_position].next = position;
         my_list->data[position].prev = prev_position;
     }
@@ -476,7 +506,7 @@ size_t get_min_free_position(List* my_list) {
 
     size_t now_position = my_list->nearest_free;
 
-    while(my_list->data[my_list->data[now_position].prev].is_used == false && now_position > my_list->data[now_position].prev) {
+    while(!my_list->data[my_list->data[now_position].prev].is_used && now_position > my_list->data[now_position].prev) {
         now_position = my_list->data[now_position].prev;
     }
 
@@ -488,7 +518,7 @@ size_t get_max_free_position(List* my_list) {
 
     size_t now_position = my_list->nearest_free;
 
-    while(my_list->data[now_position].is_used == false && my_list->data[now_position].next < my_list->capacity) {
+    while(!my_list->data[now_position].is_used && my_list->data[now_position].next < my_list->capacity) {
         now_position = my_list->data[now_position].next;
     }
 
@@ -500,16 +530,16 @@ Elem_type list_get_logical_element(List* my_list, const size_t position) {
 
     if(position > my_list->capacity) {
         REPORT_ABOUT_ERROR(LIST_NO_SUCH_ELEMENT)
-        return my_list->list_status;
+        return LIST_NO_SUCH_ELEMENT;
     }
 
-    if(my_list->data[position].is_used == false) {
+    if(!my_list->data[position].is_used) {
         my_list->list_status = LIST_NO_SUCH_ELEMENT;
         ASSERTION
         return POISON;
     }
 
-    if(my_list->flag_of_sorted == true) {
+    if(my_list->flag_of_sorted) {
         return my_list->data[position].value;
     }
 
@@ -532,7 +562,7 @@ Elem_type list_get_physical_element(List* my_list, const size_t position) {
 
     if(position > my_list->capacity) {
         REPORT_ABOUT_ERROR(LIST_NO_SUCH_ELEMENT)
-        return my_list->list_status;
+        return LIST_NO_SUCH_ELEMENT;
     }
 
     return my_list->data[position].value;
@@ -572,4 +602,8 @@ LIST_STATUSES list_slow_sort(List* my_list) {
     }
 
     return LIST_OK;
+}
+
+void assertion(List* my_list) {
+    ASSERTION
 }
