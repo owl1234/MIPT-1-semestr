@@ -4,7 +4,7 @@
 
 const Elem_type POISON = -3802;
 const int BEGIN_INIT_SIZE = 8;
-const int SIZE_OF_NAME_FILES = 30;
+const int SIZE_OF_NAME_FILES = 50;
 const size_t MAX_VALUE_SIZE_T = (size_t)-1;
 
 const char name_input_html_file[] = "list_dump.html";
@@ -107,9 +107,7 @@ void list_initializate(List* my_list, const size_t begin_position = 0);
 
 void list_destruct(List* my_list);
 
-LIST_STATUSES list_insert_before(List* my_list, const size_t physical_position, Elem_type value);
-
-LIST_STATUSES list_insert_after(List* my_list, const size_t physical_position, Elem_type value);
+LIST_STATUSES list_insert(List* my_list, const size_t physical_position, Elem_type value);
 
 LIST_STATUSES list_resize(List* my_list, const double quantity);
 
