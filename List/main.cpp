@@ -2,9 +2,10 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  November 23, 2020, 09:50:25
+ *                  December 11, 2020, 10:17:25
  *  @par What was changed?
- *                      1. Small additions
+ *                      1. Fixed tests
+ *                      2. Fixed search physical position by logical
 */
 
 #include <stdio.h>
@@ -12,171 +13,175 @@
 #include "list.h"
 
 //#define FIRST_TEST   1
-#define SECOND_TEST  2
-//#define THIRD_TEST   3
+//#define SECOND_TEST  2
 //#define FOURTH_TEST  4
-//#define FIFTH_TEST 5
-//#define SIXTH_TEST 6
-//#define SEVENTH_TEST 7
-
-#define BEGIN_TEST(number_of_test)                                          \
-    delete_old_information_from_file();                                     \
-    printf("Start testing on test %d..................\n", number_of_test); \
-    BEGIN_WORK_WITH_LIST
-
-#define BEGIN_WORK_WITH_LIST                                                \
-    list_construct(my_list);
-
-#define END_TEST(number_of_test)                                            \
-    printf("End testing on test %d....................\n", number_of_test); \
-    END_WORK_WITH_LIST
-
-#define END_WORK_WITH_LIST                                                  \
-    list_dump(my_list, create_struct(__FILE__, __LINE__, __FUNCTION__));    \
-    list_destruct(my_list);                                                 \
+//#define FIFTH_TEST   5
+//#define SIXTH_TEST   6
 
 int main() {
-    List* my_list = (List*)calloc(1, sizeof(List));
+    FILE* file = fopen(name_input_html_file, "wb");
+    fprintf(file, "<pre><tt>\n");
+    fclose(file);
 
     #ifdef FIRST_TEST
     {
-        BEGIN_TEST(FIRST_TEST)
+        List my_list = {0};
+        list_construct(&my_list);
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 10);
-        list_insert(my_list, 2, 20);
-        list_insert(my_list, 3, 30);
-        list_insert(my_list, 4, 40);
-        list_insert(my_list, 5, 50);
-        list_insert(my_list, 6, 60);
-        list_insert(my_list, 7, 70);
-        list_insert(my_list, 7, 80);
-        list_insert(my_list, 2, 90);
-        list_insert(my_list, 1, 1000);
-        list_insert(my_list, 0, 1234);
-        list_insert(my_list, 11, 1812);
-        list_insert(my_list, 11, 912387);
+        list_insert_before(&my_list, 1, 100);
+        list_insert_before(&my_list, 2, 10);
+        list_insert_before(&my_list, 3, 20);
+        list_insert_before(&my_list, 4, 30);
+        list_insert_before(&my_list, 5, 40);
+        list_insert_before(&my_list, 6, 50);
+        list_insert_before(&my_list, 7, 60);
+        list_insert_before(&my_list, 8, 70);
 
-        END_TEST(FIRST_TEST)
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_before(&my_list, 8, 80);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_before(&my_list, 2, 90);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_before(&my_list, 1, 1000);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_before(&my_list, 0, 1234);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_before(&my_list, 11, 1812);
+        list_insert_before(&my_list, 11, 912387);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_after(&my_list, 0, -8152);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_destruct(&my_list);
     }
     #endif // FIRST_TEST
 
     #ifdef SECOND_TEST
     {
-        BEGIN_TEST(SECOND_TEST)
+        List my_list = {0};
+        list_construct(&my_list);
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 10);
-        list_insert(my_list, 2, 20);
-        list_insert(my_list, 3, 30);
-        list_insert(my_list, 4, 40);
-        list_insert(my_list, 5, 50);
-        list_insert(my_list, 6, 60);
-        list_insert(my_list, 7, 70);
-        list_insert(my_list, 8, 80);
-        list_insert(my_list, 9, 90);
+        list_insert_before(&my_list, 1, 10);
+        list_insert_before(&my_list, 2, 20);
+        list_insert_before(&my_list, 3, 30);
+        list_insert_before(&my_list, 4, 40);
+        list_insert_before(&my_list, 5, 50);
+        list_insert_before(&my_list, 6, 60);
+        list_insert_before(&my_list, 7, 70);
+        list_insert_before(&my_list, 8, 80);
+        list_insert_before(&my_list, 9, 90);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
         int delete_value = -1;
-        list_delete_element(my_list, 3, &delete_value);
-        printf("Delete value: %d\n", delete_value);
+        list_delete_element(&my_list, 6, &delete_value);
+        printf("Delete value from pos %d: %d\n", 6, delete_value);
 
-        list_delete_element(my_list, 6, &delete_value);
-        printf("Delete value: %d\n", delete_value);
+        list_delete_element(&my_list, 3, &delete_value);
+        printf("Delete value from pos %d: %d\n", 3, delete_value);
 
-        list_insert(my_list, 1, 2000);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_insert_before(&my_list, 1, 2000);
 
-        END_TEST(SECOND_TEST)
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_destruct(&my_list);
     }
     #endif // SECOND_TEST
 
-    #ifdef THIRD_TEST
-    {
-        BEGIN_TEST(THIRD_TEST)
-
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 10);
-        list_insert(my_list, 2, 20);
-        list_insert(my_list, 3, 30);
-        list_insert(my_list, 4, 40);
-
-        printf("There is an element %d in logical position %d, (%d in physical position)\n", list_get_logical_element(my_list, 1), 1, list_get_physical_element(my_list, 1));
-
-        list_insert(my_list, 1, 7024);
-        printf("There is an element %d in logical position %d, (%d in physical position)\n", list_get_logical_element(my_list, 1), 1, list_get_physical_element(my_list, 1));
-
-        int delete_value = -1;
-        list_delete_element(my_list, 1, &delete_value);
-        printf("There is an element %d in logical position %d, (%d in physical position)\n", list_get_logical_element(my_list, 1), 1, list_get_physical_element(my_list, 1));
-
-
-        END_TEST(THIRD_TEST)
-    }
-    #endif // THIRD_TEST
-
     #ifdef FOURTH_TEST
     {
-        BEGIN_TEST(FOURTH_TEST)
+        List my_list = {0};
+        list_construct(&my_list);
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 50);
-        list_insert(my_list, 1, 60);
-        list_insert(my_list, 1, 70);
+        list_insert_before(&my_list, 1, 50);
+        list_insert_before(&my_list, 1, 60);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
-        list_dump(my_list, create_struct(__FILE__, __LINE__, __FUNCTION__));
+        list_insert_before(&my_list, 2, 80);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
-        printf("There is %d on the %d logical position (before sort)\n", my_list->data[2].value, list_get_logical_element(my_list, 2));
+        list_insert_before(&my_list, 1, 70);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
-        list_slow_sort(my_list);
+        Elem_type search_element = list_slow_find_physical_position_by_logical(&my_list, 5);
 
-        printf("There is %d on the %d logical position (after sort)\n", my_list->data[2].value, list_get_logical_element(my_list, 2));
+        if(search_element == my_list.fictive)
+            printf("Element on pos 5 not found\n");
+        else
+            printf("(before sort) Element %d: logical pos: %d, physical pos: %d\n", my_list.data[search_element].value, 5, search_element);
 
-        END_TEST(FOURTH_TEST)
+        search_element = list_slow_find_physical_position_by_logical(&my_list, 3);
+        printf("(before sort) Element %d: logical pos: %d, physical pos: %d\n", my_list.data[search_element].value, 3, search_element);
+
+        list_very_very_slow_sort(&my_list);
+
+        search_element = list_slow_find_physical_position_by_logical(&my_list, 3);
+        printf("(after sort)  Element %d: logical pos: %d, physical pos: %d\n", my_list.data[search_element].value, 3, search_element);
+
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_destruct(&my_list);
     }
     #endif // FOURTH_TEST
 
     #ifdef FIFTH_TEST
     {
-        BEGIN_TEST(FIFTH_TEST)
+        List my_list = {0};
+        list_construct(&my_list);
 
-        list_insert(my_list, 0, 100);
-        list_insert(my_list, 1, 50);
-        list_insert(my_list, 2, 60);
-        list_insert(my_list, 3, 70);
+        list_insert_before(&my_list, 1, 50);
+        list_insert_before(&my_list, 2, 60);
+        list_insert_before(&my_list, 3, 70);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
-        list_insert_back(my_list, 80);
-        list_insert_back(my_list, 90);
+        list_insert_back(&my_list, 80);
+        list_insert_back(&my_list, 90);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
-        list_insert_front(my_list, 200);
+        list_insert_front(&my_list, 200);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
 
-        int delete_value = -1;
-        list_pop_front(my_list, &delete_value);
-        printf("Delete value: %d\n", delete_value);
+        int position_delete_value = my_list.fictive;
 
-        list_pop_back(my_list, &delete_value);
-        printf("Delete value: %d\n", delete_value);
+        list_pop_front(&my_list, &position_delete_value);
+        printf("Delete value from front: %d\n", my_list.data[position_delete_value].value);
 
-        END_TEST(FIFTH_TEST)
+        list_pop_back(&my_list, &position_delete_value);
+        printf("Delete value from back: %d\n", my_list.data[position_delete_value].value);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+
+        list_delete_element(&my_list, 2, &position_delete_value);
+        printf("Delete value from pos %d: %d\n", 2, my_list.data[position_delete_value].value);
+
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+        list_destruct(&my_list);
     }
     #endif // FIFTH_TEST
 
     #ifdef SIXTH_TEST
     {
-        BEGIN_TEST(SIXTH_TEST)
+        List my_list = {0};
+        list_construct(&my_list);
 
-        list_insert(my_list, 0, 10);
-        list_insert(my_list, 1, 339);
-        list_insert(my_list, 2, 910);
+        list_insert_before(&my_list, 1, 10);
+        list_insert_before(&my_list, 2, 339);
+        list_insert_before(&my_list, 3, 910);
 
-        END_TEST(SIXTH_TEST)
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+
+        list_insert_front(&my_list, 723);
+        list_dump(&my_list, INFORMATION_ABOUT_CALL);
+
+        warning(&my_list, INFORMATION_ABOUT_CALL);
+
+        list_destruct(&my_list);
     }
     #endif // SIXTH_TEST
-
-    #ifdef SEVENTH_TEST
-    {
-        assertion(my_list);
-    }
-    #endif // SEVENTH_TEST
-
 
     return 0;
 }
