@@ -37,9 +37,10 @@ int main(int argc, char* argv[]) {
         for(int i=1; i<argc; ) {
             printf("%i %s\n", i, argv[i]);
             if(is_request_load_from_file(argv[i])) {
-                if(i + 1 <= argc)
+                if(i + 1 <= argc) {
                     load_buffer_and_tree_from_file(&akinator, argv[i+1]);
-                else {
+                    dump_tree(&akinator);
+                } else {
                     warning(INFORMATION_ABOUT_CALL);
                     return USER_IS_STUPID;
                 }
