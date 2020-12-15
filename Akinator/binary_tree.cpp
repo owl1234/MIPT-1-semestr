@@ -50,7 +50,6 @@ TREE_STATUS load_buffer_and_tree_from_file(Binary_tree* tree, Catalog_names* cat
     }
 
     catalog_name_nodes->buffer = input_file.buffer;
-    add_peak_into_catalog(catalog_name_nodes);
 
     tree->root = load_tree_from_buffer(input_file.buffer, catalog_name_nodes);
 
@@ -68,7 +67,7 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
         ++now_position;
 
     Node_binary_tree* result_tree = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-    node_construct(result_tree, root_position, now_position++ - root_position);
+    node_construct(result_tree, root_position, now_position++ - root_position, catalog_name_nodes);
 
     while(*now_position != '[' && *now_position != ']' && *now_position != '"')        // find []
         ++now_position;
@@ -77,15 +76,12 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
     bool is_leaf_left = false, is_leaf_right = false;
 
     if(*now_position  != ']') {
-        now_position = search_next_position_after_symbol(now_position, '"');
+        now_position = search_next_position_after_symbol(now_position, '"');\
 
         left_son = now_position;
-
         while(*now_position != '"')                           // find end the left son
             ++now_position;
-
         int length_name_left = now_position++ - left_son;
-        add_into_catalog(catalog_name_nodes, left_son - catalog_name_nodes->buffer, length_name_left);
 
         while(*now_position != '"' && *now_position != '[')     // find
             ++now_position;
@@ -101,9 +97,7 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
         char* right_son = now_position;
         while(*now_position != '"')                              // find end right name
             ++now_position;
-
         int length_name_right = now_position++ - right_son;
-        add_into_catalog(catalog_name_nodes, right_son - catalog_name_nodes->buffer, length_name_right);
 
         while(*now_position != ']' && *now_position != '[')
             ++now_position;
@@ -115,7 +109,7 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
 
         if(is_leaf_left) {
             Node_binary_tree* left_son_of_leaf = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-            node_construct(left_son_of_leaf, left_son, length_name_left);
+            node_construct(left_son_of_leaf, left_son, length_name_left, catalog_name_nodes);
             result_tree->left = left_son_of_leaf;
         }
         else
@@ -128,7 +122,7 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
 
         if(is_leaf_right) {
             Node_binary_tree* right_son_of_leaf = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-            node_construct(right_son_of_leaf, left_son, length_name_right);
+            node_construct(right_son_of_leaf, right_son, length_name_right, catalog_name_nodes);
             result_tree->right = right_son_of_leaf;
         } else
             result_tree->right = load_tree_from_buffer(right_son - 1, catalog_name_nodes);
@@ -142,19 +136,22 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
     return result_tree;
 }
 
-TREE_STATUS node_construct(Node_binary_tree* new_node, char* position_in_buffer, const int length_name) {
+TREE_STATUS node_construct(Node_binary_tree* new_node, char* position_in_buffer, const int length_name, Catalog_names* catalog_name_node) {
     if(!new_node) {
         warning(TEXT_TREE_STATUS[TREE_BAD_POINTER], INFORMATION_ABOUT_CALL);
         return TREE_BAD_POINTER;
     }
 
-    new_node->height = 1;
+    new_node->height      = 1;
     new_node->length_name = length_name;
 
     if(length_name > MAX_SIZE_KEY)
         new_node->length_name = MAX_SIZE_KEY;
 
-    new_node->position_in_buffer = position_in_buffer;
+    printf("Cry.\n");
+
+    new_node->index_into_names_catalog = catalog_name_node->count_nodes;
+    add_into_catalog(catalog_name_node, position_in_buffer - catalog_name_node->buffer, length_name);
 
     return TREE_OKEY;
 }
@@ -213,7 +210,7 @@ void dump_tree(Binary_tree* tree) {
 
 void do_dump_tree(Node_binary_tree* node, FILE* file) {
     fprintf(file, "%ld[shape=record label = \"", (size_t)node); //\"height = %ld|{left = %p|right = %p| parent = %p|node = %p}|size_name = %d|", (size_t)node, node->height, node->left, node->right, node->parent, node, node->length_name);
-    print_node_name_into_file(node->position_in_buffer, node->length_name, file);
+    //print_node_name_into_file(node->position_in_buffer, node->length_name, file);
     fprintf(file, "\"]\n");
     if(node->left) {
         fprintf(file, "%ld->%ld\n", (size_t)node, (size_t)node->left);
@@ -226,44 +223,38 @@ void do_dump_tree(Node_binary_tree* node, FILE* file) {
 
 }
 
-void print_node_name_into_file(char* buffer, int size_name_node, FILE* file) {
-    char* now_position = buffer;
-
-    for(int i=0; i<size_name_node; ++i) {
-        fprintf(file, "%c", *now_position);
-        ++now_position;
-    }
+void print_node_name_into_file(Catalog_names* catalog_name_nodes, size_t index_into_catalog, FILE* file) {
+    for(int i=0; i<catalog_name_nodes->nodes[index_into_catalog].length_name; ++i)
+        fprintf(file, "%c", catalog_name_nodes->buffer[i + catalog_name_nodes->nodes[index_into_catalog].count_symbols_from_begin]);
 }
 
-void print_node_name_into_concole(char* buffer, int size_name_node) {
-    char* now_position = buffer;
-
-    for(int i=0; i<size_name_node; ++i) {
-        printf("%c", *now_position);
-        ++now_position;
-    }
+void print_node_name_into_concole(Catalog_names* catalog_name_nodes, size_t index_into_catalog) {
+    for(int i=0; i<catalog_name_nodes->nodes[index_into_catalog].length_name; ++i)
+        printf("%c", catalog_name_nodes->buffer[i + catalog_name_nodes->nodes[index_into_catalog].count_symbols_from_begin]);
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////// PLAY ///////////////////////////////////////////////////////////////////////////////
 
-bool search_leaf(Node_binary_tree* node) {
+bool search_leaf(Node_binary_tree* node, Catalog_names* catalog_name_nodes) {
     char* name_node = (char*)calloc(node->length_name, sizeof(char));
-    memcpy(name_node, node->position_in_buffer, node->length_name);
-    printf("\tnode: %d, %c\n", node->length_name, *(node->position_in_buffer));
+    memcpy(name_node, catalog_name_nodes->buffer + catalog_name_nodes->nodes[node->index_into_names_catalog].count_symbols_from_begin, catalog_name_nodes->nodes[node->index_into_names_catalog].length_name);
+    //printf("\tnode: %d, %c\n", node->length_name, *(node->position_in_buffer));
 
     if(node->is_leaf) {
         print_and_say(YES_OR_NO_QUESTION, "Everything is clear. You made a ", name_node, " wish. Am I right?", NULL);
         free(name_node);
-        return check_akinator_answer(node);
+        return check_akinator_answer(node, catalog_name_nodes);
     } else {
         print_and_say(YES_OR_NO_QUESTION, name_node, "?", NULL);
 
         USER_ANSWERS user_answer = get_user_answer();
         if(user_answer == YES_ANSWER_USER) {
-            return search_leaf(node->left);
+            return search_leaf(node->left, catalog_name_nodes);
         } else
-            return search_leaf(node->right);
+            return search_leaf(node->right, catalog_name_nodes);
     }
 
     free(name_node);
@@ -284,7 +275,7 @@ USER_ANSWERS get_user_answer() {
     return get_user_answer();
 }
 
-bool check_akinator_answer(Node_binary_tree* node) {
+bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_nodes) {
     USER_ANSWERS user_answer = get_user_answer();
 
     if(user_answer == YES_ANSWER_USER) {
@@ -296,11 +287,12 @@ bool check_akinator_answer(Node_binary_tree* node) {
         char now_symbol = '!';
         int length_name_new_node = 0;
         scanf("%[^\r\n]", name_new_node);
+        scanf("%c", &now_symbol);
         length_name_new_node = strlen(name_new_node);
         printf("!!!!!!!!!!! %d, %s\n", length_name_new_node, name_new_node);
 
         Node_binary_tree* new_node = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-        node_construct(new_node, &(name_new_node[0]), length_name_new_node);
+        node_construct(new_node, catalog_name_nodes->nodes[catalog_name_nodes->count_nodes-1].count_symbols_from_begin + catalog_name_nodes->nodes[catalog_name_nodes->count_nodes-1].length_name + catalog_name_nodes->buffer + 1, length_name_new_node, catalog_name_nodes);
 
         strcat(name_new_node, " and ");
         memcpy(name_new_node + length_name_new_node + strlen(" and "), node->position_in_buffer, node->length_name);
@@ -309,11 +301,12 @@ bool check_akinator_answer(Node_binary_tree* node) {
 
         char difference[MAX_SIZE_KEY] = "";
         scanf("%[^\r\n]", difference);
+        scanf("%c", &now_symbol);
         int length_difference = strlen(difference);
         printf("!!!!!!!!!!! %d, %s\n", length_difference, difference);
 
         Node_binary_tree* new_indicator = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-        node_construct(new_indicator, difference, length_difference);
+        node_construct(new_indicator, difference, length_difference, catalog_name_nodes);
 
         new_indicator->length_name = length_difference;
         new_indicator->left  = new_node;
@@ -342,7 +335,7 @@ bool check_akinator_answer(Node_binary_tree* node) {
     return false;
 }
 
-void put_tree_to_disk(Node_binary_tree* node, FILE* file, const int height) {
+/*void put_tree_to_disk(Node_binary_tree* node, FILE* file, const int height) {
     for(int i=0; i<height; ++i)
         fprintf(file, " ");
     fprintf(file, "\"");
@@ -363,7 +356,7 @@ void put_tree_to_disk(Node_binary_tree* node, FILE* file, const int height) {
 
 void make_definition(Node_binary_tree* node) {
 
-}
+}*/
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
     char* buffer_arguments = (char*)calloc(300, sizeof(char)); //[300] = {0};

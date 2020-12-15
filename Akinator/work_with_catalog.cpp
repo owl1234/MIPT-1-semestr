@@ -28,8 +28,6 @@ CATALOG_STATUS catalog_resize(Catalog_names* catalog_name_nodes) {
 
     Node_characteristics* new_nodes = (Node_characteristics*)realloc(catalog_name_nodes->buffer, catalog_name_nodes->capacity * 2 * sizeof(Node_characteristics));
 
-    VERIFY_CATALOG_PTR
-
     catalog_name_nodes->nodes = new_nodes;
     catalog_name_nodes->capacity *= 2;
 
@@ -48,16 +46,3 @@ CATALOG_STATUS add_into_catalog(Catalog_names* catalog_name_nodes, size_t pos_in
     return CATALOG_OKEY;
 }
 
-CATALOG_STATUS add_peak_into_catalog(Catalog_names* catalog_name_nodes) {
-    VERIFY_CATALOG_PTR
-
-    char* now_position  = search_next_position_after_symbol(catalog_name_nodes->buffer, '"');
-    char* root_position = now_position;
-
-    while(*now_position != '"')                               // find end root
-        ++now_position;
-
-    add_into_catalog(catalog_name_nodes, root_position - catalog_name_nodes->buffer, now_position - root_position);
-
-    return CATALOG_OKEY;
-}

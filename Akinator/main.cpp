@@ -2,18 +2,14 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  December 15, 2020, 18:36:25
+ *                  December 15, 2020, 19:50:25
  *  @par What was changed?
- *                      1. Redoing from the beginning....
- *                      2. Create catalogs for easy access to vertex names and easy addition of new nodes
- *                      3. Create file with warnings (small library for beautiful and comfortable print warnings)
+ *                      1. Guessing works. We need to work on the additive.
  *  @par To-do list
  *                      1. Kill recursion (change to stack)
  *                      2. Make definition
  *                      3. Make comparison
- *                      4. Launch the game again
- *                      5. Normal (!!!) parsing of command line arguments
- *                      6. Убрать костыль в на 25 строке (настолько он меня возмущает, что пишу по-русски)
+ *                      4. Убрать костыль в на 25 строке (настолько он меня возмущает, что пишу по-русски)
 */
 
 #include <stdio.h>
@@ -59,13 +55,13 @@ int main(int argc, char* argv[]) {
             printf("The download was successful.\n");
         }
 
-        /*else if(is_request_game(type_command)) {
-            is_continue_game = search_leaf(akinator.root);
+        else if(is_request_game(type_command)) {
+            is_continue_game = search_leaf(akinator.root, &catalog_name_nodes);
             while(is_continue_game)
-                is_continue_game = search_leaf(akinator.root);
+                is_continue_game = search_leaf(akinator.root, &catalog_name_nodes);
         }
 
-        else if(is_request_load_to_file(type_command)) {
+        /*else if(is_request_load_to_file(type_command)) {
             scanf("%[^\r\n]", type_command);
             scanf("%c", &garbage);
 
@@ -77,7 +73,7 @@ int main(int argc, char* argv[]) {
         }*/
 
         else if(is_request_finish_the_program(type_command)) {
-            print_and_say(PHRASE_WITHOUT_QUESTION, "Goodbue... :(", NULL);
+            print_and_say(PHRASE_WITHOUT_QUESTION, "Goodbye...", NULL);
             is_continue_program = false;
         }
     }

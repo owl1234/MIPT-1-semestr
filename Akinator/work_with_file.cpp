@@ -2,14 +2,13 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "work_with_file.h"
+#include "warnings.h"
 
-#define ASSERTION(status)                                                                                                                    \
-    system("echo \e[31m-----------------!WARNING!----------------\e[0m");                                                                    \
-    char warning_info[150] = "";                                                                                                             \
-    sprintf(warning_info, "echo \"\\e[31mIN FILE %s (FUNCTION %s, LINE %d)\\e[0m\"", __FILE__, __FUNCTION__, __LINE__);                      \
-    system(warning_info);                                                                                                                    \
-    sprintf(warning_info, "echo \"\\e[31mFile status: %s\\e[0m\"", TEXT_FILE_STATUS[status]);                                                               \
-    system(warning_info);
+#define VERIFY_FILE_PTR                                                         \
+        if(!file) {                                                             \
+            warning(TEXT_FILE_STATUS[FILE_BAD_PTR], INFORMATION_ABOUT_CALL);    \
+            return FILE_BAD_PTR;                                                \
+        }
 
 File* file_construct(char* file_name) {
     File* input_file = {};
@@ -26,17 +25,15 @@ FILE_STATUS read_buffer(struct File* input_file) {
     //stat(input_file->name_file, &(input_file->information));
 
     FILE* file = fopen(input_file->name_file, "r");
-    if(!file) {
-        ASSERTION(FILE_BAD_PTR)
-        return FILE_BAD_PTR;
-    }
+
+    VERIFY_FILE_PTR
 
     input_file->size_buffer = get_size_of_buffer(file);
-    input_file->buffer      = (char*)calloc(input_file->size_buffer + 5, sizeof(char));
+    input_file->buffer      = (char*)calloc(input_file->size_buffer + 1, sizeof(char));
 
     int status = fread(input_file->buffer, sizeof(char), input_file->size_buffer, file);
     if(status != input_file->size_buffer) {
-        ASSERTION(FILE_BAD_BUFFER)
+        warning(TEXT_FILE_STATUS[FILE_BAD_BUFFER], INFORMATION_ABOUT_CALL);
         return FILE_BAD_BUFFER;
     }
 
@@ -54,10 +51,28 @@ int get_size_of_buffer(FILE* file) { // stat
     return length;
 }
 
-FILE_STATUS file_destruct(struct File* input_file) {
-    free(input_file->name_file);
-    free(input_file->buffer);
-    free(input_file);
+FILE_STATUS resize_buffer(struct File* file) {
+    VERIFY_FILE_PTR
+
+    char* new_buffer = (char*)realloc(file->buffer, file->size_buffer * 2 * sizeof(char));
+
+    file->buffer = new_buffer;
+    file->size_buffer *= 2;
+
+    return FILE_OK;
+}
+
+FILE_STATUS write_into_buffer(struct File* file, Catalog_names* catalog_name_nodes) {
+
+}
+
+FILE_STATUS file_destruct(struct File* file) {
+    if(file) {
+        free(file->name_file);
+        free(file->buffer);
+    }
+
+    free(file);
 
     return FILE_OK;
 }

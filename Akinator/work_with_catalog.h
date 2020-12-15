@@ -27,6 +27,4 @@ CATALOG_STATUS catalog_resize(Catalog_names* catalog_name_nodes);
 
 CATALOG_STATUS add_into_catalog(Catalog_names* catalog_name_nodes, size_t pos_into_buffer, size_t length);
 
-CATALOG_STATUS add_peak_into_catalog(Catalog_names* catalog_name_nodes);
-
-#endif
+#endif // WORK_WITH_CATALOG_H
