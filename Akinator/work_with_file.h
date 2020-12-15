@@ -13,8 +13,8 @@ enum FILE_STATUS {
 
 const int SIZE_OF_NAME_FILES = 70;
 
-#ifndef WORK_WITH_FILE_H
-#define WORK_WITH_FILE_H
+//#ifndef WORK_WITH_FILE_H
+//#define WORK_WITH_FILE_H
 
 const char TEXT_FILE_STATUS[][50] = {
     "File okey",
@@ -30,4 +30,4 @@ FILE_STATUS read_buffer(struct File* input_file);
 
 FILE_STATUS file_destruct(struct File* input_file);
 
-#endif // WORK_WITH_FILE_H
+//#endif // WORK_WITH_FILE_H

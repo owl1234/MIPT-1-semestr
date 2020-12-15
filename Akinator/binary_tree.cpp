@@ -6,8 +6,7 @@
 #include <stdarg.h>
 #include "binary_tree.h"
 #include "work_with_file.h"
-
-#define INFORMATION_ABOUT_CALL (call_of_dump){__FILE__, __LINE__, __FUNCTION__}
+#include "warnings.h"
 
 #define ASSERTION(status)                                                                                                                    \
     system("echo \e[31m-----------------!WARNING!----------------\e[0m");                                                                    \
@@ -17,11 +16,7 @@
     sprintf(warning_info, "echo \"\\e[31mFile status: %d\\e[0m\"", status);                                                \
     system(warning_info);
 
-#define REPORT_ABOUT_ERROR(code_of_error)                                                            \
-    warning(INFORMATION_ABOUT_CALL);                                                        \
-
 char say_string[MAX_SIZE_KEY] = "";
-
 
 #define PRINT_AND_SAY(string)                   \
     printf("%s", string);                     \
@@ -31,9 +26,10 @@ char say_string[MAX_SIZE_KEY] = "";
     system(say_string);                         \
     memset(say_string, '\0', MAX_SIZE_KEY);
 
+
 TREE_STATUS tree_construct(Binary_tree* tree) {
     if(!tree) {
-        REPORT_ABOUT_ERROR(TREE_BAD_POINTER);
+        warning(TEXT_TREE_STATUS[TREE_BAD_POINTER], INFORMATION_ABOUT_CALL);
         return TREE_BAD_POINTER;
     }
 
@@ -43,60 +39,53 @@ TREE_STATUS tree_construct(Binary_tree* tree) {
     return TREE_OKEY;
 }
 
-TREE_STATUS load_buffer_and_tree_from_file(Binary_tree* tree, char* file_name) {
+TREE_STATUS load_buffer_and_tree_from_file(Binary_tree* tree, Catalog_names* catalog_name_nodes, char* file_name) {
     File input_file = {};
     input_file.name_file = file_name;
 
     FILE_STATUS status = read_buffer(&input_file);
     if(status != FILE_OK) {
-        REPORT_ABOUT_ERROR(TREE_BAD_READ_FROM_FILE);
+        warning(TEXT_TREE_STATUS[TREE_BAD_READ_FROM_FILE], INFORMATION_ABOUT_CALL);
         return TREE_BAD_READ_FROM_FILE;
     }
 
-    int count_of_quotes = 0, is_found_node = 0;
+    catalog_name_nodes->buffer = input_file.buffer;
+    add_peak_into_catalog(catalog_name_nodes);
 
-    tree->root = load_tree_from_buffer(input_file.buffer);
+    tree->root = load_tree_from_buffer(input_file.buffer, catalog_name_nodes);
 
     return TREE_OKEY;
 }
 
-Node_binary_tree* load_tree_from_buffer(char* buffer) {
+Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_name_nodes) {
     if(!buffer)
         return NULL;
 
-    char* now_position = buffer;
-    now_position = search_next_position_after_symbol(now_position, '"');                                  // find begin root
-
+    char* now_position = search_next_position_after_symbol(buffer, '"');                                  // find begin root
     char* root_position = now_position;
-    int length_name_root = 0;
 
-    while(*now_position != '"') {                              // find end root
+    while(*now_position != '"')                               // find end root
         ++now_position;
-        ++length_name_root;
-    }
-    ++now_position;
 
     Node_binary_tree* result_tree = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-    node_construct(result_tree, root_position, length_name_root);
+    node_construct(result_tree, root_position, now_position++ - root_position);
 
     while(*now_position != '[' && *now_position != ']' && *now_position != '"')        // find []
         ++now_position;
 
     char* left_son = {};
-    int length_name_left = 0;
     bool is_leaf_left = false, is_leaf_right = false;
 
     if(*now_position  != ']') {
         now_position = search_next_position_after_symbol(now_position, '"');
 
         left_son = now_position;
-        length_name_left = 0;
 
-        while(*now_position != '"') {                          // find end the left son
+        while(*now_position != '"')                           // find end the left son
             ++now_position;
-            ++length_name_left;
-        }
-        ++now_position;
+
+        int length_name_left = now_position++ - left_son;
+        add_into_catalog(catalog_name_nodes, left_son - catalog_name_nodes->buffer, length_name_left);
 
         while(*now_position != '"' && *now_position != '[')     // find
             ++now_position;
@@ -107,17 +96,14 @@ Node_binary_tree* load_tree_from_buffer(char* buffer) {
         } else
             is_leaf_left = true;
 
-
-        int length_name_right = 0;
-
         now_position = search_next_position_after_symbol(now_position, '"');                              // find begin right name
 
         char* right_son = now_position;
-        while(*now_position != '"') {                             // find end right name
+        while(*now_position != '"')                              // find end right name
             ++now_position;
-            ++length_name_right;
-        }
-        ++now_position;
+
+        int length_name_right = now_position++ - right_son;
+        add_into_catalog(catalog_name_nodes, right_son - catalog_name_nodes->buffer, length_name_right);
 
         while(*now_position != ']' && *now_position != '[')
             ++now_position;
@@ -133,7 +119,8 @@ Node_binary_tree* load_tree_from_buffer(char* buffer) {
             result_tree->left = left_son_of_leaf;
         }
         else
-            result_tree->left = load_tree_from_buffer(left_son - 1);
+            result_tree->left = load_tree_from_buffer(left_son - 1, catalog_name_nodes);
+
         result_tree->left->length_name = length_name_left;
         result_tree->left->position_in_buffer = left_son;
         result_tree->left->parent = result_tree;
@@ -144,7 +131,8 @@ Node_binary_tree* load_tree_from_buffer(char* buffer) {
             node_construct(right_son_of_leaf, left_son, length_name_right);
             result_tree->right = right_son_of_leaf;
         } else
-            result_tree->right = load_tree_from_buffer(right_son - 1);
+            result_tree->right = load_tree_from_buffer(right_son - 1, catalog_name_nodes);
+
         result_tree->right->length_name = length_name_right;
         result_tree->right->position_in_buffer = right_son;
         result_tree->right->parent = result_tree;
@@ -156,7 +144,7 @@ Node_binary_tree* load_tree_from_buffer(char* buffer) {
 
 TREE_STATUS node_construct(Node_binary_tree* new_node, char* position_in_buffer, const int length_name) {
     if(!new_node) {
-        REPORT_ABOUT_ERROR(TREE_BAD_POINTER);
+        warning(TEXT_TREE_STATUS[TREE_BAD_POINTER], INFORMATION_ABOUT_CALL);
         return TREE_BAD_POINTER;
     }
 
@@ -204,14 +192,6 @@ char* find_right_node(char* pointer_in_tree) {
 
     return copy_pointer;        // возвращает указатель на имя правого сына
 
-}
-
-void warning(struct call_of_dump arguments_of_call) {
-    system("echo \e[31m-----------------!WARNING!----------------\e[0m");
-    char warning_info[SIZE_OF_WARNINGS] = "";
-    sprintf(warning_info, "echo \"\\e[31mIN FILE %s (FUNCTION %s, LINE %d)\\e[0m\"", arguments_of_call.name_file, arguments_of_call.name_function, arguments_of_call.number_of_line);
-    system(warning_info);
-    system(warning_info);
 }
 
 void dump_tree(Binary_tree* tree) {
@@ -270,23 +250,23 @@ void print_node_name_into_concole(char* buffer, int size_name_node) {
 bool search_leaf(Node_binary_tree* node) {
     char* name_node = (char*)calloc(node->length_name, sizeof(char));
     memcpy(name_node, node->position_in_buffer, node->length_name);
+    printf("\tnode: %d, %c\n", node->length_name, *(node->position_in_buffer));
 
     if(node->is_leaf) {
-        print_and_say(true, "Everything is clear. You made a ", name_node, " wish. Am I right?", NULL);
+        print_and_say(YES_OR_NO_QUESTION, "Everything is clear. You made a ", name_node, " wish. Am I right?", NULL);
         free(name_node);
         return check_akinator_answer(node);
     } else {
-        print_and_say(true, name_node, "?", NULL);
+        print_and_say(YES_OR_NO_QUESTION, name_node, "?", NULL);
 
         USER_ANSWERS user_answer = get_user_answer();
         if(user_answer == YES_ANSWER_USER) {
-            search_leaf(node->left);
+            return search_leaf(node->left);
         } else
-            search_leaf(node->right);
+            return search_leaf(node->right);
     }
 
     free(name_node);
-    return false;
 }
 
 USER_ANSWERS get_user_answer() {
@@ -300,48 +280,42 @@ USER_ANSWERS get_user_answer() {
     if(user_answer == 'n' || user_answer == 'N')
         return NO_ANSWER_USER;
 
-    print_and_say(true, "I don't understand you, my small friend.");
-    get_user_answer();
+    print_and_say(YES_OR_NO_QUESTION, "I don't understand you, my small friend.");
+    return get_user_answer();
 }
 
 bool check_akinator_answer(Node_binary_tree* node) {
     USER_ANSWERS user_answer = get_user_answer();
 
     if(user_answer == YES_ANSWER_USER) {
-        print_and_say(true, "Of course, who would doubt it? Ha-ha. Do you want to play again?");
+        print_and_say(YES_OR_NO_QUESTION, "Of course, who would doubt it? Ha-ha. Do you want to play again?");
     } else {
-        print_and_say(false, "Hmmm.. It is very strange. All right, what did you wish for?");
+        print_and_say(QUESTION_WITH_FULL_ANSWER, "Hmmm.. It is very strange. All right, what did you wish for?");
 
         char* name_new_node = (char*)calloc(MAX_SIZE_KEY, sizeof(char));
         char now_symbol = '!';
         int length_name_new_node = 0;
+        scanf("%[^\r\n]", name_new_node);
+        length_name_new_node = strlen(name_new_node);
+        printf("!!!!!!!!!!! %d, %s\n", length_name_new_node, name_new_node);
 
-        scanf("%c", &now_symbol);
-        while(now_symbol != '\n') {
-            name_new_node[length_name_new_node++] = now_symbol;
-            scanf("%c", &now_symbol);
-        }
+        Node_binary_tree* new_node = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
+        node_construct(new_node, &(name_new_node[0]), length_name_new_node);
 
         strcat(name_new_node, " and ");
         memcpy(name_new_node + length_name_new_node + strlen(" and "), node->position_in_buffer, node->length_name);
 
-        print_and_say(false, "What is the differences between ", name_new_node, "?", NULL);
+        print_and_say(QUESTION_WITH_FULL_ANSWER, "What is the differences between ", name_new_node, "?", NULL);
 
-        Node_binary_tree* new_node = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-        node_construct(new_node, name_new_node, length_name_new_node);
-
-        char* difference = (char*)calloc(MAX_SIZE_KEY, sizeof(char));
-        int length_difference = 0;
-
-        scanf("%c", &now_symbol);
-        while(now_symbol != '\n') {
-            difference[length_difference++] = now_symbol;
-            scanf("%c", &now_symbol);
-        }
+        char difference[MAX_SIZE_KEY] = "";
+        scanf("%[^\r\n]", difference);
+        int length_difference = strlen(difference);
+        printf("!!!!!!!!!!! %d, %s\n", length_difference, difference);
 
         Node_binary_tree* new_indicator = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
         node_construct(new_indicator, difference, length_difference);
 
+        new_indicator->length_name = length_difference;
         new_indicator->left  = new_node;
         new_indicator->right = node;
         new_indicator->parent = node->parent;
@@ -355,20 +329,17 @@ bool check_akinator_answer(Node_binary_tree* node) {
         node->parent  = new_node->parent  = new_indicator;
         node->is_leaf = new_node->is_leaf = true;
 
-        print_and_say(true, "Well, I remember that word. But next time you won't catch me, I'll be smarter! Do you want to play again?", NULL);
+        print_and_say(YES_OR_NO_QUESTION, "Well, I remember that word. But next time you won't catch me, I'll be smarter! Do you want to play again?", NULL);
 
         free(name_new_node);
         free(new_node);
-        free(difference);
+        //free(difference);
         free(new_indicator);
     }
 
-    if(get_user_answer() == YES_ANSWER_USER) {
-        printf("\t\tokey yes\n");
+    if(get_user_answer() == YES_ANSWER_USER)
         return true;
-    }
-    else
-        return false;
+    return false;
 }
 
 void put_tree_to_disk(Node_binary_tree* node, FILE* file, const int height) {
@@ -394,7 +365,7 @@ void make_definition(Node_binary_tree* node) {
 
 }
 
-void print_and_say(bool is_yes_or_no_question, const char* word, ...) {
+void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
     char* buffer_arguments = (char*)calloc(300, sizeof(char)); //[300] = {0};
     char* now_word = (char*)calloc(100, sizeof(char));
     char* say_string = (char*)calloc(300, sizeof(char));
@@ -414,14 +385,16 @@ void print_and_say(bool is_yes_or_no_question, const char* word, ...) {
 
     printf("%s", buffer_arguments);
 
-    if(is_yes_or_no_question)
+    if(type == YES_OR_NO_QUESTION)
         printf(" ([Y]es of [N]o)");
-    printf("\n> ");
+    printf("\n");
+    if(type != HELP_PHRASE)
+        printf("> ");
 
     strcat(say_string, "echo \"");
     strcat(say_string, buffer_arguments);
     strcat(say_string, "\" | festival --tts\n");
-    system(say_string);
+    //system(say_string);
 
     free(now_word);
     free(buffer_arguments);
