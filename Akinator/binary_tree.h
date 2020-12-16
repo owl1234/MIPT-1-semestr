@@ -1,8 +1,12 @@
+
+#ifndef BINARY_TREE_H
+#define BINARY_TREE_H
+
 #include <stdio.h>
 #include "work_with_catalog.h"
+#include "stack.h"
 
 const int MAX_SIZE_KEY = 100;
-const int SIZE_OF_WARNINGS = 100;
 
 struct Node_binary_tree {
     Node_binary_tree* left;
@@ -11,7 +15,6 @@ struct Node_binary_tree {
 
     char* position_in_buffer;
     size_t index_into_names_catalog;
-    //char key[MAX_SIZE_KEY];
     int length_name;
 
     size_t height;
@@ -78,4 +81,14 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
 
 void put_tree_to_disk(Node_binary_tree* node, FILE* file, const int height);
 
+void find_node_in_tree(Binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word);
+
+bool do_find_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word);
+
+bool is_equivalent_words(Catalog_names* catalog_name_nodes, size_t position_into_catalog, const char* need_word);
+
+void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word);
+
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...);
+
+#endif // BINARY_TREE_H

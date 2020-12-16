@@ -1,5 +1,10 @@
+
+//
+
 #ifndef WORK_WITH_CATALOG_H
 #define WORK_WITH_CATALOG_H
+
+#include "warnings.h"
 
 const int BEGIN_SIZE_CATALOG = 128;
 

@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "work_with_catalog.h"
-#include "binary_tree.h"
-#include "warnings.h"
+//#include "binary_tree.h"
 
 #define VERIFY_CATALOG_PTR                          \
         if(!catalog_name_nodes) {                   \
@@ -73,7 +72,6 @@ CATALOG_STATUS add_into_catalog(Catalog_names* catalog_name_nodes, size_t pos_in
         catalog_resize_nodes(catalog_name_nodes);
 
     catalog_name_nodes->nodes[catalog_name_nodes->count_nodes].length_name                = length;
-    //catalog_name_nodes->nodes[catalog_name_nodes->count_nodes].
     catalog_name_nodes->nodes[catalog_name_nodes->count_nodes++].count_symbols_from_begin = pos_into_buffer;
 
     return CATALOG_OKEY;
@@ -85,10 +83,8 @@ CATALOG_STATUS write_into_catalog_buffer(Catalog_names* catalog_name_nodes, cons
 
     VERIFY_CATALOG_BUFFER_PTR
 
-    printf("Pain?\n");
     if(!catalog_name_nodes->is_someone_user_add_into_buffer) {
         catalog_name_nodes->size_buffer = catalog_name_nodes->capacity_buffer + 1;
-        printf("\t\tsize_buff: %lu\n", catalog_name_nodes->size_buffer);
         catalog_name_nodes->is_someone_user_add_into_buffer = true;
     }
 

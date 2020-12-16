@@ -6,7 +6,9 @@
 #include <stdarg.h>
 #include "binary_tree.h"
 #include "work_with_file.h"
-#include "warnings.h"
+
+//#include "warnings.h"
+//#include "stack.h"
 
 #define ASSERTION(status)                                                                                                                    \
     system("echo \e[31m-----------------!WARNING!----------------\e[0m");                                                                    \
@@ -149,8 +151,6 @@ TREE_STATUS node_construct(Node_binary_tree* new_node, char* position_in_buffer,
     if(length_name > MAX_SIZE_KEY)
         new_node->length_name = MAX_SIZE_KEY;
 
-    printf("Cry.\n");
-
     new_node->index_into_names_catalog = catalog_name_node->count_nodes;
     add_into_catalog(catalog_name_node, position_in_buffer - catalog_name_node->buffer, length_name);
 
@@ -237,7 +237,7 @@ void print_node_name_into_concole(Catalog_names* catalog_name_nodes, size_t inde
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////// PLAY ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////// GAME ///////////////////////////////////////////////////////////////////////////////
 
 bool search_leaf(Node_binary_tree* node, Catalog_names* catalog_name_nodes) {
     char* name_node = (char*)calloc(node->length_name, sizeof(char));
@@ -350,16 +350,93 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
             fprintf(file, " ");
         fprintf(file, "]\n");
     }
-}
-
-void make_definition(Node_binary_tree* node) {
-
 }*/
 
+void find_node_in_tree(Binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word) {
+    bool result_finding = do_find_node_in_tree(node->root, catalog_name_nodes, definition_stack, need_word);
+
+    if(result_finding) {
+        print_and_say(PHRASE_WITHOUT_QUESTION, "Well, I find this word.", NULL);
+        print_definition(catalog_name_nodes, definition_stack, need_word);
+    } else
+        print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no such word.", NULL);
+}
+
+bool do_find_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word) {
+
+    if(node->is_leaf)
+        return is_equivalent_words(catalog_name_nodes, node->index_into_names_catalog, need_word);
+
+    bool result_finding = do_find_node_in_tree(node->left, catalog_name_nodes, definition_stack, need_word);
+    if(result_finding) {
+        stack_push(definition_stack, node->index_into_names_catalog, IS_PROPERTY);
+        return true;
+    }
+
+    result_finding = do_find_node_in_tree(node->right, catalog_name_nodes, definition_stack, need_word);
+    if(result_finding) {
+        stack_push(definition_stack, node->index_into_names_catalog, NOT_IS_PROPERTY);
+        return true;
+    }
+
+    stack_pop(definition_stack);
+
+    return false;
+}
+
+bool is_equivalent_words(Catalog_names* catalog_name_nodes, size_t position_into_catalog, const char* need_word) {
+    if(strlen(need_word) != catalog_name_nodes->nodes[position_into_catalog].length_name)
+        return false;
+
+    size_t begin_catalog_word = catalog_name_nodes->nodes[position_into_catalog].count_symbols_from_begin;
+
+    for(int i=0; i<catalog_name_nodes->nodes[position_into_catalog].length_name; ++i)
+        if(catalog_name_nodes->buffer[begin_catalog_word + i] != need_word[i])
+            return false;
+
+    return true;
+}
+
+void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word) {
+    char say_string[MAX_SIZE_KEY * (definition_stack->size_stack + 8) + strlen(need_word) + 5] = "";
+
+    strcat(say_string, need_word);
+    strcat(say_string, " - ");
+
+    information_about_node information_about_now_node = {};
+    int count_print_symbols = strlen(say_string);
+
+    while(definition_stack->size_stack > 0) {
+        information_about_now_node = stack_back(definition_stack);
+
+        if(information_about_now_node.is_it_property_of_node == NOT_IS_PROPERTY) {
+            strcat(say_string, "not ");
+            count_print_symbols += strlen("not ");
+        }
+
+        memcpy(say_string + count_print_symbols, catalog_name_nodes->buffer + catalog_name_nodes->nodes[information_about_now_node.index_into_catalog].count_symbols_from_begin,
+                                                 catalog_name_nodes->nodes[information_about_now_node.index_into_catalog].length_name);
+
+        count_print_symbols += catalog_name_nodes->nodes[information_about_now_node.index_into_catalog].length_name;
+
+        stack_pop(definition_stack);
+
+        if(definition_stack->size_stack > 0) {
+            strcat(say_string, ", ");
+            count_print_symbols += strlen(", ");
+        }
+    }
+
+    print_and_say(PHRASE_WITHOUT_QUESTION, say_string);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////// SAY ////////////////////////////////////////////////////////////////////////////////
+
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
-    char* buffer_arguments = (char*)calloc(300, sizeof(char)); //[300] = {0};
-    char* now_word = (char*)calloc(100, sizeof(char));
-    char* say_string = (char*)calloc(300, sizeof(char));
+    char* buffer_arguments = (char*)calloc(500, sizeof(char)); //[300] = {0};
+    char* now_word = (char*)calloc(500, sizeof(char));
+    char* say_string = (char*)calloc(500, sizeof(char));
 
     va_list say_and_print_strings;
     va_start(say_and_print_strings, word);

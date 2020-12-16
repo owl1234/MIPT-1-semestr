@@ -2,14 +2,13 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  December 16, 2020, 14:07:25
+ *                  December 16, 2020, 19:08:25
  *  @par What was changed?
- *                      1. Adding new nodes works.
+ *                      1. Make definition
  *  @par To-do list
  *                      1. Kill recursion (change to stack)
- *                      2. Make definition
- *                      3. Make comparison
- *                      4. Убрать костыль в на 25 строке (настолько он меня возмущает, что пишу по-русски)
+ *                      2. Make comparison
+ *                      3. Убрать костылиии с библиотеками (настолько они меня возмущают, что пишу по-русски)
 */
 
 #include <stdio.h>
@@ -19,14 +18,15 @@
 #include "main.h"
 #include "work_with_file.h"
 #include "binary_tree.h"
-#include "work_with_catalog.h"
+//#include "work_with_catalog.h"
 #include "warnings.cpp"
+//#include "stack.h"
 
 #define INFORMATION_ABOUT_CALL (call_of_dump){__FILE__, __LINE__, __FUNCTION__}
 
 void help() {
     print_and_say(HELP_PHRASE, "This program load catalog tree from file", NULL);
-    printf("[L]oad from file / [G]ame / [P]ut on the disk / [Q]uit     \n"
+    printf("[L]oad from file / [G]ame / [P]ut on the disk / [D]efinition of someone make /[Q]uit     \n"
                     "For more information, go here: https://github.com/owl1234/MIPT-1-semestr/tree/master/Stack\n");
 }
 
@@ -39,6 +39,9 @@ int main(int argc, char* argv[]) {
     Catalog_names catalog_name_nodes = {};
     catalog_names_construct(&catalog_name_nodes);
 
+    Stack_t definition_stack = {};
+    stack_construct(&definition_stack);
+
     char type_command[MAX_SIZE_KEY] = "";
     char garbage = '!';
     bool is_continue_game = false, is_continue_program = true, is_load_tree_from_file = false;
@@ -49,7 +52,7 @@ int main(int argc, char* argv[]) {
         scanf("%[^\r\n]%c", type_command, &garbage);
 
         if(is_request_load_from_file(type_command)) {
-            load_buffer_and_tree_from_file(&akinator, &catalog_name_nodes, "database.txt");
+            load_buffer_and_tree_from_file(&akinator, &catalog_name_nodes, "database_pro.txt");
             is_load_tree_from_file = true;
             printf("The download was successful.\n");
         }
@@ -64,19 +67,25 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        else if(is_request_make_the_definition(type_command)) {
+            print_and_say(QUESTION_WITH_FULL_ANSWER, "Write the word you want to hear defined.");
+            scanf("%[^\r\n]%c", type_command, &garbage);
+            find_node_in_tree(&akinator, &catalog_name_nodes, &definition_stack, type_command);
+        }
+
         /*else if(is_request_load_to_file(type_command)) {
-            scanf("%[^\r\n]", type_command);
-            scanf("%c", &garbage);
+            scanf("%[^\r\n]%c", type_command, &garbage);
 
             FILE* file = fopen(type_command, "w");
-            if(file)
+            if(file) {
                 put_tree_to_disk(akinator.root, file, 0);
-            else
+                printf("The tree was successfully placed on disk.\n");
+            } else
                 return USER_IS_STUPID;
         }*/
 
         else if(is_request_finish_the_program(type_command)) {
-            print_and_say(PHRASE_WITHOUT_QUESTION, "Goodbye...", NULL);
+            print_and_say(PHRASE_WITHOUT_QUESTION, "Bye, my little friend.", NULL);
             is_continue_program = false;
         }
     }
@@ -106,6 +115,12 @@ bool is_request_play(const char* request) {
 
 bool is_request_game(const char* request) {
     if(request[0] == 'g' || request[0] == 'G')
+        return true;
+    return false;
+}
+
+bool is_request_make_the_definition(const char* request) {
+    if(request[0] == 'D' || request[0] == 'd')
         return true;
     return false;
 }
