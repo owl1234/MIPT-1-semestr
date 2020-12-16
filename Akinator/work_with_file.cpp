@@ -29,7 +29,7 @@ FILE_STATUS read_buffer(struct File* input_file) {
     VERIFY_FILE_PTR
 
     input_file->size_buffer = get_size_of_buffer(file);
-    input_file->buffer      = (char*)calloc(input_file->size_buffer + 1, sizeof(char));
+    input_file->buffer      = (char*)calloc(input_file->size_buffer + 3, sizeof(char));
 
     int status = fread(input_file->buffer, sizeof(char), input_file->size_buffer, file);
     if(status != input_file->size_buffer) {
@@ -60,10 +60,6 @@ FILE_STATUS resize_buffer(struct File* file) {
     file->size_buffer *= 2;
 
     return FILE_OK;
-}
-
-FILE_STATUS write_into_buffer(struct File* file, Catalog_names* catalog_name_nodes) {
-
 }
 
 FILE_STATUS file_destruct(struct File* file) {

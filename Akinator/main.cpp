@@ -2,9 +2,9 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  December 15, 2020, 19:50:25
+ *                  December 16, 2020, 14:07:25
  *  @par What was changed?
- *                      1. Guessing works. We need to work on the additive.
+ *                      1. Adding new nodes works.
  *  @par To-do list
  *                      1. Kill recursion (change to stack)
  *                      2. Make definition
@@ -41,24 +41,27 @@ int main(int argc, char* argv[]) {
 
     char type_command[MAX_SIZE_KEY] = "";
     char garbage = '!';
-    bool is_continue_game = false, is_continue_program = true;
+    bool is_continue_game = false, is_continue_program = true, is_load_tree_from_file = false;
 
     while(is_continue_program) {
         print_and_say(QUESTION_WITH_FULL_ANSWER, "Okey. Well, what do we do next?", NULL);
 
-        scanf("%[^\r\n]", type_command);
-        scanf("%c", &garbage);
-        printf("command: %s\n", type_command);
+        scanf("%[^\r\n]%c", type_command, &garbage);
 
         if(is_request_load_from_file(type_command)) {
             load_buffer_and_tree_from_file(&akinator, &catalog_name_nodes, "database.txt");
+            is_load_tree_from_file = true;
             printf("The download was successful.\n");
         }
 
         else if(is_request_game(type_command)) {
-            is_continue_game = search_leaf(akinator.root, &catalog_name_nodes);
-            while(is_continue_game)
+            if(!is_load_tree_from_file) {
+                print_and_say(PHRASE_WITHOUT_QUESTION, "Please, download the tree before you play with me.", NULL);
+            } else {
                 is_continue_game = search_leaf(akinator.root, &catalog_name_nodes);
+                while(is_continue_game)
+                    is_continue_game = search_leaf(akinator.root, &catalog_name_nodes);
+            }
         }
 
         /*else if(is_request_load_to_file(type_command)) {
@@ -78,13 +81,13 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    printf("size: %lu\n", catalog_name_nodes.count_nodes);
+    /*printf("size: %lu\n", catalog_name_nodes.count_nodes);
     for(int i=0; i<catalog_name_nodes.count_nodes; ++i) {
         printf("%lu, %lu: ", catalog_name_nodes.nodes[i].count_symbols_from_begin, catalog_name_nodes.nodes[i].length_name);
         for(int j=0; j<catalog_name_nodes.nodes[i].length_name; ++j)
             printf("%c", catalog_name_nodes.buffer[catalog_name_nodes.nodes[i].count_symbols_from_begin + j]);
         printf("\n");
-    }
+    }*/
 
     return 0;
 }

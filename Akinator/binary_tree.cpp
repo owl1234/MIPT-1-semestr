@@ -50,6 +50,7 @@ TREE_STATUS load_buffer_and_tree_from_file(Binary_tree* tree, Catalog_names* cat
     }
 
     catalog_name_nodes->buffer = input_file.buffer;
+    catalog_name_nodes->capacity_buffer = catalog_name_nodes->size_buffer = input_file.size_buffer;
 
     tree->root = load_tree_from_buffer(input_file.buffer, catalog_name_nodes);
 
@@ -76,7 +77,7 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
     bool is_leaf_left = false, is_leaf_right = false;
 
     if(*now_position  != ']') {
-        now_position = search_next_position_after_symbol(now_position, '"');\
+        now_position = search_next_position_after_symbol(now_position, '"');
 
         left_son = now_position;
         while(*now_position != '"')                           // find end the left son
@@ -241,7 +242,6 @@ void print_node_name_into_concole(Catalog_names* catalog_name_nodes, size_t inde
 bool search_leaf(Node_binary_tree* node, Catalog_names* catalog_name_nodes) {
     char* name_node = (char*)calloc(node->length_name, sizeof(char));
     memcpy(name_node, catalog_name_nodes->buffer + catalog_name_nodes->nodes[node->index_into_names_catalog].count_symbols_from_begin, catalog_name_nodes->nodes[node->index_into_names_catalog].length_name);
-    //printf("\tnode: %d, %c\n", node->length_name, *(node->position_in_buffer));
 
     if(node->is_leaf) {
         print_and_say(YES_OR_NO_QUESTION, "Everything is clear. You made a ", name_node, " wish. Am I right?", NULL);
@@ -284,29 +284,27 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
         print_and_say(QUESTION_WITH_FULL_ANSWER, "Hmmm.. It is very strange. All right, what did you wish for?");
 
         char* name_new_node = (char*)calloc(MAX_SIZE_KEY, sizeof(char));
-        char now_symbol = '!';
-        int length_name_new_node = 0;
-        scanf("%[^\r\n]", name_new_node);
-        scanf("%c", &now_symbol);
-        length_name_new_node = strlen(name_new_node);
-        printf("!!!!!!!!!!! %d, %s\n", length_name_new_node, name_new_node);
+        char garbage = '!';
+
+        scanf("%[^\r\n]%c", name_new_node, &garbage);
+        int length_name_new_node = strlen(name_new_node);
+        write_into_catalog_buffer(catalog_name_nodes, name_new_node, length_name_new_node);
 
         Node_binary_tree* new_node = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-        node_construct(new_node, catalog_name_nodes->nodes[catalog_name_nodes->count_nodes-1].count_symbols_from_begin + catalog_name_nodes->nodes[catalog_name_nodes->count_nodes-1].length_name + catalog_name_nodes->buffer + 1, length_name_new_node, catalog_name_nodes);
+        node_construct(new_node, catalog_name_nodes->size_buffer + catalog_name_nodes->buffer - length_name_new_node - 1, length_name_new_node, catalog_name_nodes);
 
         strcat(name_new_node, " and ");
         memcpy(name_new_node + length_name_new_node + strlen(" and "), node->position_in_buffer, node->length_name);
 
         print_and_say(QUESTION_WITH_FULL_ANSWER, "What is the differences between ", name_new_node, "?", NULL);
 
-        char difference[MAX_SIZE_KEY] = "";
-        scanf("%[^\r\n]", difference);
-        scanf("%c", &now_symbol);
+        char* difference = (char*)calloc(MAX_SIZE_KEY, sizeof(char));
+        scanf("%[^\r\n]%c", difference, &garbage);
         int length_difference = strlen(difference);
-        printf("!!!!!!!!!!! %d, %s\n", length_difference, difference);
+        write_into_catalog_buffer(catalog_name_nodes, difference, length_difference);
 
         Node_binary_tree* new_indicator = (Node_binary_tree*)calloc(1, sizeof(Node_binary_tree));
-        node_construct(new_indicator, difference, length_difference, catalog_name_nodes);
+        node_construct(new_indicator, catalog_name_nodes->size_buffer + catalog_name_nodes->buffer - length_difference - 1, length_difference, catalog_name_nodes);
 
         new_indicator->length_name = length_difference;
         new_indicator->left  = new_node;
@@ -324,10 +322,10 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
 
         print_and_say(YES_OR_NO_QUESTION, "Well, I remember that word. But next time you won't catch me, I'll be smarter! Do you want to play again?", NULL);
 
-        free(name_new_node);
-        free(new_node);
+        //free(name_new_node);
+        //free(new_node);
         //free(difference);
-        free(new_indicator);
+        //free(new_indicator);
     }
 
     if(get_user_answer() == YES_ANSWER_USER)
@@ -381,7 +379,7 @@ void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
     if(type == YES_OR_NO_QUESTION)
         printf(" ([Y]es of [N]o)");
     printf("\n");
-    if(type != HELP_PHRASE)
+    if(type != HELP_PHRASE && type != PHRASE_WITHOUT_QUESTION)
         printf("> ");
 
     strcat(say_string, "echo \"");
