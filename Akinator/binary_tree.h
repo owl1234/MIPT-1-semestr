@@ -89,6 +89,10 @@ bool is_equivalent_words(Catalog_names* catalog_name_nodes, size_t position_into
 
 void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word);
 
+void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, const char* first_word, const char* second_word);
+
+void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_first_word, Stack_t* definition_second_word, const char* first_word, const char* second_word);
+
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...);
 
 #endif // BINARY_TREE_H

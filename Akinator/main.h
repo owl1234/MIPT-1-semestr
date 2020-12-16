@@ -10,6 +10,8 @@ bool is_request_game(const char* request);
 
 bool is_request_make_the_definition(const char* request);
 
+bool is_request_make_the_comparison(const char* request);
+
 bool is_request_load_to_file(const char* request);
 
 bool is_request_finish_the_program(const char* request);

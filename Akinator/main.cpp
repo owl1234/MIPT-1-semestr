@@ -2,13 +2,12 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  December 16, 2020, 19:08:25
+ *                  December 16, 2020, 23:14:25
  *  @par What was changed?
- *                      1. Make definition
+ *                      1. Make comparison
  *  @par To-do list
  *                      1. Kill recursion (change to stack)
- *                      2. Make comparison
- *                      3. Убрать костылиии с библиотеками (настолько они меня возмущают, что пишу по-русски)
+ *                      2. Kill magic numbers!!
 */
 
 #include <stdio.h>
@@ -26,7 +25,7 @@
 
 void help() {
     print_and_say(HELP_PHRASE, "This program load catalog tree from file", NULL);
-    printf("[L]oad from file / [G]ame / [P]ut on the disk / [D]efinition of someone make /[Q]uit     \n"
+    printf("[L]oad from file / [G]ame / [P]ut on the disk / [D]efinition of someone make / [C]ompare two words / [Q]uit     \n"
                     "For more information, go here: https://github.com/owl1234/MIPT-1-semestr/tree/master/Stack\n");
 }
 
@@ -42,7 +41,7 @@ int main(int argc, char* argv[]) {
     Stack_t definition_stack = {};
     stack_construct(&definition_stack);
 
-    char type_command[MAX_SIZE_KEY] = "";
+    char type_command[MAX_SIZE_KEY] = "", second_word_for_comparison[MAX_SIZE_KEY] = "";
     char garbage = '!';
     bool is_continue_game = false, is_continue_program = true, is_load_tree_from_file = false;
 
@@ -71,6 +70,16 @@ int main(int argc, char* argv[]) {
             print_and_say(QUESTION_WITH_FULL_ANSWER, "Write the word you want to hear defined.");
             scanf("%[^\r\n]%c", type_command, &garbage);
             find_node_in_tree(&akinator, &catalog_name_nodes, &definition_stack, type_command);
+        }
+
+        else if(is_request_make_the_comparison(type_command)) {
+            print_and_say(QUESTION_WITH_FULL_ANSWER, "Write the first word you want to hear defined.");
+            scanf("%[^\r\n]%c", type_command, &garbage);
+
+            print_and_say(QUESTION_WITH_FULL_ANSWER, "Write the second word you want to hear defined.");
+            scanf("%[^\r\n]%c", second_word_for_comparison, &garbage);
+
+            comparison_nodes(&akinator, &catalog_name_nodes, type_command, second_word_for_comparison);
         }
 
         /*else if(is_request_load_to_file(type_command)) {
@@ -121,6 +130,12 @@ bool is_request_game(const char* request) {
 
 bool is_request_make_the_definition(const char* request) {
     if(request[0] == 'D' || request[0] == 'd')
+        return true;
+    return false;
+}
+
+bool is_request_make_the_comparison(const char* request) {
+    if(request[0] == 'C' || request[0] == 'c')
         return true;
     return false;
 }

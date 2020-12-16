@@ -271,7 +271,7 @@ USER_ANSWERS get_user_answer() {
     if(user_answer == 'n' || user_answer == 'N')
         return NO_ANSWER_USER;
 
-    print_and_say(YES_OR_NO_QUESTION, "I don't understand you, my small friend.");
+    print_and_say(YES_OR_NO_QUESTION, "I don't understand you, my small friend.", NULL);
     return get_user_answer();
 }
 
@@ -352,8 +352,11 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
     }
 }*/
 
-void find_node_in_tree(Binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word) {
-    bool result_finding = do_find_node_in_tree(node->root, catalog_name_nodes, definition_stack, need_word);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////// DEFINITION ////////////////////////////////////////////////////////////////////////////
+
+void find_node_in_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word) {
+    bool result_finding = do_find_node_in_tree(tree->root, catalog_name_nodes, definition_stack, need_word);
 
     if(result_finding) {
         print_and_say(PHRASE_WITHOUT_QUESTION, "Well, I find this word.", NULL);
@@ -431,12 +434,114 @@ void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_sta
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////// DEFINITION ////////////////////////////////////////////////////////////////////////////
+
+void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, const char* first_word, const char* second_word) {
+    Stack_t definition_first_word  = {};
+    Stack_t definition_second_word = {};
+
+    stack_construct(&definition_first_word);
+    stack_construct(&definition_second_word);
+
+    bool result_finding_first_word  = do_find_node_in_tree(tree->root, catalog_name_nodes, &definition_first_word,  first_word);
+    bool result_finding_second_word = do_find_node_in_tree(tree->root, catalog_name_nodes, &definition_second_word, second_word);
+
+    if(result_finding_first_word && result_finding_second_word)
+        compare_definitions(catalog_name_nodes, &definition_first_word, &definition_second_word, first_word, second_word);
+
+    else if(!result_finding_first_word && result_finding_second_word)
+        print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no word ", first_word,  ".",  NULL);
+
+    else if(result_finding_first_word && !result_finding_second_word)
+        print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no word ", second_word, ".",  NULL);
+
+    else
+        print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no words ", first_word, "and ", second_word, ".",  NULL);
+}
+
+void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_first_word, Stack_t* definition_second_word, const char* first_word, const char* second_word) {
+    char say_string[2000] = ""; //[MAX_SIZE_KEY * (definition_first_word->size_stack + 8 + definition_second_word->size_stack) + strlen(first_word) + strlen(second_word) + 5] = "";
+
+    information_about_node information_about_first_node  = stack_back(definition_first_word);
+    information_about_node information_about_second_node = stack_back(definition_second_word);
+
+    if(information_about_first_node.index_into_catalog     != information_about_second_node.index_into_catalog ||
+       information_about_first_node.index_into_catalog     == information_about_second_node.index_into_catalog &&
+       information_about_first_node.is_it_property_of_node != information_about_second_node.is_it_property_of_node) {
+
+        print_and_say(PHRASE_WITHOUT_QUESTION, "Well, they have no similarities.", NULL);
+
+        print_definition(catalog_name_nodes, definition_first_word,  first_word);
+        print_definition(catalog_name_nodes, definition_second_word, second_word);
+
+        return;
+    }
+
+    strcat(say_string, "Well, ");
+    strcat(say_string, first_word);
+    strcat(say_string, " and ");
+    strcat(say_string, second_word);
+    strcat(say_string, " both have the following properties: ");
+
+    int count_print_symbols = strlen(say_string);
+    bool is_find_differences = false;
+
+    if(information_about_first_node.is_it_property_of_node == NOT_IS_PROPERTY) {
+        strcat(say_string, "not ");
+        count_print_symbols += strlen("not ");
+    }
+
+    memcpy(say_string + count_print_symbols, catalog_name_nodes->buffer + catalog_name_nodes->nodes[information_about_first_node.index_into_catalog].count_symbols_from_begin,
+                                                 catalog_name_nodes->nodes[information_about_first_node.index_into_catalog].length_name);
+    count_print_symbols += catalog_name_nodes->nodes[information_about_first_node.index_into_catalog].length_name;
+
+    stack_pop(definition_first_word);
+    stack_pop(definition_second_word);
+
+    while(definition_first_word->size_stack > 0 && definition_second_word->size_stack > 0 && !is_find_differences) {
+        information_about_first_node  = stack_back(definition_first_word);
+        information_about_second_node = stack_back(definition_second_word);
+
+        if(information_about_first_node.index_into_catalog     == information_about_second_node.index_into_catalog &&
+           information_about_first_node.is_it_property_of_node == information_about_second_node.is_it_property_of_node) {
+            strcat(say_string, ", ");
+            count_print_symbols += strlen(", ");
+
+            if(information_about_first_node.is_it_property_of_node == NOT_IS_PROPERTY) {
+                strcat(say_string, "not ");
+                count_print_symbols += strlen("not ");
+            }
+
+            memcpy(say_string + count_print_symbols, catalog_name_nodes->buffer + catalog_name_nodes->nodes[information_about_first_node.index_into_catalog].count_symbols_from_begin,
+                                                 catalog_name_nodes->nodes[information_about_first_node.index_into_catalog].length_name);
+            count_print_symbols += catalog_name_nodes->nodes[information_about_first_node.index_into_catalog].length_name;
+
+            stack_pop(definition_first_word);
+            stack_pop(definition_second_word);
+        } else
+            is_find_differences = true;
+    }
+
+    if(is_find_differences) {
+        strcat(say_string, ".\nWell, the similarities are over. Now let's see how they differ.\n");
+        count_print_symbols += strlen(".\nWell, the similarities are over. Now let's see how they differ.\n");
+    }
+
+    print_and_say(PHRASE_WITHOUT_QUESTION, say_string, NULL);
+
+    if(is_find_differences) {
+        print_definition(catalog_name_nodes, definition_first_word,  first_word);
+        print_definition(catalog_name_nodes, definition_second_word, second_word);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////// SAY ////////////////////////////////////////////////////////////////////////////////
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
     char* buffer_arguments = (char*)calloc(500, sizeof(char)); //[300] = {0};
-    char* now_word = (char*)calloc(500, sizeof(char));
-    char* say_string = (char*)calloc(500, sizeof(char));
+    char* now_word         = (char*)calloc(500, sizeof(char));
+    char* say_string       = (char*)calloc(500, sizeof(char));
 
     va_list say_and_print_strings;
     va_start(say_and_print_strings, word);
