@@ -2,17 +2,18 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  December 16, 2020, 23:14:25
+ *                  December 17, 2020, 11:58:25
  *  @par What was changed?
- *                      1. Make comparison
+ *                      1. Kill magic numbers
+ *                      2. Make print definition of random node
  *  @par To-do list
  *                      1. Kill recursion (change to stack)
- *                      2. Kill magic numbers!!
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "main.h"
 #include "work_with_file.h"
@@ -25,12 +26,13 @@
 
 void help() {
     print_and_say(HELP_PHRASE, "This program load catalog tree from file", NULL);
-    printf("[L]oad from file / [G]ame / [P]ut on the disk / [D]efinition of someone make / [C]ompare two words / [Q]uit     \n"
+    printf("[L]oad from file / [G]ame / [P]ut on the disk / [D]efinition of someone make / [R]andom determination / [C]ompare two words / [Q]uit     \n"
                     "For more information, go here: https://github.com/owl1234/MIPT-1-semestr/tree/master/Stack\n");
 }
 
 int main(int argc, char* argv[]) {
     help();
+    srand(time(0));
 
     Binary_tree akinator  = {};
     tree_construct(&akinator);
@@ -46,6 +48,7 @@ int main(int argc, char* argv[]) {
     bool is_continue_game = false, is_continue_program = true, is_load_tree_from_file = false;
 
     while(is_continue_program) {
+        printf("\n");
         print_and_say(QUESTION_WITH_FULL_ANSWER, "Okey. Well, what do we do next?", NULL);
 
         scanf("%[^\r\n]%c", type_command, &garbage);
@@ -80,6 +83,10 @@ int main(int argc, char* argv[]) {
             scanf("%[^\r\n]%c", second_word_for_comparison, &garbage);
 
             comparison_nodes(&akinator, &catalog_name_nodes, type_command, second_word_for_comparison);
+        }
+
+        else if(is_request_make_the_random_definition(type_command)) {
+            find_random_node_in_tree(&akinator, &catalog_name_nodes);
         }
 
         /*else if(is_request_load_to_file(type_command)) {
@@ -136,6 +143,12 @@ bool is_request_make_the_definition(const char* request) {
 
 bool is_request_make_the_comparison(const char* request) {
     if(request[0] == 'C' || request[0] == 'c')
+        return true;
+    return false;
+}
+
+bool is_request_make_the_random_definition(const char* request) {
+    if(request[0] == 'R' || request[0] == 'r')
         return true;
     return false;
 }

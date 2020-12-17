@@ -25,10 +25,10 @@ struct Catalog_names {
 };
 
 enum CATALOG_STATUS {
-    CATALOG_BAD_POINTER  = 1,
-    CATALOG_OKEY         = 2,
-    CATALOG_BAD_CAPACITY = 3,
-    CATALOG_BAD_NODES_PTR = 4,
+    CATALOG_BAD_POINTER    = 1,
+    CATALOG_OKEY           = 2,
+    CATALOG_BAD_CAPACITY   = 3,
+    CATALOG_BAD_NODES_PTR  = 4,
     CATALOG_BAD_BUFFER_PTR = 5,
 };
 

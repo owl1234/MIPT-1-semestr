@@ -7,6 +7,8 @@
 #include "stack.h"
 
 const int MAX_SIZE_KEY = 100;
+const int MAX_SIZE_DEFINITION = 1000;
+const int MAX_SIZE_SAY_WORDS  = 1000;
 
 struct Node_binary_tree {
     Node_binary_tree* left;
@@ -45,9 +47,9 @@ enum USER_ANSWERS {
 };
 
 enum TYPE_UTTERANCE {
-    PHRASE_WITHOUT_QUESTION = 0,
-    YES_OR_NO_QUESTION = 1,
-    HELP_PHRASE = 2,
+    PHRASE_WITHOUT_QUESTION   = 0,
+    YES_OR_NO_QUESTION        = 1,
+    HELP_PHRASE               = 2,
     QUESTION_WITH_FULL_ANSWER = 3,
 };
 
@@ -92,6 +94,10 @@ void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_sta
 void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, const char* first_word, const char* second_word);
 
 void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_first_word, Stack_t* definition_second_word, const char* first_word, const char* second_word);
+
+void find_random_node_in_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes);
+
+void do_find_random_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, char* find_word);
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...);
 

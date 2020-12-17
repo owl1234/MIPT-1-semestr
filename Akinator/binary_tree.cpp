@@ -10,24 +10,8 @@
 //#include "warnings.h"
 //#include "stack.h"
 
-#define ASSERTION(status)                                                                                                                    \
-    system("echo \e[31m-----------------!WARNING!----------------\e[0m");                                                                    \
-    char warning_info[150] = "";                                                                                                             \
-    sprintf(warning_info, "echo \"\\e[31mIN FILE %s (FUNCTION %s, LINE %d)\\e[0m\"", __FILE__, __FUNCTION__, __LINE__);                      \
-    system(warning_info);                                                                                                                    \
-    sprintf(warning_info, "echo \"\\e[31mFile status: %d\\e[0m\"", status);                                                \
-    system(warning_info);
-
-char say_string[MAX_SIZE_KEY] = "";
-
-#define PRINT_AND_SAY(string)                   \
-    printf("%s", string);                     \
-    strcat(say_string, "echo \"");               \
-    strcat(say_string, string);                 \
-    strcat(say_string, "\" | festival --tts");  \
-    system(say_string);                         \
-    memset(say_string, '\0', MAX_SIZE_KEY);
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////// LOAD ///////////////////////////////////////////////////////////////////////////////
 
 TREE_STATUS tree_construct(Binary_tree* tree) {
     if(!tree) {
@@ -401,7 +385,7 @@ bool is_equivalent_words(Catalog_names* catalog_name_nodes, size_t position_into
 }
 
 void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word) {
-    char say_string[MAX_SIZE_KEY * (definition_stack->size_stack + 8) + strlen(need_word) + 5] = "";
+    char say_string[MAX_SIZE_DEFINITION] = "";
 
     strcat(say_string, need_word);
     strcat(say_string, " - ");
@@ -460,7 +444,7 @@ void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, cons
 }
 
 void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_first_word, Stack_t* definition_second_word, const char* first_word, const char* second_word) {
-    char say_string[2000] = ""; //[MAX_SIZE_KEY * (definition_first_word->size_stack + 8 + definition_second_word->size_stack) + strlen(first_word) + strlen(second_word) + 5] = "";
+    char say_string[MAX_SIZE_DEFINITION * 2] = "";
 
     information_about_node information_about_first_node  = stack_back(definition_first_word);
     information_about_node information_about_second_node = stack_back(definition_second_word);
@@ -536,12 +520,42 @@ void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////// RANDOM NODE ////////////////////////////////////////////////////////////////////////////
+
+void find_random_node_in_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes) {
+    Stack_t definition_stack = {};
+    stack_construct(&definition_stack);
+
+    char find_word[MAX_SIZE_DEFINITION] = "";
+
+    do_find_random_node_in_tree(tree->root, catalog_name_nodes, &definition_stack, find_word);
+
+    print_definition(catalog_name_nodes, &definition_stack, find_word);
+
+    stack_destruct(&definition_stack);
+}
+
+void do_find_random_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, char* find_word) {
+
+    if(node->is_leaf) {
+        memcpy(find_word, catalog_name_nodes->buffer + catalog_name_nodes->nodes[node->index_into_names_catalog].count_symbols_from_begin, catalog_name_nodes->nodes[node->index_into_names_catalog].length_name);
+    } else
+        if(rand() % 2) {
+            do_find_random_node_in_tree(node->right, catalog_name_nodes, definition_stack, find_word);
+            stack_push(definition_stack, node->index_into_names_catalog, NOT_IS_PROPERTY);
+        } else {
+            do_find_random_node_in_tree(node->left, catalog_name_nodes, definition_stack, find_word);
+            stack_push(definition_stack, node->index_into_names_catalog, IS_PROPERTY);
+        }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////// SAY ////////////////////////////////////////////////////////////////////////////////
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
-    char* buffer_arguments = (char*)calloc(500, sizeof(char)); //[300] = {0};
-    char* now_word         = (char*)calloc(500, sizeof(char));
-    char* say_string       = (char*)calloc(500, sizeof(char));
+    char buffer_arguments[MAX_SIZE_SAY_WORDS] = "";
+    char* now_word = (char*)calloc(MAX_SIZE_SAY_WORDS, sizeof(char));
+    char say_string[MAX_SIZE_SAY_WORDS] = "";
 
     va_list say_and_print_strings;
     va_start(say_and_print_strings, word);
@@ -570,6 +584,4 @@ void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
     //system(say_string);
 
     free(now_word);
-    free(buffer_arguments);
-    free(say_string);
 }

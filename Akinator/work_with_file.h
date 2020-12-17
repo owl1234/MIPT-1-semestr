@@ -6,8 +6,8 @@ struct File {
 };
 
 enum FILE_STATUS {
-    FILE_OK = 0,
-    FILE_BAD_PTR = 1,
+    FILE_OK         = 0,
+    FILE_BAD_PTR    = 1,
     FILE_BAD_BUFFER = 2
 };
 
