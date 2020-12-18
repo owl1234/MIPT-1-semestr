@@ -19,7 +19,7 @@
 #include "work_with_file.h"
 #include "binary_tree.h"
 //#include "work_with_catalog.h"
-#include "warnings.cpp"
+//#include "warnings.h"
 //#include "stack.h"
 
 #define INFORMATION_ABOUT_CALL (call_of_dump){__FILE__, __LINE__, __FUNCTION__}
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
         else if(is_request_make_the_definition(type_command)) {
             print_and_say(QUESTION_WITH_FULL_ANSWER, "Write the word you want to hear defined.");
             scanf("%[^\r\n]%c", type_command, &garbage);
-            find_node_in_tree(&akinator, &catalog_name_nodes, &definition_stack, type_command);
+            find_node_in_tree(&akinator, &catalog_name_nodes, type_command);
         }
 
         else if(is_request_make_the_comparison(type_command)) {
@@ -89,16 +89,20 @@ int main(int argc, char* argv[]) {
             find_random_node_in_tree(&akinator, &catalog_name_nodes);
         }
 
-        /*else if(is_request_load_to_file(type_command)) {
+        else if(is_request_load_to_file(type_command)) {
+            print_and_say(QUESTION_WITH_FULL_ANSWER, "Write the file name you want to load the tree.");
             scanf("%[^\r\n]%c", type_command, &garbage);
 
             FILE* file = fopen(type_command, "w");
             if(file) {
-                put_tree_to_disk(akinator.root, file, 0);
+                put_tree_to_disk(akinator.root, &catalog_name_nodes, file, 0);
                 printf("The tree was successfully placed on disk.\n");
             } else
                 return USER_IS_STUPID;
-        }*/
+
+            dump_tree(&akinator, &catalog_name_nodes);
+            fclose(file);
+        }
 
         else if(is_request_finish_the_program(type_command)) {
             print_and_say(PHRASE_WITHOUT_QUESTION, "Bye, my little friend.", NULL);

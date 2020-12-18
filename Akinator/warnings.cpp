@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "warnings.h"
 
-#ifndef WARNINGS_HP
-#define WARNINGS_HP
+#ifndef WARNINGS_H
+#define WARNINGS_H
 
 void warning(const char* information, struct call_of_dump arguments_of_call) {
     system("echo \e[31m-----------------!WARNING!----------------\e[0m");

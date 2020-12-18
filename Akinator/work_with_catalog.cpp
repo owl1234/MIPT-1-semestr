@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "work_with_catalog.h"
+#include "warnings.h"
+//#include "warnings.h"
 //#include "binary_tree.h"
 
 #define VERIFY_CATALOG_PTR                          \
@@ -20,6 +22,8 @@
             warning("zzz", INFORMATION_ABOUT_CALL); \
             return CATALOG_BAD_BUFFER_PTR;              \
         }
+
+
 
 CATALOG_STATUS catalog_names_construct(Catalog_names* catalog_name_nodes) {
     VERIFY_CATALOG_PTR

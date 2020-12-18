@@ -1,4 +1,6 @@
 
+#include "warnings.h"
+
 #ifndef BINARY_TREE_H
 #define BINARY_TREE_H
 
@@ -6,9 +8,10 @@
 #include "work_with_catalog.h"
 #include "stack.h"
 
-const int MAX_SIZE_KEY = 100;
+const int MAX_SIZE_KEY = 1000;
 const int MAX_SIZE_DEFINITION = 1000;
 const int MAX_SIZE_SAY_WORDS  = 1000;
+const int SPACES_INTO_TABULATION = 4;
 
 struct Node_binary_tree {
     Node_binary_tree* left;
@@ -67,9 +70,9 @@ char* find_right_node(char* pointer_in_tree);
 
 void warning(struct call_of_dump arguments_of_call);
 
-void dump_tree(Binary_tree* tree);
+void dump_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes);
 
-void do_dump_tree(Node_binary_tree* node, FILE* file);
+void do_dump_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, FILE* file);
 
 void print_node_name_into_file(Catalog_names* catalog_name_nodes, size_t index_into_catalog, FILE* file);
 
@@ -81,9 +84,7 @@ USER_ANSWERS get_user_answer();
 
 bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_nodes);
 
-void put_tree_to_disk(Node_binary_tree* node, FILE* file, const int height);
-
-void find_node_in_tree(Binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word);
+void find_node_in_tree(Binary_tree* node, Catalog_names* catalog_name_nodes, const char* need_word);
 
 bool do_find_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, const char* need_word);
 
@@ -98,6 +99,8 @@ void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_
 void find_random_node_in_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes);
 
 void do_find_random_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, char* find_word);
+
+void put_tree_to_disk(Node_binary_tree* node, Catalog_names* catalog_name_nodes, FILE* file, const int height);
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...);
 

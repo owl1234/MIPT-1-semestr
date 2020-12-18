@@ -71,10 +71,14 @@ int stack_capacity(Stack_t* node) {
 void stack_construct(Stack_t* node) {
     assert(node != nullptr);
 
+    printf("\t@@@@@@@@\n");
     node->data = (Elem_t*)calloc(DIMENSION, sizeof(Elem_t));
+    printf("\t$$$$$$$$\n");
     node->size_stack = 0;
     node->capacity = DIMENSION;
+    printf("\t###########\n");
     fill_stack_stuff(node);
+    printf("\t****\n");
 
     node->stack_status = STACK_IS_CREATED;
 
@@ -83,12 +87,17 @@ void stack_construct(Stack_t* node) {
 
 void stack_destruct(Stack_t* node) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
+    printf("----------------------------------------destruct begin------------------------------\n");
 
-    free(node->data);
+    if(node->data)
+        free(node->data);
+
     node->size_stack = POISON;
     node->capacity   = POISON;
     node->data = nullptr;
     node->stack_status = STACK_IS_DECTRUCT;
+
+    printf("--------------------------------------destruct end---------------------------------\n");
 }
 
 bool stack_is_empty(Stack_t* node){

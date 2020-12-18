@@ -1,10 +1,8 @@
 
-//
+//#ifndef WORK_WITH_CATALOG_H
+//#define WORK_WITH_CATALOG_H
 
-#ifndef WORK_WITH_CATALOG_H
-#define WORK_WITH_CATALOG_H
-
-#include "warnings.h"
+//#include "warnings.h"
 
 const int BEGIN_SIZE_CATALOG = 128;
 
@@ -34,10 +32,12 @@ enum CATALOG_STATUS {
 
 CATALOG_STATUS catalog_names_construct(Catalog_names* catalog_name_nodes);
 
-CATALOG_STATUS catalog_resize(Catalog_names* catalog_name_nodes);
+CATALOG_STATUS catalog_resize_nodes(Catalog_names* catalog_name_nodes);
+
+CATALOG_STATUS catalog_resize_buffer(Catalog_names* catalog_name_nodes);
 
 CATALOG_STATUS add_into_catalog(Catalog_names* catalog_name_nodes, size_t pos_into_buffer, size_t length);
 
 CATALOG_STATUS write_into_catalog_buffer(Catalog_names* catalog_name_nodes, const char* line, const int length);
 
-#endif // WORK_WITH_CATALOG_H
+//#endif // WORK_WITH_CATALOG_H
