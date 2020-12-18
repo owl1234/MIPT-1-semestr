@@ -103,3 +103,4 @@ CATALOG_STATUS write_into_catalog_buffer(Catalog_names* catalog_name_nodes, cons
     return CATALOG_OKEY;
 }
 
+

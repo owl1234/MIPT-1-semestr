@@ -141,6 +141,29 @@ TREE_STATUS node_construct(Node_binary_tree* new_node, char* position_in_buffer,
     return TREE_OKEY;
 }
 
+TREE_STATUS destruct_tree(Binary_tree* tree) {
+    if(!tree || !tree->root)
+        return TREE_OKEY;
+
+    return destruct_nodes(tree->root);
+}
+
+TREE_STATUS destruct_nodes(Node_binary_tree* node) {
+    if(node->is_leaf) {
+        node->height = POISON;
+        node->index_into_names_catalog = POISON;
+        node->length_name = POISON;
+    } else {
+        destruct_nodes(node->left);
+        free(node->left);
+
+        destruct_nodes(node->right);
+        free(node->right);
+    }
+
+    return TREE_OKEY;
+}
+
 char* search_next_position_after_symbol(char* pointer_in_tree, const char symbol) {
     char* copy_pointer = pointer_in_tree;
 
@@ -197,16 +220,22 @@ void dump_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes) {
 }
 
 void do_dump_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, FILE* file) {
-    fprintf(file, "%ld[shape=record label = \"", (size_t)node);
+    fprintf(file, "%ld[shape=record, label = \"", (size_t)node);
     print_node_name_into_file(catalog_name_nodes, node->index_into_names_catalog, file);
-    fprintf(file, "\"]\n");
+
+    fprintf(file, "\"");
+    if(node->is_leaf)
+        fprintf(file, ", color=\"%s\", style=\"filled\", fillcolor=\"%s\"", CONTOUR_LABEL_COLOR_FOR_LEAF, INTERIOR_LABEL_COLOR_FOR_LEAF);
+    else
+        fprintf(file, ", color=\"%s\", style=\"filled\", fillcolor=\"%s\"", CONTOUR_LABEL_COLOR_FOR_NOT_LEAF, INTERIOR_LABEL_COLOR_FOR_NOT_LEAF);
+    fprintf(file, "]\n");
 
     if(node->left) {
-        fprintf(file, "%ld->%ld\n", (size_t)node, (size_t)node->left);
+        fprintf(file, "%ld->%ld [color=\"%s\", label=\"yes\"]\n", (size_t)node, (size_t)node->left, ARROW_COLOR_FOR_YES);
         do_dump_tree(node->left, catalog_name_nodes, file);
     }
     if(node->right) {
-        fprintf(file, "%ld->%ld\n", (size_t)node, (size_t)node->right);
+        fprintf(file, "%ld->%ld [color=\"%s\", label=\"no\"]\n", (size_t)node, (size_t)node->right, ARROW_COLOR_FOR_NO);
         do_dump_tree(node->right, catalog_name_nodes, file);
     }
 }
@@ -227,19 +256,17 @@ void print_node_name_into_concole(Catalog_names* catalog_name_nodes, size_t inde
 ///////////////////////////////////////////////////////// GAME ///////////////////////////////////////////////////////////////////////////////
 
 bool search_leaf(Node_binary_tree* node, Catalog_names* catalog_name_nodes) {
-    char* name_node = (char*)calloc(node->length_name, sizeof(char));
-    //char name_node[node->length_name] = "";
-    memcpy(name_node, catalog_name_nodes->buffer + catalog_name_nodes->nodes[node->index_into_names_catalog].count_symbols_from_begin, catalog_name_nodes->nodes[node->index_into_names_catalog].length_name);
+    char name_node[node->length_name + 1] = "";
+    memcpy(name_node, catalog_name_nodes->buffer + catalog_name_nodes->nodes[node->index_into_names_catalog].count_symbols_from_begin, node->length_name); //catalog_name_nodes->nodes[node->index_into_names_catalog].length_name);
+    name_node[node->length_name] = '\0';
 
     if(node->is_leaf) {
         print_and_say(YES_OR_NO_QUESTION, "Everything is clear. You made a ", name_node, " wish. Am I right?", NULL);
-        free(name_node);
         return check_akinator_answer(node, catalog_name_nodes);
     } else {
         print_and_say(YES_OR_NO_QUESTION, name_node, "?", NULL);
 
         USER_ANSWERS user_answer = get_user_answer();
-        free(name_node);
         if(user_answer == YES_ANSWER_USER) {
             return search_leaf(node->left, catalog_name_nodes);
         } else
@@ -266,9 +293,9 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
     USER_ANSWERS user_answer = get_user_answer();
 
     if(user_answer == YES_ANSWER_USER) {
-        print_and_say(YES_OR_NO_QUESTION, "Of course, who would doubt it? Ha-ha. Do you want to play again?");
+        print_and_say(YES_OR_NO_QUESTION, "Of course, who would doubt it? Ha-ha. Do you want to play again?", NULL);
     } else {
-        print_and_say(QUESTION_WITH_FULL_ANSWER, "Hmmm.. It is very strange. All right, what did you wish for?");
+        print_and_say(QUESTION_WITH_FULL_ANSWER, "Hmmm.. It is very strange. All right, what did you wish for?", NULL);
 
         char* name_new_node = (char*)calloc(MAX_SIZE_KEY, sizeof(char));
         char garbage = '!';
@@ -308,11 +335,6 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
         node->is_leaf = new_node->is_leaf = true;
 
         print_and_say(YES_OR_NO_QUESTION, "Well, I remember that word. But next time you won't catch me, I'll be smarter! Do you want to play again?", NULL);
-
-        //free(name_new_node);
-        //free(new_node);
-        //free(difference);
-        //free(new_indicator);
     }
 
     if(get_user_answer() == YES_ANSWER_USER)
@@ -324,20 +346,17 @@ bool check_akinator_answer(Node_binary_tree* node, Catalog_names* catalog_name_n
 ////////////////////////////////////////////////////// DEFINITION ////////////////////////////////////////////////////////////////////////////
 
 void find_node_in_tree(Binary_tree* tree, Catalog_names* catalog_name_nodes, const char* need_word) {
-    //printf("begin construct into find node\n");
     Stack_t definition_stack = {};
     stack_construct(&definition_stack);
 
-    //printf("begin find\n");
     bool result_finding = do_find_node_in_tree(tree->root, catalog_name_nodes, &definition_stack, need_word);
-    //printf("end find\n");
+
     if(result_finding) {
         print_and_say(PHRASE_WITHOUT_QUESTION, "Well, I find this word.", NULL);
         print_definition(catalog_name_nodes, &definition_stack, need_word);
     } else
         print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no such word.", NULL);
 
-    //printf("begin destruct into find node\n");
     stack_destruct(&definition_stack);
 }
 
@@ -403,6 +422,9 @@ void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_sta
         if(definition_stack->size_stack > 0) {
             strcat(say_string, ", ");
             count_print_symbols += strlen(", ");
+        } else {
+            strcat(say_string, ".");
+            count_print_symbols += strlen(".");
         }
     }
 
@@ -413,7 +435,6 @@ void print_definition(Catalog_names* catalog_name_nodes, Stack_t* definition_sta
 ////////////////////////////////////////////////////// COMPARISON ////////////////////////////////////////////////////////////////////////////
 
 void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, const char* first_word, const char* second_word) {
-    printf("begin comparison!!!\n");
     Stack_t definition_first_word  = {};
     Stack_t definition_second_word = {};
 
@@ -423,12 +444,9 @@ void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, cons
     bool result_finding_first_word  = do_find_node_in_tree(tree->root, catalog_name_nodes, &definition_first_word,  first_word);
     bool result_finding_second_word = do_find_node_in_tree(tree->root, catalog_name_nodes, &definition_second_word, second_word);
 
-    printf("fir-fir\n");
-
-    if(result_finding_first_word && result_finding_second_word) {
-        printf("\tlalala\n");
+    if(result_finding_first_word && result_finding_second_word)
         compare_definitions(catalog_name_nodes, &definition_first_word, &definition_second_word, first_word, second_word);
-}
+
     else if(!result_finding_first_word && result_finding_second_word)
         print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no word ", first_word, NULL);
 
@@ -438,20 +456,12 @@ void comparison_nodes(Binary_tree* tree, Catalog_names* catalog_name_nodes, cons
     else
         print_and_say(PHRASE_WITHOUT_QUESTION, "You are deceiving me. There is no words ", first_word, "and ", second_word, NULL);
 
-    printf("!!!\n");
-
-    //stack_destruct(&definition_first_word);
-    //stack_destruct(&definition_second_word);
-
-    printf("@@@\n");
+    stack_destruct(&definition_first_word);
+    stack_destruct(&definition_second_word);
 }
 
 void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_first_word, Stack_t* definition_second_word, const char* first_word, const char* second_word) {
-    printf("begin compare\n");
-
-    char say_string[MAX_SIZE_DEFINITION * 2] = "";
-
-    printf("compare\n");
+    char say_string[MAX_SIZE_COMPARISON] = "";
 
     information_about_node information_about_first_node  = stack_back(definition_first_word);
     information_about_node information_about_second_node = stack_back(definition_second_word);
@@ -467,8 +477,6 @@ void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_
 
         return;
     }
-
-    printf("STACK_BACK\n");
 
     strcat(say_string, "Well, ");
     strcat(say_string, first_word);
@@ -490,8 +498,6 @@ void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_
 
     stack_pop(definition_first_word);
     stack_pop(definition_second_word);
-
-    printf("begin push\n");
 
     while(definition_first_word->size_stack > 0 && definition_second_word->size_stack > 0 && !is_find_differences) {
         information_about_first_node  = stack_back(definition_first_word);
@@ -522,17 +528,12 @@ void compare_definitions(Catalog_names* catalog_name_nodes, Stack_t* definition_
         count_print_symbols += strlen(".\nThe similarities are over. Now let's see how they differ.\n");
     }
 
-    printf("say: %lu\n", strlen(say_string));
-    printf("\t\t\t%s\n", say_string);
     print_and_say(PHRASE_WITHOUT_QUESTION, say_string, NULL);
-    printf("say end\n");
 
     if(is_find_differences) {
         print_definition(catalog_name_nodes, definition_first_word,  first_word);
         print_definition(catalog_name_nodes, definition_second_word, second_word);
     }
-
-    printf("end..\n");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -542,16 +543,14 @@ void find_random_node_in_tree(Binary_tree* tree, Catalog_names* catalog_name_nod
     Stack_t definition_stack = {};
     stack_construct(&definition_stack);
 
-    //char find_word[MAX_SIZE_DEFINITION] = "";
     char* find_word = (char*)calloc(MAX_SIZE_DEFINITION, sizeof(char));
 
     do_find_random_node_in_tree(tree->root, catalog_name_nodes, &definition_stack, find_word);
-    printf("\t%s\n", find_word);
     print_definition(catalog_name_nodes, &definition_stack, find_word);
 
-    printf("!!! stack destruct\n");
     stack_destruct(&definition_stack);
-    printf("buy, find!\n");
+
+    free(find_word);
 }
 
 void do_find_random_node_in_tree(Node_binary_tree* node, Catalog_names* catalog_name_nodes, Stack_t* definition_stack, char* find_word) {
@@ -595,25 +594,19 @@ void put_tree_to_disk(Node_binary_tree* node, Catalog_names* catalog_name_nodes,
 ///////////////////////////////////////////////////////// SAY ////////////////////////////////////////////////////////////////////////////////
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
-    printf("begin and say %lu\n", strlen(word));
-    char* buffer_arguments = (char*)calloc(300, sizeof(char));   //[MAX_SIZE_DEFINITION] = "";
-    printf("don't fall!\n");
-    char* now_word = (char*)calloc(298, sizeof(char));printf("say_string haha\n");
-    char* say_string = (char*)calloc(MAX_SIZE_DEFINITION, sizeof(char)); ///[MAX_SIZE_DEFINITION] = "";
+    char* buffer_arguments = (char*)calloc(MAX_SIZE_COMPARISON, sizeof(char));
+    char* say_string = (char*)calloc(MAX_SIZE_COMPARISON, sizeof(char));
+    char* now_word = (char*)calloc(MAX_SIZE_DEFINITION, sizeof(char));
 
-    va_list say_and_print_strings;
+    va_list say_and_print_strings = {};
     va_start(say_and_print_strings, word);
 
     strcat(buffer_arguments, word);
     now_word = va_arg(say_and_print_strings, char*);
-    printf("poihali\n");
 
     while(now_word != NULL) {
-        printf("hi\n");
         strcat(buffer_arguments, now_word);
-        printf("ha\n");
         now_word = va_arg(say_and_print_strings, char*);
-        printf("haha\n");
     }
 
     va_end(say_and_print_strings);
@@ -631,9 +624,8 @@ void print_and_say(TYPE_UTTERANCE type, const char* word, ...) {
     strcat(say_string, "\" | festival --tts\n");
     //system(say_string);
 
-    printf("!!! FREE !!!\n");
-    free(buffer_arguments);
     free(now_word);
+    free(buffer_arguments);
     free(say_string);
-    printf("!!! END FREE !!!\n");
 }
+

@@ -8,10 +8,20 @@
 #include "work_with_catalog.h"
 #include "stack.h"
 
-const int MAX_SIZE_KEY = 1000;
-const int MAX_SIZE_DEFINITION = 1000;
-const int MAX_SIZE_SAY_WORDS  = 1000;
+const int MAX_SIZE_KEY           = 1000;
+const int MAX_SIZE_DEFINITION    = 1000;
+const int MAX_SIZE_COMPARISON    = MAX_SIZE_DEFINITION * 2;
+const int MAX_SIZE_SAY_WORDS     = 1000;
 const int SPACES_INTO_TABULATION = 4;
+
+const char CONTOUR_LABEL_COLOR_FOR_LEAF[]      = "darkolivegreen";
+const char CONTOUR_LABEL_COLOR_FOR_NOT_LEAF[]  = "#ff844f";
+
+const char INTERIOR_LABEL_COLOR_FOR_LEAF[]     = "#e4fce1";   //"#c9ffe2";
+const char INTERIOR_LABEL_COLOR_FOR_NOT_LEAF[] = "#fffdba";  //"#ffe3cf";  //"#ffe3ed";
+
+const char ARROW_COLOR_FOR_YES[] = "#cd2682";
+const char ARROW_COLOR_FOR_NO[]  = "#101a78";
 
 struct Node_binary_tree {
     Node_binary_tree* left;
@@ -64,6 +74,10 @@ Node_binary_tree* load_tree_from_buffer(char* buffer, Catalog_names* catalog_nam
 
 TREE_STATUS node_construct(Node_binary_tree* new_node, char* position_in_buffer, const int length_name, Catalog_names* catalog_name_nodes);
 
+TREE_STATUS destruct_tree(Binary_tree* tree);
+
+TREE_STATUS destruct_nodes(Node_binary_tree* node);
+
 char* search_next_position_after_symbol(char* pointer_in_tree, const char symbol);
 
 char* find_right_node(char* pointer_in_tree);
@@ -104,4 +118,13 @@ void put_tree_to_disk(Node_binary_tree* node, Catalog_names* catalog_name_nodes,
 
 void print_and_say(TYPE_UTTERANCE type, const char* word, ...);
 
+/*void print_and_say(TYPE_UTTERANCE type, const char* first_word);
+
+void print_and_say(TYPE_UTTERANCE type, const char* first_word, const char* second_word);
+
+void print_and_say(TYPE_UTTERANCE type, const char* first_word, const char* second_word, const char* third_word);
+
+void print_and_say(TYPE_UTTERANCE type, const char* first_word, const char* second_word, const char* third_word, const char* fourth_word);*/
+
 #endif // BINARY_TREE_H
+

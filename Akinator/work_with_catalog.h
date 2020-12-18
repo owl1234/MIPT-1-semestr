@@ -41,3 +41,4 @@ CATALOG_STATUS add_into_catalog(Catalog_names* catalog_name_nodes, size_t pos_in
 CATALOG_STATUS write_into_catalog_buffer(Catalog_names* catalog_name_nodes, const char* line, const int length);
 
 //#endif // WORK_WITH_CATALOG_H
+

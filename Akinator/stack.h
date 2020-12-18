@@ -190,3 +190,4 @@ void clear_file(const char* file_log_name);
 *
 *   @return 0, if there are no errors
 */
+

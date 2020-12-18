@@ -71,14 +71,10 @@ int stack_capacity(Stack_t* node) {
 void stack_construct(Stack_t* node) {
     assert(node != nullptr);
 
-    printf("\t@@@@@@@@\n");
     node->data = (Elem_t*)calloc(DIMENSION, sizeof(Elem_t));
-    printf("\t$$$$$$$$\n");
     node->size_stack = 0;
     node->capacity = DIMENSION;
-    printf("\t###########\n");
     fill_stack_stuff(node);
-    printf("\t****\n");
 
     node->stack_status = STACK_IS_CREATED;
 
@@ -87,17 +83,9 @@ void stack_construct(Stack_t* node) {
 
 void stack_destruct(Stack_t* node) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
-    printf("----------------------------------------destruct begin------------------------------\n");
 
-    if(node->data)
-        free(node->data);
-
-    node->size_stack = POISON;
-    node->capacity   = POISON;
-    node->data = nullptr;
+    free(node->data);
     node->stack_status = STACK_IS_DECTRUCT;
-
-    printf("--------------------------------------destruct end---------------------------------\n");
 }
 
 bool stack_is_empty(Stack_t* node){
@@ -113,34 +101,43 @@ bool stack_is_empty(Stack_t* node){
 
 void stack_resize(Stack_t* node) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
-    assert(node->capacity >= stack_size(node));
+    if(!(node->capacity >= stack_size(node))) {
+        warning("Bad capacity into stack", INFORMATION_ABOUT_CALL);
+        node->stack_status = STACK_BAD_CAPACITY;
+        return;
+    }
 
-    Elem_t* new_data = (Elem_t*)realloc(node->data, stack_capacity(node) * 2 * sizeof(Elem_t) + 1);
-    node->capacity *= 2;
-    fill_stack_stuff(node);
+    Elem_t* new_data = (Elem_t*)realloc(node->data, (node->capacity * 2 + 1) * sizeof(Elem_t));
+    if(!new_data) {
+        warning(text_stack_t_status[STACK_DATA_NULL], INFORMATION_ABOUT_CALL);
+        node->stack_status = STACK_DATA_NULL;
+        return;
+    }
 
-    assert(new_data != nullptr);
     node->data = new_data;
+    node->capacity *= 2;
+
+    fill_stack_stuff(node);
 
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
 }
 
 void fill_stack_stuff(Stack_t* node) {
-    int begin_pos = node->size_stack + 1, new_capacity = node->capacity;
+    int begin_pos = node->size_stack, new_capacity = node->capacity;
     if(node->stack_status == STACK_IS_CREATED) {
         begin_pos = 0;
     }
 
     for(int i=begin_pos; i<new_capacity; ++i) {
-        node->data[i].index_into_catalog = POISON;
+        node->data[i].index_into_catalog     = POISON;
         node->data[i].is_it_property_of_node = NOT_IS_PROPERTY;
     }
 }
 
-void stack_push(Stack_t* node, size_t value, TYPE_PROPERTY_NODE type_property) { //////////////////////////// STACK ELEM T VALUE
+void stack_push(Stack_t* node, size_t value, TYPE_PROPERTY_NODE type_property) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
 
-    if(node->size_stack >= node->capacity) {
+    if(node->size_stack + 1 >= node->capacity) {
         stack_resize(node);
     }
 
@@ -158,7 +155,7 @@ void stack_push(Stack_t* node, size_t value, TYPE_PROPERTY_NODE type_property) {
 void stack_pop(Stack_t* node) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
 
-    if(node->stack_status == STACK_EMPTY && stack_is_empty(node)) {
+    if(stack_is_empty(node) && node->stack_status == STACK_EMPTY) {
         IF_DEBUG(printf("Don't delete end element from stack\n");)
         return;
     }
@@ -200,3 +197,4 @@ void clear_file(const char* file_log_name) {
     FILE* file = fopen(file_log_name, "w");
     fclose(file);
 }
+
