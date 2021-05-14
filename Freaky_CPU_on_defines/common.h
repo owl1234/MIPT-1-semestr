@@ -7,19 +7,21 @@
 #include "operation_codes.h"
 #include "stack.h"
 
-const int VERSION = 6;
-const int SIGNATURE_SIZE = 10;
-const long long SIGNATURE_NAME_HASH = 1343871799; // 0x64F3F67CF65BE1CBA2C649705203B97E % ULLONG_MAX;
+const int VERSION                       = 7;
+const int SIGNATURE_SIZE                = 10;
+const int SIGNATURE_NAME_HASH           = 1343871799; // 0x64F3F67CF65BE1CBA2C649705203B97E % ULLONG_MAX;
 
-const int MAX_SIZE = 11;
-const int MAX_SIZE_RAM = 10;
-const int MAX_COUNT_OF_ARGUMENTS = 3;
-const int ERROR_NUMBER = -3802;
-const double EPSILON = 1e-6;
-const int OK = 0;
-const int number_of_register_vars = 4;
-const int number_of_commands = sizeof(TEXT_OPERATION) / sizeof(TEXT_OPERATION[0]);
-const int MAX_COUNT_LABELS = 20;
+const int MAX_SIZE                      = 11;
+const int MAX_SIZE_RAM                  = 10;
+const int MAX_COUNT_OF_ARGUMENTS        = 3;
+const int ERROR_NUMBER                  = -3802;
+const double EPSILON                    = 1e-6;
+const int OK                            = 0;
+const int number_of_register_vars       = 4;
+const int number_of_commands            = sizeof(TEXT_OPERATION) / sizeof(TEXT_OPERATION[0]);
+const int MAX_COUNT_LABELS              = 20;
+const int SIZE_BYTE                     = 8;
+const int BYTE_IN_ELEM_TYPE             = 4;
 
 const char SEPARATORS[] = "\n ";
 

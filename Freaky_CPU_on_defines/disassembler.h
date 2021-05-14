@@ -28,23 +28,37 @@ struct File {
     struct stat information;
 };
 
+struct disassembler_struct {
+    char* disassembled_text;
+    int index_in_disassembled_text;
+    int now_byte;
+
+    Label* labels;
+    int index_in_labels;
+    int now_position_in_labels;
+
+    int real_size;
+};
+
 DISASM_ERRORS file_construct(File* file, const char* name_file, const char* reading_mode);
 
 DISASM_ERRORS destruct_file(File* file);
 
+DISASM_ERRORS create_disassembler_struct(File* input_file, struct disassembler_struct* disasm_struct);
+
 DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file);
 
-DISASM_ERRORS check_signature(File* file, int* now_byte);
+DISASM_ERRORS check_signature(File* file, struct disassembler_struct* disasm_struct);
 
-void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels, int real_size);
+void find_labels_into_text(File* input_file, struct disassembler_struct* disasm_struct);
 
 bool is_code_connected_with_labels(int command, int* number_of_condition);
 
-void put_char_into_disassembled_text(const char* command, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line);
+void put_char_into_disassembled_text(const char* command, struct disassembler_struct* disasm_struct, int flag_of_the_end_line);
 
-void put_int_into_disassembled_text(Elem_t value, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line);
+void put_int_into_disassembled_text(Elem_t value, struct disassembler_struct* disasm_struct, int flag_of_the_end_line);
 
-DISASM_ERRORS create_disassembling_file(const char* disassembled_text, const int index_in_disassembled_text, const char* name_output_file);
+DISASM_ERRORS create_disassembling_file(struct disassembler_struct* disasm_struct, const char* name_output_file);
 
-int get_double_from_text(File* file, int* now_byte);
+double get_double_from_text(File* file, struct disassembler_struct* disasm_struct);
 

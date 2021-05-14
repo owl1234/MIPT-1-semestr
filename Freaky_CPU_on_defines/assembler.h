@@ -58,11 +58,17 @@ int get_number_of_command(char* text);
 
 bool is_equal_labels(const char* first, const char* second);
 
-int max(int first, int second);
-
 int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text, int* number_of_byte, char* argument, int* type_of_argument);
 
+void put_opcode_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
+
+void put_char_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
+
+void put_int_into_assembled_text(char code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
+
 void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
+
+void put_int_into_assembled_text(long long code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 
 void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte);
 

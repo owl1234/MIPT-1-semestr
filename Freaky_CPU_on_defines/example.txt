@@ -1,0 +1,6 @@
+push 5
+pop rcx
+push 98
+push rcx
+sub
+

@@ -1,5 +1,5 @@
 #define GET_ADDRESS_LABEL_GO_TO                                         \
-    int address_label = get_double_from_text(processor, &now_byte);     \
+    int address_label = get_byte_from_text(processor, &now_byte);     \
                                                                         \
     if(address_label == OPERATION_CODE_RECURSIVE_RET) {                 \
         COMMAND_ret;                                                    \
@@ -9,15 +9,19 @@
     }
 
 #define PUT_ADDRESS_LABEL_GO_TO(code_of_operation)                                                                                      \
-    put_char_into_disassembled_text(TEXT_OPERATION[code_of_operation], disassembled_text, &index_in_disassembled_text, SPACE);          \
-    now_command = (int)get_double_from_text(input_file, &now_byte);                                                                     \
+    print_labels(disasm_struct.labels, disasm_struct.index_in_labels);    \
+    put_char_into_disassembled_text(TEXT_OPERATION[(int)now_command], &disasm_struct, SPACE);                                          \
+    printf("put_address: command %lg\n", now_command);      \
+    now_command = (int)get_byte_from_text(input_file, &disasm_struct);                                                                 \
+    printf("put_address: command %lg\n", now_command);                                                                                   \
                                                                                                                                         \
-    for(int label=0; label<index_in_labels; ++label) {                                                                                  \
-        if(labels[label].byte_address == now_command) {                                                                                 \
-            put_char_into_disassembled_text(TEXT_OPERATION[(int)now_command], disassembled_text, &index_in_disassembled_text, END_LINE);\
+    for(int label=0; label<disasm_struct.index_in_labels; ++label) {                                                                    \
+        printf("\tput_address: %d %lg\n", disasm_struct.labels[label].byte_address, now_command);                                        \
+        if(abs(disasm_struct.labels[label].byte_address - now_command) < EPSILON) {                                                                  \
+            put_char_into_disassembled_text("meow", &disasm_struct, END_LINE);                                \
         }                                                                                                                               \
     }                                                                                                                                   \
-    printf("\t# %d, label: %d\n", now_byte, labels[now_position_in_labels].byte_address);                                                                                                                                 \
+    printf("\t# %d, label: %d\n", disasm_struct.now_position_in_labels, disasm_struct.labels[disasm_struct.now_position_in_labels].byte_address);                                                                                                                                 \
 
 
 #define RECURSIVE_RETURN                                                \
@@ -28,7 +32,7 @@
 
 
 #define PUT_COMMAND_WITHOUT_ARGUMENTS(code_of_command)                                                                                  \
-    put_int_into_assembled_text(code_of_command, assembled_text, &index_in_assembled_text, &number_of_byte);                            \
+    put_opcode_into_assembled_text(code_of_command, assembled_text, &index_in_assembled_text, &number_of_byte);                            \
                                                                                                                                         \
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, code_of_command);                                                          \
     listing(input_file->listing_file, "|", SPACE);                                                                                      \
@@ -36,8 +40,8 @@
 
 
 #define CONDITION_COMMANDS(number_of_condition)                                                                                         \
-    is_find_label = false;                                                                                                         \
-    put_int_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);                        \
+    is_find_label = false;                                                                                                              \
+    put_opcode_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);                        \
                                                                                                                                         \
     temp_string = strtok(NULL, SEPARATORS);                                                                                             \
     for(int label=0; label<index_in_labels; ++label) {                                                                                  \
@@ -55,7 +59,7 @@
     }                                                                                                                                   \
                                                                                                                                         \
     if(!is_find_label && !strcmp(temp_string, "recret")) {                                                                              \
-        put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);           \
+        put_opcode_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);           \
                                                                                                                                         \
         listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);                   \
         listing(input_file->listing_file, "|", SPACE);                                                                                  \
@@ -71,7 +75,7 @@
 
 #define ASSEMBLER(code) code
 #define PROCESSOR(code) code
-#define DISASSEMBLER(code) code
+#define DISASSEMBLER(code) code;
 
 #define STACK_BACK(stack) stack_back(&stack);
 #define STACK_POP(stack)  stack_pop(&stack);
@@ -84,11 +88,11 @@ DISASSEMBLER (
 
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     temp_string = strtok(NULL, SEPARATORS);
 
-    put_int_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);
     listing(input_file->listing_file, "|", SPACE);
@@ -104,10 +108,10 @@ PROCESSOR (
     break;
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_HLT], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_HLT], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(OPERATION_CODE_HLT, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(OPERATION_CODE_HLT, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_HLT);
     listing(input_file->listing_file, "| hlt", END_LINE);
@@ -117,15 +121,21 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( push, OPERATION_CODE_PUSH, 2,
 PROCESSOR (
-    Elem_t flag_of_registers = get_double_from_text(processor, &now_byte);
+    Flag_t flag_of_registers = get_byte_from_text(processor, &now_byte);
 
-    Elem_t now_value = get_double_from_text(processor, &now_byte);
+    Elem_t now_value = 0; 
 
     if(flag_of_registers == IS_REGISTER) {
-        stack_push(&(processor->proc_stack), processor->registers_variables[(int)now_value]);
+        now_value = get_byte_from_text(processor, &now_byte);
+        stack_push(&(processor->proc_stack), processor->registers_variables[now_value]);
     } else if(flag_of_registers == IS_ELEM_T) {
+        ++now_byte;
+        now_value = get_long_long_number_from_binary(processor, &now_byte);
+        printf("\t\t push %d\n", now_value);
         stack_push(&(processor->proc_stack), now_value);
+        --now_byte;
     } else if(flag_of_registers == (IS_RAM | IS_REGISTER)) {
+        now_value = get_byte_from_text(processor, &now_byte);
         ram_index = (int)(processor->registers_variables[(int)now_value]);
         if(ram_index < MAX_SIZE_RAM) {
             stack_push(&(processor->proc_stack), processor->ram[ram_index]);
@@ -133,6 +143,7 @@ PROCESSOR (
             printf("Bad index in RAM\n");
         }
     } else if(flag_of_registers == (IS_RAM | IS_ELEM_T)) {
+        now_value = get_long_long_number_from_binary(processor, &now_byte);
         ram_index = (int)now_value;
         if(ram_index < MAX_SIZE_RAM) {
             stack_push(&(processor->proc_stack), processor->ram[ram_index]);
@@ -143,29 +154,31 @@ PROCESSOR (
         printf("Unknown value to add to the stack");
         return PROC_UNKNOWN_COMMAND;
     }
+
+    printf("\tmade push %d\n", now_value);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_PUSH], disassembled_text, &index_in_disassembled_text, SPACE);
-    Elem_t flag_of_the_command = get_double_from_text(input_file, &now_byte);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_PUSH], &disasm_struct, SPACE);
+    Elem_t flag_of_the_command = get_byte_from_text(input_file, &disasm_struct);
 
-    Elem_t now_value = get_double_from_text(input_file, &now_byte);
+    Elem_t now_value = get_byte_from_text(input_file, &disasm_struct);
     if(flag_of_the_command == IS_ELEM_T) {
-        put_int_into_disassembled_text(now_value, disassembled_text, &index_in_disassembled_text, END_LINE);
+        put_int_into_disassembled_text(now_value, &disasm_struct, END_LINE);
     } else if(flag_of_the_command == IS_REGISTER) {
-        put_char_into_disassembled_text(TEXT_REGISTERS[(int)now_value], disassembled_text, &index_in_disassembled_text, END_LINE);
+        put_char_into_disassembled_text(TEXT_REGISTERS[(int)now_value], &disasm_struct, END_LINE);
     }
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(OPERATION_CODE_PUSH, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     temp_string = strtok(NULL, SEPARATORS);
 
     int type_push_value = type_of_value(temp_string);
-    put_int_into_assembled_text(type_push_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_char_into_assembled_text(type_push_value, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     if(type_push_value == IS_REGISTER || type_push_value == (IS_RAM | IS_REGISTER)) {
 
-        put_int_into_assembled_text(get_number_of_register(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
+        put_char_into_assembled_text(get_number_of_register(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
 
         listing(input_file->listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_PUSH, type_push_value, get_number_of_register(temp_string));
         listing(input_file->listing_file, "| push", SPACE);
@@ -180,7 +193,9 @@ ASSEMBLER (
             now_value = strtod(temp_string, NULL);
         }
 
-        put_double_into_assembled_text(now_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+        printf("now value: %d, %s\n", now_value, temp_string);
+
+        put_int_into_assembled_text(now_value, assembled_text, &index_in_assembled_text, &number_of_byte);
 
         listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_PUSH, type_push_value);
         listing(input_file->listing_file, NOTHING, (double)ONE_ARGUMENT, now_value);
@@ -196,41 +211,41 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( pop, OPERATION_CODE_POP, 2,
 PROCESSOR (
-    double back_element = 0.0;
+    int back_element = 0;
 
-    int flag_of_registers = get_double_from_text(processor, &now_byte);
+    int flag_of_registers = get_byte_from_text(processor, &now_byte);
 
     if(flag_of_registers == NOT_ARGS) {
         back_element = STACK_BACK(processor->proc_stack);
         STACK_POP(processor->proc_stack);
     } else {
-        int number_of_register = get_double_from_text(processor, &now_byte);
+        int number_of_register = get_byte_from_text(processor, &now_byte);
         processor->registers_variables[number_of_register] = STACK_BACK(processor->proc_stack);
         STACK_POP(processor->proc_stack);
     }
 ),
 DISASSEMBLER (
-    int flag_of_the_command = (int)get_double_from_text(input_file, &now_byte);
+    int flag_of_the_command = (int)get_byte_from_text(input_file, &disasm_struct);
 
     if(flag_of_the_command == NOT_ARGS) {
-        put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_POP], disassembled_text, &index_in_disassembled_text, END_LINE);
+        put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_POP], &disasm_struct, END_LINE);
     } if(flag_of_the_command == IS_ELEM_T) {
-        put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_POP], disassembled_text, &index_in_disassembled_text, END_LINE);
+        put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_POP], &disasm_struct, END_LINE);
     } else if(flag_of_the_command == IS_REGISTER) {
-        put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_POP], disassembled_text, &index_in_disassembled_text, SPACE);
-        Elem_t now_value = get_double_from_text(input_file, &now_byte);
-        put_char_into_disassembled_text(TEXT_REGISTERS[(int)now_value], disassembled_text, &index_in_disassembled_text, END_LINE);
+        put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_POP], &disasm_struct, SPACE);
+        Elem_t now_value = get_byte_from_text(input_file, &disasm_struct);
+        put_char_into_disassembled_text(TEXT_REGISTERS[(int)now_value], &disasm_struct, END_LINE);
     }
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     temp_string = strtok(NULL, SEPARATORS);
 
     if(type_of_value(temp_string) == IS_REGISTER) {
 
-        put_int_into_assembled_text(IS_REGISTER, assembled_text, &index_in_assembled_text, &number_of_byte);
-        put_int_into_assembled_text(get_number_of_register(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
+        put_char_into_assembled_text(IS_REGISTER, assembled_text, &index_in_assembled_text, &number_of_byte);
+        put_char_into_assembled_text(get_number_of_register(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
 
         listing(input_file->listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_POP, IS_REGISTER, get_number_of_register(temp_string));
         listing(input_file->listing_file, "| pop ", NOTHING);
@@ -238,7 +253,7 @@ ASSEMBLER (
 
     } else {
 
-        put_int_into_assembled_text(NOT_ARGS, assembled_text, &index_in_assembled_text, &number_of_byte);
+        put_char_into_assembled_text(NOT_ARGS, assembled_text, &index_in_assembled_text, &number_of_byte);
 
         listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_POP, NOT_ARGS);
         listing(input_file->listing_file, "| pop", END_LINE);
@@ -253,16 +268,17 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( add, OPERATION_CODE_ADD, 0,
 PROCESSOR (
-    double last = STACK_BACK(processor->proc_stack);
+    Elem_t last = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
-    double penultimate = STACK_BACK(processor->proc_stack);
+    Elem_t penultimate = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
+    printf("\tadd %d + %d = %d\n", last, penultimate, last + penultimate);
     stack_push(&(processor->proc_stack), last + penultimate);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_ADD], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_ADD], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_ADD)
@@ -271,16 +287,17 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( sub, OPERATION_CODE_SUB, 0,
 PROCESSOR (
-    double last = STACK_BACK(processor->proc_stack);
+    Elem_t last = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
-    double penultimate = STACK_BACK(processor->proc_stack);
+    Elem_t penultimate = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
+    printf("\tsub %d - %d = %d\n", penultimate, last, penultimate - last);
     stack_push(&(processor->proc_stack), penultimate - last);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_SUB], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_SUB], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_SUB)
@@ -295,10 +312,11 @@ PROCESSOR (
     penultimate = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
+    printf("\tmul %d * %d = %d\n", penultimate, last, penultimate * last);
     stack_push(&(processor->proc_stack), last * penultimate);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_MUL], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_MUL], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_MUL)
@@ -307,16 +325,17 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( div, OPERATION_CODE_DIV, 0,
 PROCESSOR (
-    double last = STACK_BACK(processor->proc_stack);
+    Elem_t last = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
-    double penultimate = STACK_BACK(processor->proc_stack);
+    Elem_t penultimate = STACK_BACK(processor->proc_stack);
     STACK_POP(processor->proc_stack);
 
+    printf("\tdiv %d / %d = %d\n", penultimate, last, penultimate / last);
     stack_push(&(processor->proc_stack), penultimate / last);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_DIV], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_DIV], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_DIV)
@@ -330,12 +349,12 @@ PROCESSOR (
     } else {
         //print_stack(&proc_stack);
         printf("Answer: (size_stack = %lu) ", processor->proc_stack.size_stack);
-        printf(identity, STACK_BACK(processor->proc_stack));
+        printf(identity, stack_back(&processor->proc_stack)); //STACK_BACK(processor->proc_stack));
         printf("\n\n");
     }
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_OUT], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_OUT], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_OUT)
@@ -349,7 +368,7 @@ PROCESSOR (
     stack_push(&(processor->proc_stack), input_value);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_IN], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_IN], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_IN)
@@ -364,7 +383,7 @@ PROCESSOR (
     stack_push(&(processor->proc_stack), sqrt(last));
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_SQRT], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_SQRT], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
     PUT_COMMAND_WITHOUT_ARGUMENTS(OPERATION_CODE_SQRT)
@@ -373,7 +392,7 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( jmp, OPERATION_CODE_JMP, 1,
 PROCESSOR (
-    int address_label = get_double_from_text(processor, &now_byte);
+    int address_label = get_byte_from_text(processor, &now_byte);
     now_byte = address_label - 2;
 ),
 DISASSEMBLER (
@@ -391,12 +410,12 @@ PROCESSOR (
     second_comparison = get_value_to_compare(processor, &now_byte);
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_CMP], disassembled_text, &index_in_disassembled_text, SPACE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_CMP], &disasm_struct, SPACE);
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(OPERATION_CODE_CMP, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(OPERATION_CODE_CMP, assembled_text, &index_in_assembled_text, &number_of_byte);
 
-    char* first_string = (char*)calloc(MAX_SIZE, sizeof(char));
+    char* first_string  = (char*)calloc(MAX_SIZE, sizeof(char));
     char* second_string = (char*)calloc(MAX_SIZE, sizeof(char));
 
     int first_value  = put_cmp_value(temp_string, assembled_text, &index_in_assembled_text, &number_of_byte, first_string,  &first_type_of_value);
@@ -415,7 +434,7 @@ PROCESSOR (
     if(fabs(first_comparison - second_comparison) < EPSILON) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        int address_label = get_double_from_text(processor, &now_byte);
+        int address_label = get_byte_from_text(processor, &now_byte);
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -434,7 +453,7 @@ PROCESSOR (
     if(fabs(first_comparison - second_comparison) >= EPSILON) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        int address_label = get_double_from_text(processor, &now_byte);
+        int address_label = get_byte_from_text(processor, &now_byte);
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -453,7 +472,7 @@ PROCESSOR (
     if(first_comparison > second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        int address_label = get_double_from_text(processor, &now_byte);
+        int address_label = get_byte_from_text(processor, &now_byte);
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -472,7 +491,7 @@ PROCESSOR (
     if(first_comparison >= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        int address_label = get_double_from_text(processor, &now_byte);
+        int address_label = get_byte_from_text(processor, &now_byte);
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -491,7 +510,7 @@ PROCESSOR (
     if(first_comparison < second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        int address_label = get_double_from_text(processor, &now_byte);
+        int address_label = get_byte_from_text(processor, &now_byte);
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -510,7 +529,7 @@ PROCESSOR (
     if(first_comparison <= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
     } else {
-        int address_label = get_double_from_text(processor, &now_byte);
+        int address_label = get_byte_from_text(processor, &now_byte);
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -526,7 +545,7 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( call, OPERATION_CODE_CALL, 1,
 PROCESSOR (
-    int address_label = get_double_from_text(processor, &now_byte);
+    int address_label = get_byte_from_text(processor, &now_byte);
 
     stack_push(&(processor->call_stack), now_byte);
     now_byte = address_label - 2;
@@ -546,10 +565,10 @@ PROCESSOR (
     now_byte = go_to_address;
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_RET], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_RET], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(OPERATION_CODE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);
+    put_opcode_into_assembled_text(OPERATION_CODE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_RET);
     listing(input_file->listing_file, "|", SPACE);
@@ -562,10 +581,11 @@ PROCESSOR (
     printf("meow\n");
 ),
 DISASSEMBLER (
-    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_MEOW], disassembled_text, &index_in_disassembled_text, END_LINE);
+    put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_MEOW], &disasm_struct, END_LINE);
 ),
 ASSEMBLER (
-    put_int_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, &index_in_assembled_text, &number_of_byte);
+    printf("--%c\n", char(OPERATION_CODE_MEOW));
+    put_opcode_into_assembled_text(OPERATION_CODE_MEOW, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, OPERATION_CODE_MEOW);
     listing(input_file->listing_file, "| meow", END_LINE);

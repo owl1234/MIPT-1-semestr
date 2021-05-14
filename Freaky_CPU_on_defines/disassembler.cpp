@@ -17,6 +17,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <unistd.h>
 #include "common.h"
 #include "disassembler.h"
 
@@ -48,7 +49,7 @@ DISASM_ERRORS file_construct(File* file, const char* name_file, const char* read
 
     file->text_for_disassembling = (double*)calloc(file->information.st_size + 2, sizeof(double));
 
-    if(file->text_for_disassembling == NULL) {
+    if(!file->text_for_disassembling) {
         return DISASM_BAD_MEMORY;
     }
 
@@ -73,33 +74,57 @@ DISASM_ERRORS destruct_file(File* file) {
     return DISASM_OKEY;
 }
 
+void print_labels(Label* labels, int length) {
+    //printf("%p\n", labels);
+    for(int i=0;i<length; ++i) {
+        printf("\t%s %d\n", labels[i].name, labels[i].byte_address);
+    }
+    printf("\n");
+}
+
+DISASM_ERRORS create_disassembler_struct(File* input_file, struct disassembler_struct* disasm_struct) {
+    disasm_struct->disassembled_text = (char*)calloc(3 * MAX_SIZE * input_file->lines, sizeof(char));
+    if(!disasm_struct->disassembled_text) {
+        return DISASM_BAD_MEMORY;
+    }
+
+    disasm_struct->index_in_disassembled_text = 0;
+    disasm_struct->now_byte = 0;
+
+    disasm_struct->labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
+    if(!disasm_struct->labels) {
+        return DISASM_BAD_MEMORY;
+    }
+
+    disasm_struct->index_in_labels = 0;
+    disasm_struct->now_position_in_labels = 0;
+
+    disasm_struct->real_size = input_file->information.st_size / sizeof(double);
+
+    return DISASM_OKEY;
+}
 
 DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file) {
     printf("Start disassembling file.........................................\n");
     printf("name_file: %s\n", input_file->name);
 
-    int now_byte = 0;
-    DISASM_ERRORS status = check_signature(input_file, &now_byte);
+    struct disassembler_struct disasm_struct = {};
+    DISASM_ERRORS status = create_disassembler_struct(input_file, &disasm_struct);
+
+    status = check_signature(input_file, &disasm_struct);
     if(status != DISASM_OKEY) {
         return status;
     }
 
-    char* disassembled_text = (char*)calloc(3 * MAX_SIZE * input_file->lines, sizeof(char));
-    int index_in_disassembled_text = 0;
+    find_labels_into_text(input_file, &disasm_struct);
+
     double now_command = 0;
 
-    Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(labels));
-    int index_in_labels = 0;
-
-    int real_size = input_file->information.st_size / sizeof(double);
-
-    find_labels_into_text(input_file, labels, &index_in_labels, real_size);
-
-    int now_position_in_labels = 0;
-
-    while(now_byte < real_size) {
-        now_command = input_file->text_for_disassembling[now_byte];
-        IF_DEBUG(printf("> now_command: %d (byte: %d) \n", (int)now_command, now_byte);)
+    print_labels(disasm_struct.labels, disasm_struct.index_in_labels);
+    printf("\n%d\n", disasm_struct.now_position_in_labels);
+    while(disasm_struct.now_byte < disasm_struct.real_size) {
+        now_command = input_file->text_for_disassembling[disasm_struct.now_byte];
+        IF_DEBUG(printf("> now_command: %d (byte: %d) (%p)\n", (int)now_command, disasm_struct.now_byte, disasm_struct.labels);)
 
         switch((int)now_command) {
 
@@ -108,17 +133,19 @@ DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file)
             default:
                 printf("popados (bad command) .....  (╯ ° □ °) ╯ (┻━┻) \n");
         }
-
-        if(now_position_in_labels < index_in_labels && now_byte == labels[now_position_in_labels].byte_address) {
-            put_char_into_disassembled_text(labels[now_position_in_labels].name, disassembled_text, &index_in_disassembled_text, NOTHING);
-            put_char_into_disassembled_text(":", disassembled_text, &index_in_disassembled_text, END_LINE);
-            ++now_position_in_labels;
+        printf("%d\n", disasm_struct.now_position_in_labels);
+        if(disasm_struct.now_position_in_labels < disasm_struct.index_in_labels && disasm_struct.now_byte == disasm_struct.labels[disasm_struct.now_position_in_labels].byte_address) {
+            put_char_into_disassembled_text(disasm_struct.labels[disasm_struct.now_position_in_labels].name, &disasm_struct, NOTHING);
+            put_char_into_disassembled_text(":", &disasm_struct, END_LINE);
+            ++(disasm_struct.now_position_in_labels);
+            printf("!!! %d\n", disasm_struct.now_position_in_labels);
         }
 
-        ++now_byte;
+        ++(disasm_struct.now_byte);
+        print_labels(disasm_struct.labels, disasm_struct.index_in_labels);
     }
 
-    status = create_disassembling_file(disassembled_text, index_in_disassembled_text, name_output_file);
+    status = create_disassembling_file(&disasm_struct, name_output_file);
     if(status != DISASM_OKEY) {
         printf("There are problems with the file %s\n", name_output_file);
         return status;
@@ -129,42 +156,45 @@ DISASM_ERRORS disassembling_file(File* input_file, const char* name_output_file)
     return DISASM_OKEY;
 }
 
-DISASM_ERRORS check_signature(File* file, int* now_byte) {
-
-    if(file->text_for_disassembling[(*now_byte)++] > VERSION) {
+DISASM_ERRORS check_signature(File* file, struct disassembler_struct* disasm_struct) {
+    if(file->text_for_disassembling[(disasm_struct->now_byte)++] > VERSION) {
         return DISASM_BAD_VERSION;
     }
 
-    if(file->text_for_disassembling[(*now_byte)++] != SIGNATURE_NAME_HASH) {
+    if(file->text_for_disassembling[(disasm_struct->now_byte)++] != SIGNATURE_NAME_HASH) {
         return DISASM_BAD_VERSION;
     }
 
     return DISASM_OKEY;
 }
 
-void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels, int real_size) {
+void find_labels_into_text(File* input_file, struct disassembler_struct* disasm_struct) {
     int number_of_byte = 0;
 
     int now_command = input_file->text_for_disassembling[number_of_byte], number_of_condition = 0;
 
-    while(number_of_byte < real_size) {
+    while(number_of_byte < disasm_struct->real_size) {
         now_command = input_file->text_for_disassembling[number_of_byte];
+        //printf("now_byte: %d\n", number_of_byte);
         if(is_code_connected_with_labels(now_command, &number_of_condition)) {
-            labels[*index_in_labels].name = (char*)calloc(MAX_SIZE, sizeof(char));
-            strcpy(labels[*index_in_labels].name, "label");
+            disasm_struct->labels[disasm_struct->index_in_labels].name = (char*)calloc(MAX_SIZE, sizeof(char));
+            strcpy(disasm_struct->labels[disasm_struct->index_in_labels].name, "label");
 
-            char* number_of_label_byte = (char*)calloc(length_of_number(*index_in_labels) + 1, sizeof(char));
-            sprintf(number_of_label_byte, "%d", *index_in_labels);
+            char* number_of_label_byte = (char*)calloc(length_of_number(disasm_struct->index_in_labels) + 1, sizeof(char));
+            sprintf(number_of_label_byte, "%d", disasm_struct->index_in_labels);
 
-            strcat(labels[*index_in_labels].name, number_of_label_byte);
+            strcat(disasm_struct->labels[disasm_struct->index_in_labels].name, number_of_label_byte);
+            //printf("I find new label! %s\n", disasm_struct->labels[disasm_struct->index_in_labels]);
 
             now_command = input_file->text_for_disassembling[++number_of_byte];
-            labels[(*index_in_labels)++].byte_address = now_command;
-
+            disasm_struct->labels[disasm_struct->index_in_labels].byte_address = now_command;
+            disasm_struct->index_in_labels++;
             free(number_of_label_byte);
         }
         ++number_of_byte;
+        //sleep(2);
     }
+        print_labels(disasm_struct->labels, disasm_struct->index_in_labels);
 
 }
 
@@ -203,47 +233,50 @@ bool is_code_connected_with_labels(int command, int* number_of_condition) {
     return command_is_condition;
 }
 
-void put_char_into_disassembled_text(const char* command, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line) {
+void put_char_into_disassembled_text(const char* command, struct disassembler_struct* disasm_struct, int flag_of_the_end_line) {
     int length_command = strlen(command);
 
+    print_labels(disasm_struct->labels, disasm_struct->index_in_labels);
     for(int i=0; i<length_command; ++i) {
-        disassembled_text[*index_in_disassembled_text] = command[i];
-        ++(*index_in_disassembled_text);
+        disasm_struct->disassembled_text[disasm_struct->index_in_disassembled_text] = command[i];
+        ++(disasm_struct->index_in_disassembled_text);
     }
 
     if(flag_of_the_end_line == END_LINE) {
-        disassembled_text[(*index_in_disassembled_text)++] = '\n';
+        disasm_struct->disassembled_text[(disasm_struct->index_in_disassembled_text)++] = '\n';
     } else {
-        disassembled_text[(*index_in_disassembled_text)++] = ' ';
+        disasm_struct->disassembled_text[(disasm_struct->index_in_disassembled_text)++] = ' ';
     }
 
-    /*if(flag_of_the_end_line != NOTHING) {
-        ++(*index_in_disassembled_text);
-    }*/
+    //printf("index_in_dasasm_text: %d\n", *index_in_disassembled_text);
+    if(flag_of_the_end_line != NOTHING) {
+        ++(disasm_struct->index_in_disassembled_text);
+    }
 
 }
 
-void put_int_into_disassembled_text(Elem_t value, char* disassembled_text, int* index_in_disassembled_text, int flag_of_the_end_line) {
+void put_int_into_disassembled_text(Elem_t value, struct disassembler_struct* disasm_struct, int flag_of_the_end_line) {
     char* temp_string = (char*)calloc(MAX_SIZE, sizeof(char));
     sprintf(temp_string, "%lg", value);
-    put_char_into_disassembled_text(temp_string, disassembled_text, index_in_disassembled_text, flag_of_the_end_line);
+    put_char_into_disassembled_text(temp_string, disasm_struct, flag_of_the_end_line);
     free(temp_string);
 }
 
-int get_double_from_text(File* file, int* now_byte) {
-    ++(*now_byte);
-    return file->text_for_disassembling[*now_byte];
+double get_double_from_text(File* file, struct disassembler_struct* disasm_struct) {
+    ++(disasm_struct->now_byte);
+    return file->text_for_disassembling[disasm_struct->now_byte];
 }
 
-DISASM_ERRORS create_disassembling_file(const char* disassembled_text, const int index_in_disassembled_text, const char* name_output_file) {
+DISASM_ERRORS create_disassembling_file(struct disassembler_struct* disasm_struct, const char* name_output_file) {
     printf("out: %s\n", name_output_file);
     FILE* output_file = fopen(name_output_file, "w");
     if(output_file == NULL) {
         return DISASM_BAD_FILE;
     }
 
-    for(int i=0; i<index_in_disassembled_text; ++i)
-        fprintf(output_file, "%c", disassembled_text[i]);
+    //printf("Be happy %d\n", disasm_struct->index_in_labels);
+    for(int i=0; i<disasm_struct->index_in_disassembled_text; ++i)
+        fprintf(output_file, "%c", disasm_struct->disassembled_text[i]);
 
     int status = fclose(output_file);
     if(status == EOF) {
@@ -262,6 +295,8 @@ int main(const int argc, const char* argv[]) {
         File file = {};
 
         status = file_construct(&file, argv[1], "r");
+        for(int i=0; i<file.information.st_size; ++i)
+            printf("%lg ", file.text_for_disassembling[i]);
         if(status == OK) {
             disassembling_file(&file, argv[2]);
         } else {
@@ -274,10 +309,11 @@ int main(const int argc, const char* argv[]) {
             printf("The program was stopped (%s).\n", TEXT_DISASM_ERRORS[status]);
             return status;
         }
+        printf("%s\n", TEXT_DISASM_ERRORS[status]);
     } else {
         help();
     }
 
-    return OK;
+    return status;
 }
 

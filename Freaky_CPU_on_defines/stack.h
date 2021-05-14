@@ -5,8 +5,9 @@
 #define IF_HASH_PROTECTION(code) code
 #define IF_DEBUG(code) code
 
-typedef double Elem_t;
-const char identity[] = "%lg";
+typedef int Elem_t;
+typedef int    Flag_t;
+const char identity[] = "%d";
 
 const int POISON = -3802;
 IF_CANARY_PROTECTION(const int CANARY = -57005;)

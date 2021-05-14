@@ -29,7 +29,7 @@ const char TEXT_PROCESSOR_ERRORS[][30] = {
 };
 
 struct Processor {
-    double* text;
+    char* text;
     int symbols;
     Stack_t proc_stack;
     Stack_t call_stack;
@@ -61,10 +61,14 @@ void print_ram(Elem_t* ram);
 
 Elem_t get_value_to_compare(Processor* processor, int* now_byte);
 
+Elem_t get_byte_from_text(Processor* processor, int* now_byte);
+
 Elem_t get_double_from_text(Processor* processor, int* now_byte);
 
 void destruct_processor(Processor* processor);
 
 PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte);
+
+inline long long get_long_long_number_from_binary(Processor* processor, int* now_byte);
 
 #endif // PROCESSOR_H

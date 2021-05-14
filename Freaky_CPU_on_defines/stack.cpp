@@ -176,14 +176,14 @@ void stack_err(Stack_t* node, struct call_of_dump arguments_of_call = stack_base
         node->stack_status = STACK_OVERFLOW;
         stack_dump(node, arguments_of_call);
     }
-    if(node->size_stack < 0) {
+    /*if(node->size_stack < 0) {
         node->stack_status = STACK_BAD_SIZE;
         stack_dump(node, arguments_of_call);
     }
     if(node->capacity < 0) {
         node->stack_status = STACK_BAD_CAPACITY;
         stack_dump(node, arguments_of_call);
-    }
+    }*/                                                 // don't need (because unsigned!)
 
     IF_HASH_PROTECTION(
     if(node != nullptr && node->data != nullptr && get_hash(node) != node->stack_hash) {
@@ -244,7 +244,7 @@ void stack_construct(Stack_t* node, const char* name_log_file) {
 }
 
 void stack_destruct(Stack_t* node) {
-    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
+    //IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     free(node->data);
     node->size_stack = POISON;
@@ -309,7 +309,7 @@ void stack_push(Stack_t* node, Elem_t value) {
 
     IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 
-    IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
+    //IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 }
 
 void stack_pop(Stack_t* node) {
