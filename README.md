@@ -11,14 +11,16 @@ Well, this repo is created for 1 semester study projects at MIPT. Below you can 
 
 This project deals with the solution of a quadratic equation. At the entrance to the program, 3 numbers are given, at the exit the user receives solutions. This work also has testing and documentation (doxygen).
 
-## [Sort lines from file](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Onegin)
+## [Onegin](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Onegin)
 
 ## [Stack implementation](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Stack)
 
 This project is a stack implementation. But it has more than just add, remove, etc. functions. It implements stack protection: hashing and canary protection.
 
-## [CPU](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/CPU) -> [Freaky CPU](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines)
+## [CPU](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines)
+It is a CPU emulator with a custom assembler language. A program written in this assembler is transformed to a binary “executable” which is executed by the CPU emulator.
 
 ## [List implementation](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/List)
 
-## [Akinator](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Akinator)
+## [Decision tree](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Akinator)
+Akinator's likeness. He can guess the object, compare two objects, name their similarities and differences, and much more (text voice acting works).
