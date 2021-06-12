@@ -1,6 +1,6 @@
 This project is Akinator's likeness. He can speak thanks to Festival technology. Guide to his skills:
 
-![guide](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Akinator/Pictures/game.png)
+![guide](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Akinator/Pictures/guide.png)
 
 Akinator can guess the hidden word (the database is [here](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Akinator/database_pro.txt) (database_pro.txt), the picture is [here](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Akinator/picture.png) (picture.png))
 
