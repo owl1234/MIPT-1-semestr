@@ -5,6 +5,8 @@
 #include "operation_codes.h"
 #include "warnings.h"
 
+#define IF_DEBUG_PARSING(code) //code
+
 const int BIG_NUMBER = 16;
 
 struct Parser {
@@ -30,7 +32,7 @@ struct Parser {
   	}
 
   	Node* get_number() {
-  		printf("GET_N\n");
+  		IF_DEBUG_PARSING(printf("GET_N\n");)
   		char* ptr_after_number = NULL;
 		double value = strtod(pointer, &ptr_after_number);
 
@@ -38,15 +40,13 @@ struct Parser {
 			return NULL;
 
 		pointer = ptr_after_number;
-		//printf("\tget_n: %lg, %s\n", value, pointer);
-
 
 		Node* tmp = node_construct(NUMBER, value, NULL, NULL);
 		return tmp;
   	}
 
   	Node* get_variable() {
-  		printf("GET_V\n");
+  		IF_DEBUG_PARSING(printf("GET_V\n");)
   		skip_spaces();
   		if('a' <= *pointer && *pointer <= 'z') {
   			Node* new_node = node_construct(VARIABLE, *pointer, NULL, NULL);
@@ -58,7 +58,7 @@ struct Parser {
   	}
 
   	Node* get_function() {
-  		printf("GET_F\n");
+  		IF_DEBUG_PARSING(printf("GET_F\n");)
   		skip_spaces();
   		Node* new_node = NULL;
   		const char* find_str = NULL;
@@ -93,7 +93,7 @@ struct Parser {
   	}
 
   	Node* get_priority() {
-  		printf("GET_P\n");
+  		IF_DEBUG_PARSING(printf("GET_P\n");)
   		skip_spaces();
   		Node* new_node = NULL;
 
@@ -114,7 +114,6 @@ struct Parser {
 
   		new_node = get_number();
   		if(new_node != NULL) {
-  			//printf("\tfind number\n");
   			return new_node;
   		}
 
@@ -130,7 +129,7 @@ struct Parser {
   	}
 
   	Node* get_unary() {
-  		printf("GET_U\n");
+  		IF_DEBUG_PARSING(printf("GET_U\n");)
   		skip_spaces();
 
   		if(*pointer == '+')
@@ -148,7 +147,7 @@ struct Parser {
   	}
 
   	Node* get_degree() {
-  		printf("GET_D\n");
+  		IF_DEBUG_PARSING(printf("GET_D\n");)
 	  	skip_spaces();
 	  	Node* left_son = get_unary();
 	  	skip_spaces();
@@ -156,7 +155,7 @@ struct Parser {
 	  	if(left_son == NULL)
 	  		return NULL;
 
-	  	if(!pointer != '^')
+	  	if(*pointer != '^')
 	  		return left_son;
 
 	  	Node* new_node = node_construct(OPERATOR, POW, left_son, NULL);
@@ -166,7 +165,7 @@ struct Parser {
   	}
 
   	Node* get_term() {
-  		printf("GET_T\n");
+  		IF_DEBUG_PARSING(printf("GET_T\n");)
   		skip_spaces();
   		Node* left_son = get_degree();
   		skip_spaces();
@@ -191,7 +190,7 @@ struct Parser {
   	}
 
   	Node* get_expression() {
-  		printf("GET_E\n");
+  		IF_DEBUG_PARSING(printf("GET_E\n");)
   		skip_spaces();
   		Node* left_son = get_term();
   		skip_spaces();
@@ -220,7 +219,7 @@ struct Parser {
   	}
 
   	Node* get_G(const char* line_to_parsing) {
-  		printf("GET_G\n");
+  		IF_DEBUG_PARSING(printf("GET_G\n");)
   		if(line_to_parsing == NULL) {
   			warning("Bad string to parsing", base_arguments_of_call);
   			return NULL;

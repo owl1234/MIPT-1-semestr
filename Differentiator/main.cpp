@@ -3,17 +3,16 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 6, 2021, 09:30:25
+        				July 6, 2021, 11:30:56
     
     What was changed?
-                        1. I still decided to upload this repository to the GitHub
-                        2. Sine and cosine differentiate normally
+                        1. Done degree differentiation
 
 	To-do list
 						1. Add other basic trigonometric functions: tg, ctg.
 						2. Add inverse trigonometric functions: arcsin, arccos, arctg, arcctg (possibly)
 						3. Add lg
-						4. MAJOR ASSIGNMENT: Add degree differentiation!
+						4. Add simplifying the formula in which there is a degree
 */
 
 #include <stdio.h>

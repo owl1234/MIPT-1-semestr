@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#define IF_DEBUG_SIMPLIFY(code) //code
+
 void simplify_expression(Tree* tree, FILE* latex) {
 	if(!tree || !latex)
 		return;
@@ -35,10 +37,8 @@ Node* shrinking(Node* node, FILE* latex, bool& is_changed) {
 			node = left_num_right_var(node, latex, is_changed);
 
 		else
-		if(node->left->type == VARIABLE && node->right->type == NUMBER) {
-			//printf("\n\nhhihih\n");
+		if(node->left->type == VARIABLE && node->right->type == NUMBER) 
 			node = left_var_right_num(node, latex, is_changed);
-		}
 
 		else
 		if(node->left->type == OPERATOR && node->right->type == NUMBER) {
@@ -55,8 +55,6 @@ Node* shrinking(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right)
 		node->right = shrinking(node->right, latex, is_changed);
 
-	//printf("end now: %d\n", node->value);
-
 	return node;
 }
 
@@ -70,7 +68,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 			node->type  = NUMBER;
 			free(node->left);  node->left  = NULL;
 			free(node->right); node->right = NULL;
-			printf("add!\n");
+			IF_DEBUG_SIMPLIFY(printf("add!\n");)
 			is_changed = true;
 
 		case SUB:
@@ -79,7 +77,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 				node->type  = NUMBER;
 				free(node->left);  node->left  = NULL;
 				free(node->right); node->right = NULL;
-				printf("sub!\n");
+				IF_DEBUG_SIMPLIFY(printf("sub!\n");)
 				is_changed = true;
 			}
 
@@ -89,14 +87,14 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 				node->type  = NUMBER;
 				free(node->left);  node->left  = NULL;
 				free(node->right); node->right = NULL;
-				printf("mul!\n");
+				IF_DEBUG_SIMPLIFY(printf("mul!\n");)
 				is_changed = true;
 			}
 
 		case DIV:
 			if(node->type == OPERATOR) {
 				node->value = node->left->value / node->right->value;
-				printf("div! %d\n", node->value);
+				IF_DEBUG_SIMPLIFY(printf("div! %d\n", node->value);)
 
 				node->type  = NUMBER;
 				free(node->left);  node->left  = NULL;
@@ -110,7 +108,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 				node->type  = NUMBER;
 				free(node->left);  node->left  = NULL;
 				free(node->right); node->right = NULL;
-				printf("pow! %d\n", node->value);
+				IF_DEBUG_SIMPLIFY(printf("pow! %d\n", node->value);)
 				is_changed = true;							
 			}
 	}
@@ -127,7 +125,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left num right var .... add! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left num right var .... add! %d\n", node->value);)
 		is_changed = true;				
 	} 
 
@@ -137,7 +135,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left num right var .... sub! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left num right var .... sub! %d\n", node->value);)
 		is_changed = true;				
 	}
 
@@ -147,7 +145,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left num right var .... mul+! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left num right var .... mul+! %d\n", node->value);)
 		is_changed = true;				
 	} 	
 
@@ -157,7 +155,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left num right var .... mul+! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left num right var .... mul+! %d\n", node->value);)
 		is_changed = true;				
 	} 
 
@@ -167,7 +165,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left num right var .... mul-! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left num right var .... mul-! %d\n", node->value);)
 		is_changed = true;				
 	} 
 
@@ -177,7 +175,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left num right var .... div! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left num right var .... div! %d\n", node->value);)
 		is_changed = true;				
 	}		
 
@@ -193,7 +191,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left var right num .... 0 add! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 add! %d\n", node->value);)
 		is_changed = true;				
 	} 
 
@@ -203,7 +201,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left var right num .... 0 sub! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 sub! %d\n", node->value);)
 		is_changed = true;				
 	}
 
@@ -213,7 +211,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left var right num .... 0 mul! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 mul! %d\n", node->value);)
 		is_changed = true;			
 	} 
 
@@ -223,7 +221,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left var right num .... 1 mul! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left var right num .... 1 mul! %d\n", node->value);)
 		is_changed = true;				
 	} 
 
@@ -233,7 +231,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left var right num .... -1 mul! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left var right num .... -1 mul! %d\n", node->value);)
 		is_changed = true;				
 	} 
 
@@ -243,7 +241,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left var right num .... 0 div! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 div! %d\n", node->value);)
 		is_changed = true;				
 	}		
 
@@ -259,7 +257,7 @@ static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
 		node->type = NUMBER;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
-		printf("left oper right num .... 0! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left oper right num .... 0! %d\n", node->value);)
 		is_changed = true;				
 	}
 
@@ -267,7 +265,7 @@ static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 1 && node->value == MUL) {
 		Node* new_node = NULL;
 		node_make_copy(node->left, new_node);
-		printf("left oper right num .... 1! %d\n", node->value);
+		IF_DEBUG_SIMPLIFY(printf("left oper right num .... 1! %d\n", node->value);)
 		is_changed = true;	
 		return new_node;	
 	}

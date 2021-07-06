@@ -40,25 +40,8 @@ Node* node_construct(const NODE_TYPE type, const Type_value value, Node* left_so
 	new_node->type  = type;
 	new_node->value = value;
 
-	//printf("%p, %p\n", left_son, right_son);
-
-	//if(!left_son)
-		new_node->left = left_son;
-	//else
-	//	node_make_copy(new_node->left, left_son);
-
-	//if(!right_son)
-		new_node->right = right_son;
-	//else
-	//	node_make_copy(new_node->right, right_son);
-
-	//new_node->left  = left_son;
-	/*printf("!\n");
-	printf("@\n");
-	node_make_copy(new_node->right, right_son);
-	printf("#\n");*/
-	//new_node->right = right_son;
-	//printf("%p, %p\n", left_son, right_son);
+	new_node->left = left_son;
+	new_node->right = right_son;
 
 	new_node->number_node = counter++;
 

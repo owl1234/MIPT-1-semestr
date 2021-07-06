@@ -17,16 +17,23 @@ void latex_node(const Node* node, FILE* latex) {
 		return;
 
 	if(node->type == OPERATOR && COUNT_OF_ARGS[node->value] == 1) {
-		fprintf(latex, "%s(", TEXT_OPERATIONS[node->value]);
+		fprintf(latex, "%s", TEXT_OPERATIONS[node->value]);
+		if((node->value == SIN || node->value == COS) && node->left->type == NUMBER)		// add other functions with one argument
+			fprintf(latex, "(");
+
 		latex_node(node->left, latex);
-		fprintf(latex, ")");
+
+		if((node->value == SIN || node->value == COS) && node->left->type == NUMBER)		// add other functions with one argument
+			fprintf(latex, ")");
 
 		return;
 	} 	
 
 	if(node->type == NUMBER)
 		fprintf(latex, "%d", node->value);
-	else if(node->type == VARIABLE)
+
+	else
+	if(node->type == VARIABLE)
 		fprintf(latex, "%c", node->value);
 	else {
 		if(node->value == ADD || node->value == SUB)
@@ -34,10 +41,18 @@ void latex_node(const Node* node, FILE* latex) {
 
 		latex_node(node->left,  latex);
 		fprintf(latex, "%s", TEXT_OPERATIONS[node->value]);
+
+		if(node->value == POW)
+			fprintf(latex, "{");	
+
 		latex_node(node->right, latex);
 		
 		if(node->value == ADD || node->value == SUB)
 			fprintf(latex, ")");
+		
+		else
+		if(node->value == POW)
+			fprintf(latex, "}");		
 	}
 }
 

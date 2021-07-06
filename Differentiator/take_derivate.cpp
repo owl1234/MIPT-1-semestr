@@ -32,16 +32,16 @@ Node* derivate_node(Node* node, FILE* latex) {
 			node = derivate_div(node, latex);
 
 		else
-		if(node->value == SIN) {
-			node = derivate_sin(node, latex);
-			//test_latex(node, latex, "from sin: ");
-		}
+		if(node->value == POW)
+			node = derivate_pow(node, latex);
 
 		else
-		if(node->value == COS) {
+		if(node->value == SIN) 
+			node = derivate_sin(node, latex);
+	
+		else
+		if(node->value == COS) 
 			node = derivate_cos(node, latex);
-			//test_latex(node, latex, "from sin: ");
-		}		
 
 
 	} else {
@@ -63,14 +63,14 @@ static Node* derivate_add_and_sub(Node* node, FILE* latex) {
 }
 
 static Node* derivate_mul(Node* node, FILE* latex) {
-	if(!node || !latex)
+	if(!node || !latex || !node->left || !node->right)
 		return node;
 
-	printf("node: type %d, value %d\n", node->type, node->value);
+	/*printf("node: type %d, value %d\n", node->type, node->value);
 	if(node->left)
 		printf("node->left: type %d, value %d\n", node->left->type, node->left->value);
 	if(node->right)
-		printf("node->right: type %d, value %d\n\n", node->right->type, node->right->value);
+		printf("node->right: type %d, value %d\n\n", node->right->type, node->right->value);*/
 
 	Node* old_left  = node_construct(node->left->type,  node->left->value,  NULL, NULL);
 	Node* old_right = node_construct(node->right->type, node->right->value, NULL, NULL);		
@@ -84,13 +84,8 @@ static Node* derivate_mul(Node* node, FILE* latex) {
 	node_make_copy(old_left, der_old_left);
 	node_make_copy(old_right, der_old_right);
 
-	der_old_left  = derivate_node(der_old_left, latex);
+	der_old_left  = derivate_node(der_old_left,  latex);
 	der_old_right = derivate_node(der_old_right, latex);
-
-	if(node->right && node->right->value == 6) {
-		test_latex(old_right, latex, "AAAA derivate sin(...): ");
-		test_latex(der_old_right, latex, "AAAA derivate sin(...): ");
-	}
 
 	Node* new_left  = node_construct(OPERATOR, MUL, NULL,  NULL);
 	Node* new_right = node_construct(OPERATOR, MUL, NULL, NULL);
@@ -115,6 +110,80 @@ static Node* derivate_div(Node* node, FILE* latex) {
 	return node;
 }
 
+static Node* derivate_pow(Node* node, FILE* latex) {
+	if(!node || !latex || !node->left || !node->right)
+		return node;
+
+	Node* old_left  = node_construct(node->left->type,  node->left->value,  NULL, NULL);
+	Node* old_right = node_construct(node->right->type, node->right->value, NULL, NULL);
+
+	node_make_copy(node->left,  old_left);
+	node_make_copy(node->right, old_right);
+
+	Node* der_old_left  = node_construct(old_left->type,  old_left->value,  NULL, NULL);
+	Node* der_old_right = node_construct(old_right->type, old_right->value, NULL, NULL);
+
+	node_make_copy(old_left, der_old_left);
+	node_make_copy(old_right, der_old_right);
+
+	der_old_left  = derivate_node(der_old_left,  latex);
+	der_old_right = derivate_node(der_old_right, latex);
+
+	return do_derivating_pow(old_left, old_right, der_old_left, der_old_right);
+}
+
+static inline Node* do_derivating_pow(Node* left, Node* right, Node* der_left, Node* der_right) {
+	//---------------------------------------- make left -------------------------------------------
+
+	Node* answer_left = node_construct(OPERATOR, MUL, NULL, NULL);
+	node_make_copy(der_left, answer_left->right);
+
+	Node* answer_left_left = node_construct(OPERATOR, MUL, NULL, NULL);
+	node_make_copy(right, answer_left_left->left);
+
+	Node* answer_left_left_right = node_construct(OPERATOR, POW, NULL, NULL);
+	node_make_copy(left, answer_left_left_right->left);
+
+	Node* answer_left_left_right_right = node_construct(OPERATOR, SUB, NULL, NULL);
+	node_make_copy(right, answer_left_left_right_right->left);
+	answer_left_left_right_right->right = node_construct(NUMBER, 1, NULL, NULL);
+
+	node_make_copy(answer_left_left_right_right, answer_left_left_right->right);
+
+	node_make_copy(answer_left_left_right, answer_left_left->right);
+
+	node_make_copy(answer_left_left, answer_left->left);
+
+	//---------------------------------------- make right -------------------------------------------
+
+	Node* answer_right = node_construct(OPERATOR, MUL, NULL, NULL);
+	node_make_copy(der_right, answer_right->right);
+
+	Node* answer_right_left = node_construct(OPERATOR, MUL, NULL, NULL);
+
+	Node* answer_right_left_left = node_construct(OPERATOR, LG, NULL, NULL);
+	node_make_copy(left, answer_right_left_left->left);
+
+	node_make_copy(answer_right_left_left, answer_right_left->left);
+
+	Node* answer_right_left_right = node_construct(OPERATOR, POW, NULL, NULL);
+	node_make_copy(left,  answer_right_left_right->left);
+	node_make_copy(right, answer_right_left_right->right);
+
+	node_make_copy(answer_right_left_right, answer_right_left->right);
+
+	node_make_copy(answer_right_left, answer_right->left);
+
+	//---------------------------------------- make answer -------------------------------------------
+
+	Node* answer = node_construct(OPERATOR, ADD, NULL, NULL);
+	node_make_copy(answer_left,  answer->left);
+	node_make_copy(answer_right, answer->right);
+
+	return answer;
+}
+
+
 static Node* derivate_sin(Node* node, FILE* latex) {
 	if(!node || !latex)
 		return node;
@@ -131,8 +200,6 @@ static Node* derivate_sin(Node* node, FILE* latex) {
 
 	der_arg = derivate_node(der_arg, latex);
 	node_make_copy(der_arg, answer->right);
-
-	//test_latex(answer, latex, "answer from sin: ");
 
 	return answer;
 }
