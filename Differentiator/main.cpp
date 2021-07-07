@@ -3,10 +3,10 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 6, 2021, 11:30:56
+        				July 7, 2021, 09:06:34
     
     What was changed?
-                        1. Done degree differentiation
+                        1. Differentiation of fractions is done
 
 	To-do list
 						1. Add other basic trigonometric functions: tg, ctg.

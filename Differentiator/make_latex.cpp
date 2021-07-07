@@ -43,13 +43,17 @@ void latex_node(const Node* node, FILE* latex) {
 		fprintf(latex, "%s", TEXT_OPERATIONS[node->value]);
 
 		if(node->value == POW)
-			fprintf(latex, "{");	
+			fprintf(latex, "{");
+
+		else
+		if(node->value == DIV)
+			fprintf(latex, "(");	
 
 		latex_node(node->right, latex);
 		
-		if(node->value == ADD || node->value == SUB)
+		if(node->value == ADD || node->value == SUB || node->value == DIV)
 			fprintf(latex, ")");
-		
+
 		else
 		if(node->value == POW)
 			fprintf(latex, "}");		

@@ -13,3 +13,4 @@ static Node* 			derivate_cos		 		(Node* node, FILE* latex);
 
 
 static inline Node* 	do_derivating_pow			(Node* left, Node* right, Node* der_left, Node* der_right);
+static inline Node* 	do_derivating_div			(Node* left, Node* right, Node* der_left, Node* der_right);
