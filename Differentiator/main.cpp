@@ -3,10 +3,10 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 8, 2021, 22:59:38
+        				July 8, 2021, 23:18:14
     
     What was changed?
-                        1. Cosmetic fixes
+                        1. Codacy swears at duplicates. Removed them.
 
 	To-do list
 						1. Add inverse trigonometric functions: arcsin, arccos, arctg, arcctg (possibly)
