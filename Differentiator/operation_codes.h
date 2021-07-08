@@ -16,7 +16,8 @@ enum OPERATION_CODES {
 	ARCCOS = 11,
 	ARCTG  = 12,
 	ARCCTG = 13,
-	LG     = 14
+	LN     = 14,
+	LG 	   = 15,
 };
 
 const int OPERATIONS_LENGTH[] = {
@@ -34,6 +35,7 @@ const int OPERATIONS_LENGTH[] = {
 	6,
 	5,
 	6,
+	2,
 	2
 };
 
@@ -52,6 +54,7 @@ const char TEXT_OPERATIONS[][9] = {
 	"arccos",
 	"arctg",
 	"arcctg",
+	"ln",
 	"lg"
 };
 
@@ -62,6 +65,7 @@ const int COUNT_OF_ARGS[] = {
 	2,
 	2,
 	2,
+	1,
 	1,
 	1,
 	1,

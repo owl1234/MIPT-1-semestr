@@ -5,8 +5,25 @@
 
 #define IF_DEBUG_SIMPLIFY(code) //code
 
+#define CHECK_LATEX_FILE(node)							\
+	if(!latex)											\
+		return node;
+
+#define CHECK_NODE(node)								\
+	if(!node)											\
+		return node;
+
+#define CHECK_TREE(tree)								\
+	if(!tree)											\
+		return;
+
+#define CHECK_CHILDREN(node)							\
+	if(!node->left || !node->right)						\
+		return node;
+
 void simplify_expression(Tree* tree, FILE* latex) {
-	if(!tree || !latex)
+	CHECK_TREE(tree)
+	if(!latex)
 		return;
 
 	bool is_changed = true;
@@ -20,8 +37,7 @@ void simplify_expression(Tree* tree, FILE* latex) {
 }
 
 Node* shrinking(Node* node, FILE* latex, bool& is_changed) {
-	if(!node)
-		return NULL;
+	CHECK_NODE(node);
 
 	if(node->type != OPERATOR)
 		return node;
@@ -59,10 +75,14 @@ Node* shrinking(Node* node, FILE* latex, bool& is_changed) {
 }
 
 static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
-	if(!node || !node->left || !node->right || node->left->type != NUMBER || node->right->type != NUMBER)
+	CHECK_NODE		(node);
+	CHECK_CHILDREN	(node);
+	CHECK_LATEX_FILE(node);
+
+	if(node->left->type != NUMBER || node->right->type != NUMBER)
 		return node;
 
-	switch(node->value) {
+	switch((int)node->value) {
 		case ADD:
 			node->value = node->left->value + node->right->value;
 			node->type  = NUMBER;
@@ -117,10 +137,14 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 }
 
 static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
-	if(!node || !node->left || !node->right || node->left->type != NUMBER || node->right->type != VARIABLE)
+	CHECK_NODE		(node);
+	CHECK_CHILDREN	(node);
+	CHECK_LATEX_FILE(node);
+
+	if(node->left->type != NUMBER || node->right->type != VARIABLE)
 		return node;
 
-	if(node->left->value == 0 && node->type == OPERATOR && node->value == ADD) {
+	if(node->left->value == 0. && node->type == OPERATOR && node->value == ADD) {
 		node->value = node->right->value;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
@@ -130,7 +154,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->left->value == 0 && node->type == OPERATOR && node->value == SUB) {
+	if(node->left->value == 0. && node->type == OPERATOR && node->value == SUB) {
 		node->value = -node->right->value;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
@@ -140,8 +164,8 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	}
 
 	else
-	if(node->left->value == 0 && node->type == OPERATOR && node->value == MUL) {
-		node->value = 0;
+	if(node->left->value == 0. && node->type == OPERATOR && node->value == MUL) {
+		node->value = 0.;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
@@ -150,7 +174,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	} 	
 
 	else
-	if(node->left->value == 1 && node->type == OPERATOR && node->value == MUL) {
+	if(node->left->value == 1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = node->right->value;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
@@ -160,7 +184,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->left->value == -1 && node->type == OPERATOR && node->value == MUL) {
+	if(node->left->value == -1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = -node->right->value;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
@@ -170,8 +194,8 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->left->value == 0 && node->type == OPERATOR && node->value == DIV) {
-		node->value = 0;
+	if(node->left->value == 0. && node->type == OPERATOR && node->value == DIV) {
+		node->value = 0.;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
@@ -183,10 +207,14 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 }
 
 static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
-	if(!node || !node->left || !node->right || node->left->type != VARIABLE || node->right->type != NUMBER)
+	CHECK_NODE		(node);
+	CHECK_CHILDREN	(node);
+	CHECK_LATEX_FILE(node);
+
+	if(node->left->type != VARIABLE || node->right->type != NUMBER)
 		return node;
 
-	if(node->right->value == 0 && node->type == OPERATOR && node->value == ADD) {
+	if(node->right->value == 0. && node->type == OPERATOR && node->value == ADD) {
 		node->value = node->left->value;
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
@@ -196,7 +224,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->right->value == 0 && node->type == OPERATOR && node->value == SUB) {
+	if(node->right->value == 0. && node->type == OPERATOR && node->value == SUB) {
 		node->value = -node->left->value;
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
@@ -206,8 +234,8 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	}
 
 	else
-	if(node->right->value == 0 && node->type == OPERATOR && node->value == MUL) {
-		node->value = 0;
+	if(node->right->value == 0. && node->type == OPERATOR && node->value == MUL) {
+		node->value = 0.;
 		node->type = node->right->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
@@ -216,7 +244,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->right->value == 1 && node->type == OPERATOR && node->value == MUL) {
+	if(node->right->value == 1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = node->left->value;
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
@@ -226,7 +254,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->right->value == -1 && node->type == OPERATOR && node->value == MUL) {
+	if(node->right->value == -1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = -node->left->value;
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
@@ -236,8 +264,8 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	} 
 
 	else
-	if(node->right->value == 0 && node->type == OPERATOR && node->value == DIV) {
-		node->value = 0;
+	if(node->right->value == 0. && node->type == OPERATOR && node->value == DIV) {
+		node->value = 0.;
 		node->type = node->left->type;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
@@ -249,11 +277,15 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 }
 
 static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
-	if(!node || !node->left || !node->right || node->left->type != OPERATOR || node->right->type != NUMBER)
+	CHECK_NODE		(node);
+	CHECK_CHILDREN	(node);
+	CHECK_LATEX_FILE(node);
+
+	if(node->left->type != OPERATOR || node->right->type != NUMBER)
 		return node;
 
-	if(node->right->value == 0 && node->value == MUL) {
-		node->value = 0;
+	if(node->right->value == 0. && node->value == MUL) {
+		node->value = 0.;
 		node->type = NUMBER;
 		free(node->left);  node->left  = NULL;
 		free(node->right); node->right = NULL;
@@ -262,7 +294,7 @@ static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
 	}
 
 	else
-	if(node->right->value == 1 && node->value == MUL) {
+	if(node->right->value == 1. && node->value == MUL) {
 		Node* new_node = NULL;
 		node_make_copy(node->left, new_node);
 		IF_DEBUG_SIMPLIFY(printf("left oper right num .... 1! %d\n", node->value);)
@@ -271,7 +303,7 @@ static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
 	}
 
 	else
-	if(node->right->value == 0 && node->value == ADD) {
+	if(node->right->value == 0. && node->value == ADD) {
 		return node->left;	
 	}
 
@@ -279,7 +311,11 @@ static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
 }
 
 static Node* simplify_mul(Node* node, FILE* latex, bool& is_changed) {
-	if(!node || !node->left || !node->right || !(node->type == OPERATOR && node->value == MUL))
+	CHECK_NODE		(node);
+	CHECK_CHILDREN	(node);
+	CHECK_LATEX_FILE(node);
+
+	if(!(node->type == OPERATOR && node->value == MUL))
 		return node;
 
 	if(node->left->type == NUMBER && node->right->type == OPERATOR && node->right->value == MUL) {

@@ -3,16 +3,15 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 7, 2021, 09:06:34
+        				July 8, 2021, 22:48:34
     
     What was changed?
-                        1. Differentiation of fractions is done
+                        1. Differentiation of lg and ln is done
+               			2. Also add tg and ctg
 
 	To-do list
-						1. Add other basic trigonometric functions: tg, ctg.
-						2. Add inverse trigonometric functions: arcsin, arccos, arctg, arcctg (possibly)
-						3. Add lg
-						4. Add simplifying the formula in which there is a degree
+						1. Add inverse trigonometric functions: arcsin, arccos, arctg, arcctg (possibly)
+						2. Add simplifying the formula in which there is a degree
 */
 
 #include <stdio.h>

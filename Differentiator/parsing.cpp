@@ -43,7 +43,7 @@ void get_variables(Node* node, bool* used_vars) {
 	get_variables(node->left, used_vars);
 
 	if(node->type == VARIABLE) {
-		used_vars[node->value - 'a'] = true;
+		used_vars[(int)node->value - 'a'] = true;
 	}
 
 	get_variables(node->right, used_vars);
