@@ -21,6 +21,10 @@
 	if(!node->left || !node->right)						\
 		return node;
 
+#define DELETE_CHILDREN(node)							\
+	free(node->left);  node->left  = NULL;				\
+	free(node->right); node->right = NULL;
+
 void simplify_expression(Tree* tree, FILE* latex) {
 	CHECK_TREE(tree)
 	if(!latex)
@@ -86,8 +90,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 		case ADD:
 			node->value = node->left->value + node->right->value;
 			node->type  = NUMBER;
-			free(node->left);  node->left  = NULL;
-			free(node->right); node->right = NULL;
+			DELETE_CHILDREN(node)
 			IF_DEBUG_SIMPLIFY(printf("add!\n");)
 			is_changed = true;
 
@@ -95,8 +98,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 			if(node->type == OPERATOR) {
 				node->value = node->left->value - node->right->value;
 				node->type  = NUMBER;
-				free(node->left);  node->left  = NULL;
-				free(node->right); node->right = NULL;
+				DELETE_CHILDREN(node)
 				IF_DEBUG_SIMPLIFY(printf("sub!\n");)
 				is_changed = true;
 			}
@@ -105,8 +107,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 			if(node->type == OPERATOR) {
 				node->value = node->left->value * node->right->value;
 				node->type  = NUMBER;
-				free(node->left);  node->left  = NULL;
-				free(node->right); node->right = NULL;
+				DELETE_CHILDREN(node)DELETE_CHILDREN(node)
 				IF_DEBUG_SIMPLIFY(printf("mul!\n");)
 				is_changed = true;
 			}
@@ -117,8 +118,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 				IF_DEBUG_SIMPLIFY(printf("div! %d\n", node->value);)
 
 				node->type  = NUMBER;
-				free(node->left);  node->left  = NULL;
-				free(node->right); node->right = NULL;
+				DELETE_CHILDREN(node)DELETE_CHILDREN(node)
 				is_changed = true;
 			}
 
@@ -126,8 +126,7 @@ static Node* two_sons_numbers(Node* node, FILE* latex, bool& is_changed) {
 			if(node->type == OPERATOR) {
 				node->value = pow(node->left->value, node->right->value);
 				node->type  = NUMBER;
-				free(node->left);  node->left  = NULL;
-				free(node->right); node->right = NULL;
+				DELETE_CHILDREN(node)DELETE_CHILDREN(node)
 				IF_DEBUG_SIMPLIFY(printf("pow! %d\n", node->value);)
 				is_changed = true;							
 			}
@@ -147,8 +146,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	if(node->left->value == 0. && node->type == OPERATOR && node->value == ADD) {
 		node->value = node->right->value;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left num right var .... add! %d\n", node->value);)
 		is_changed = true;				
 	} 
@@ -157,8 +155,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	if(node->left->value == 0. && node->type == OPERATOR && node->value == SUB) {
 		node->value = -node->right->value;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left num right var .... sub! %d\n", node->value);)
 		is_changed = true;				
 	}
@@ -167,8 +164,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	if(node->left->value == 0. && node->type == OPERATOR && node->value == MUL) {
 		node->value = 0.;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left num right var .... mul+! %d\n", node->value);)
 		is_changed = true;				
 	} 	
@@ -177,8 +173,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	if(node->left->value == 1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = node->right->value;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left num right var .... mul+! %d\n", node->value);)
 		is_changed = true;				
 	} 
@@ -187,8 +182,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	if(node->left->value == -1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = -node->right->value;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left num right var .... mul-! %d\n", node->value);)
 		is_changed = true;				
 	} 
@@ -197,8 +191,7 @@ static Node* left_num_right_var(Node* node, FILE* latex, bool& is_changed) {
 	if(node->left->value == 0. && node->type == OPERATOR && node->value == DIV) {
 		node->value = 0.;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left num right var .... div! %d\n", node->value);)
 		is_changed = true;				
 	}		
@@ -217,8 +210,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 0. && node->type == OPERATOR && node->value == ADD) {
 		node->value = node->left->value;
 		node->type = node->left->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 add! %d\n", node->value);)
 		is_changed = true;				
 	} 
@@ -227,8 +219,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 0. && node->type == OPERATOR && node->value == SUB) {
 		node->value = -node->left->value;
 		node->type = node->left->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 sub! %d\n", node->value);)
 		is_changed = true;				
 	}
@@ -237,8 +228,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 0. && node->type == OPERATOR && node->value == MUL) {
 		node->value = 0.;
 		node->type = node->right->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 mul! %d\n", node->value);)
 		is_changed = true;			
 	} 
@@ -247,8 +237,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = node->left->value;
 		node->type = node->left->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left var right num .... 1 mul! %d\n", node->value);)
 		is_changed = true;				
 	} 
@@ -257,8 +246,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == -1. && node->type == OPERATOR && node->value == MUL) {
 		node->value = -node->left->value;
 		node->type = node->left->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left var right num .... -1 mul! %d\n", node->value);)
 		is_changed = true;				
 	} 
@@ -267,8 +255,7 @@ static Node* left_var_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 0. && node->type == OPERATOR && node->value == DIV) {
 		node->value = 0.;
 		node->type = node->left->type;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left var right num .... 0 div! %d\n", node->value);)
 		is_changed = true;				
 	}		
@@ -287,8 +274,7 @@ static Node* left_oper_right_num(Node* node, FILE* latex, bool& is_changed) {
 	if(node->right->value == 0. && node->value == MUL) {
 		node->value = 0.;
 		node->type = NUMBER;
-		free(node->left);  node->left  = NULL;
-		free(node->right); node->right = NULL;
+		DELETE_CHILDREN(node)
 		IF_DEBUG_SIMPLIFY(printf("left oper right num .... 0! %d\n", node->value);)
 		is_changed = true;				
 	}

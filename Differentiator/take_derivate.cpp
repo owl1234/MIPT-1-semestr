@@ -6,8 +6,27 @@
 
 #define IF_DEBUG_DERIVATE(code) code
 
+#define CHECK_LATEX_FILE(node)							\
+	if(!latex)											\
+		return node;
+
+#define CHECK_NODE(node)								\
+	if(!node)											\
+		return node;
+
+#define CHECK_TREE(tree)								\
+	if(!tree)											\
+		return;
+
+#define CHECK_CHILDREN(node)							\
+	if(!node->left || !node->right)						\
+		return node;
+
+
 void derivate_tree(Tree* tree, FILE* latex) {
-	if(!tree || !latex)
+	CHECK_TREE(tree)
+
+	if(!latex)
 		return;
 
 	printf("begin derivate\n");
@@ -16,8 +35,8 @@ void derivate_tree(Tree* tree, FILE* latex) {
 }
 
 Node* derivate_node(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return NULL;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	if(node->type == NUMBER) {
 		node->value = 0;
@@ -71,8 +90,8 @@ Node* derivate_node(Node* node, FILE* latex) {
 }
 
 static Node* derivate_add_and_sub(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	node->left  = derivate_node(node->left, latex);
 	node->right = derivate_node(node->right, latex);
@@ -81,8 +100,9 @@ static Node* derivate_add_and_sub(Node* node, FILE* latex) {
 }
 
 static Node* derivate_mul(Node* node, FILE* latex) {
-	if(!node || !latex || !node->left || !node->right)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
+	CHECK_CHILDREN(node)
 
 	Node* old_left  = node_construct(node->left->type,  node->left->value,  NULL, NULL);
 	Node* old_right = node_construct(node->right->type, node->right->value, NULL, NULL);		
@@ -117,8 +137,8 @@ static Node* derivate_mul(Node* node, FILE* latex) {
 }
 
 static Node* derivate_div(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* old_left  = node_construct(node->left->type,  node->left->value,  NULL, NULL);
 	Node* old_right = node_construct(node->right->type, node->right->value, NULL, NULL);
@@ -178,8 +198,9 @@ static inline Node* do_derivating_div(Node* left, Node* right, Node* der_left, N
 }
 
 static Node* derivate_pow(Node* node, FILE* latex) {
-	if(!node || !latex || !node->left || !node->right)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
+	CHECK_CHILDREN(node)
 
 	Node* old_left  = node_construct(node->left->type,  node->left->value,  NULL, NULL);
 	Node* old_right = node_construct(node->right->type, node->right->value, NULL, NULL);
@@ -252,8 +273,8 @@ static inline Node* do_derivating_pow(Node* left, Node* right, Node* der_left, N
 
 
 static Node* derivate_sin(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* answer = node_construct(OPERATOR, MUL, NULL, NULL);
 
@@ -270,8 +291,8 @@ static Node* derivate_sin(Node* node, FILE* latex) {
 }
 
 static Node* derivate_cos(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* answer_without_minus = node_construct(OPERATOR, MUL, NULL, NULL);
 
@@ -294,8 +315,8 @@ static Node* derivate_cos(Node* node, FILE* latex) {
 }
 
 static Node* derivate_tg(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* answer_left = node_construct(OPERATOR, DIV, NULL, NULL);
 
@@ -325,8 +346,8 @@ static Node* derivate_tg(Node* node, FILE* latex) {
 }
 
 static Node* derivate_ctg(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* answer_left = node_construct(OPERATOR, DIV, NULL, NULL);
 
@@ -356,8 +377,8 @@ static Node* derivate_ctg(Node* node, FILE* latex) {
 }
 
 static Node* derivate_ln(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* old_arg = node_construct(node->left->type, node->left->value, NULL, NULL);
 	node_make_copy(node->left, old_arg);
@@ -379,8 +400,8 @@ static Node* derivate_ln(Node* node, FILE* latex) {
 }
 
 static Node* derivate_lg(Node* node, FILE* latex) {
-	if(!node || !latex)
-		return node;
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
 
 	Node* get_der_ln = derivate_ln(node, latex);
 	Node* answer_right = node_construct(NUMBER, LG_10, NULL, NULL);

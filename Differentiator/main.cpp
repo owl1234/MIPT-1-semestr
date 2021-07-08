@@ -3,11 +3,10 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 8, 2021, 22:48:34
+        				July 8, 2021, 22:59:38
     
     What was changed?
-                        1. Differentiation of lg and ln is done
-               			2. Also add tg and ctg
+                        1. Cosmetic fixes
 
 	To-do list
 						1. Add inverse trigonometric functions: arcsin, arccos, arctg, arcctg (possibly)
