@@ -3,14 +3,15 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 8, 2021, 23:18:14
+        				July 9, 2021, 18:08:12
     
     What was changed?
-                        1. Codacy swears at duplicates. Removed them.
+						1. Added inverse trigonometric functions: arcsin, arccos, arctg, arcctg       
+						2. Added e as a constant              
 
 	To-do list
-						1. Add inverse trigonometric functions: arcsin, arccos, arctg, arcctg (possibly)
-						2. Add simplifying the formula in which there is a degree
+						1. Add simplifying the formula in which there is a degree, lg and others
+						2. Deal with parentheses when outputting in latex file
 */
 
 #include <stdio.h>

@@ -76,9 +76,20 @@ Node* derivate_node(Node* node, FILE* latex) {
 		if(node->value == TG || node->value == CTG)
 			node = derivate_tg_and_ctg(node, latex, (OPERATION_CODES)node->value);
 
+		else
+		if(node->value == ARCSIN || node->value == ARCCOS)
+			node = derivate_arcsin_and_arccos(node, latex, (OPERATION_CODES)node->value);
+
+		else
+		if(node->value == ARCTG || node->value == ARCCTG)
+			node = derivate_arctg_and_arcctg(node, latex, (OPERATION_CODES)node->value);
+
 
 	} else {
-		node->value = 1;
+		if(node->value == 'e')
+			node->value = 0;
+		else
+			node->value = 1;
 		node->type = NUMBER;
 	}
 
@@ -100,29 +111,18 @@ static Node* derivate_mul(Node* node, FILE* latex) {
 	CHECK_NODE(node)
 	CHECK_CHILDREN(node)
 
-	Node* old_left  = node_construct(node->left->type,  node->left->value,  NULL, NULL);
-	Node* old_right = node_construct(node->right->type, node->right->value, NULL, NULL);		
+	return take_derivate_from_children_and_call_func(node, latex, MUL);
+}
 
-	node_make_copy(node->left, old_left);			
-	node_make_copy(node->right, old_right);
-
-	Node* der_old_left  = node_construct(old_left->type,  old_left->value,  NULL, NULL);
-	Node* der_old_right = node_construct(old_right->type,  old_right->value,  NULL, NULL);
-
-	node_make_copy(old_left, der_old_left);
-	node_make_copy(old_right, der_old_right);
-
-	der_old_left  = derivate_node(der_old_left,  latex);
-	der_old_right = derivate_node(der_old_right, latex);
-
+static inline Node* do_derivating_mul(Node* left, Node* right, Node* der_left, Node* der_right, FILE* latex) {
 	Node* new_left  = node_construct(OPERATOR, MUL, NULL,  NULL);
 	Node* new_right = node_construct(OPERATOR, MUL, NULL, NULL);
 
-	node_make_copy(old_left,	  new_left->left);
-	node_make_copy(old_right,    new_right->left);
+	node_make_copy(left,  new_left->left);
+	node_make_copy(right, new_right->left);
 
-	node_make_copy(der_old_right, new_left->right);
-	node_make_copy(der_old_left, new_right->right);		
+	node_make_copy(der_right, new_left->right);
+	node_make_copy(der_left, new_right->right);		
 
 	Node* result_derivating = node_construct(OPERATOR, ADD, NULL, NULL);
 
@@ -213,7 +213,7 @@ static inline Node* do_derivating_pow(Node* left, Node* right, Node* der_left, N
 
 	Node* answer_right_left = node_construct(OPERATOR, MUL, NULL, NULL);
 
-	Node* answer_right_left_left = node_construct(OPERATOR, LG, NULL, NULL);
+	Node* answer_right_left_left = node_construct(OPERATOR, LN, NULL, NULL);
 	node_make_copy(left, answer_right_left_left->left);
 
 	node_make_copy(answer_right_left_left, answer_right_left->left);
@@ -315,6 +315,90 @@ static Node* derivate_tg_and_ctg(Node* node, FILE* latex, const OPERATION_CODES 
 	return answer;
 }
 
+static Node* derivate_arcsin_and_arccos(Node* node, FILE* latex, const OPERATION_CODES now_operation) {
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
+
+	Node* answer_left = node_construct(OPERATOR, DIV, NULL, NULL);
+	Node* answer_left_left = node_construct(NUMBER, 1, NULL, NULL);
+
+	if(now_operation == ARCCOS)
+		answer_left_left->value = -1;
+
+	Node* answer_left_right = node_construct(OPERATOR, POW, NULL, NULL);
+	Node* answer_left_right_right = node_construct(NUMBER, 0.5, NULL, NULL);
+
+	Node* answer_left_right_left = node_construct(OPERATOR, SUB, NULL, NULL);
+	Node* answer_left_right_left_left = node_construct(NUMBER, 1, NULL, NULL);
+
+	Node* answer_left_right_left_right = node_construct(OPERATOR, POW, NULL, NULL);
+	Node* answer_left_right_left_right_left = node_construct(node->left->type, node->left->value, NULL, NULL);
+	node_make_copy(node->left, answer_left_right_left_right_left);
+
+	Node* answer_left_right_left_right_right = node_construct(NUMBER, 2, NULL, NULL);
+
+	node_make_copy(answer_left_right_left_right_left,  answer_left_right_left_right->left);
+	node_make_copy(answer_left_right_left_right_right, answer_left_right_left_right->right);
+
+	node_make_copy(answer_left_right_left_left,  answer_left_right_left->left);
+	node_make_copy(answer_left_right_left_right, answer_left_right_left->right);
+
+	node_make_copy(answer_left_right_left, answer_left_right->left);
+	node_make_copy(answer_left_right_right, answer_left_right->right);
+
+	node_make_copy(answer_left_left,  answer_left->left);
+	node_make_copy(answer_left_right, answer_left->right);
+
+	Node* der_arg = node_construct(node->left->type, node->left->value, NULL, NULL);
+	node_make_copy(node->left, der_arg);
+	der_arg = derivate_node(der_arg, latex);
+
+	Node* answer = node_construct(OPERATOR, MUL, NULL, NULL);
+	node_make_copy(answer_left, answer->left);
+	node_make_copy(der_arg,     answer->right);
+
+	return answer;
+}
+
+static Node* derivate_arctg_and_arcctg(Node* node, FILE* latex, const OPERATION_CODES now_operation) {
+	CHECK_LATEX_FILE(node)
+	CHECK_NODE(node)
+
+	Node* answer_left = node_construct(OPERATOR, DIV, NULL, NULL);
+	Node* answer_left_left = node_construct(NUMBER, 1, NULL, NULL);
+
+	if(now_operation == ARCCTG)
+		answer_left_left->value = -1;
+
+	Node* answer_left_right = node_construct(OPERATOR, ADD, NULL, NULL);
+	Node* answer_left_right_left = node_construct(NUMBER, 1, NULL, NULL);
+
+	Node* answer_left_right_right = node_construct(OPERATOR, POW, NULL, NULL);
+	Node* answer_left_right_right_left = node_construct(node->left->type, node->left->value, NULL, NULL);
+	node_make_copy(node->left, answer_left_right_right_left);
+
+	Node* answer_left_right_right_right = node_construct(NUMBER, 2, NULL, NULL);
+
+	node_make_copy(answer_left_right_right_left,  answer_left_right_right->left);
+	node_make_copy(answer_left_right_right_right, answer_left_right_right->right);	
+
+	node_make_copy(answer_left_right_left,  answer_left_right->left);
+	node_make_copy(answer_left_right_right, answer_left_right->right);
+
+	node_make_copy(answer_left_left,  answer_left->left);
+	node_make_copy(answer_left_right, answer_left->right);
+
+	Node* der_arg = node_construct(node->left->type, node->left->value, NULL, NULL);
+	node_make_copy(node->left, der_arg);
+	der_arg = derivate_node(der_arg, latex);
+
+	Node* answer = node_construct(OPERATOR, MUL, NULL, NULL);
+	node_make_copy(answer_left, answer->left);
+	node_make_copy(der_arg,     answer->right);
+
+	return answer;
+}
+
 static Node* derivate_ln(Node* node, FILE* latex) {
 	CHECK_LATEX_FILE(node)
 	CHECK_NODE(node)
@@ -380,6 +464,10 @@ static inline Node* take_derivate_from_children_and_call_func(Node* node, FILE* 
 	else
 	if(now_operation == DIV)
 		return do_derivating_div(old_left, old_right, der_old_left, der_old_right, latex);
+
+	else
+	if(now_operation == MUL)
+		return do_derivating_mul(old_left, old_right, der_old_left, der_old_right, latex);
 
 	return node;
 }
