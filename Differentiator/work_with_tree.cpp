@@ -5,6 +5,8 @@
 #include "operation_codes.h"
 
 int counter = 1;
+int calloc_count = 0;
+int destruct_count = 0;
 
 ERRORS_TYPE tree_construct(Tree* tree) {
 	if(!tree)
@@ -49,11 +51,20 @@ Node* node_construct(const NODE_TYPE type, const Type_value value, Node* left_so
 }
 
 ERRORS_TYPE node_destruct(Node* node) {
-	if(!node)
+	if(!node) {
+		free(node);
 		return NODE_OKEY;
+	}
 
-	node_destruct(node->left);
-	node_destruct(node->right);
+	if(node->left && (node->left->type == VARIABLE || node->left->type == NUMBER))
+		free(node->left);
+	else if(node->left)
+		node_destruct(node->left);
+
+	if(node->right && (node->right->type == VARIABLE || node->right->type == NUMBER))
+		free(node->right);
+	else if(node->right)
+		node_destruct(node->right);
 
 	return NODE_OKEY;
 }
@@ -171,6 +182,8 @@ void node_make_copy(Node* from, Node*& to) {
 		to->value = from->value;
 		to->type = from->type;
 		to->number_node = from->number_node;
+		to->left  = NULL;
+		to->right = NULL;
 	}
 
 	/*if(!from->left && !from->right) {

@@ -22,6 +22,11 @@
 	if(!node->left || !node->right)						\
 		return node;
 
+#define FREE_NODE(node)									\
+	free(node->left);									\
+	free(node->right);									\
+	free(node);											
+
 
 void derivate_tree(Tree* tree, FILE* latex) {
 	CHECK_TREE(tree)
@@ -39,8 +44,18 @@ Node* derivate_node(Node* node, FILE* latex) {
 	CHECK_NODE(node)
 
 	if(node->type == NUMBER) {
+		fprintf(latex, "Derivatives of a number are easy! Look at it: \n$$ ");
+		latex_node(node, latex, false);
+		fprintf(latex, "' = 0 $$\n");
 		node->value = 0;
 	} else if(node->type == OPERATOR) {
+		Node* old_node = node_construct(node->type, node->value, NULL, NULL);
+		node_make_copy(node, old_node);
+
+		fprintf(latex, "This expression is quite complex. Let's try to differentiate it piece by piece: \n$$ (");
+		latex_node(node, latex, true);
+		fprintf(latex, ")'$$\n");
+
 		if(node->value == ADD || node->value == SUB) 
 			node = derivate_add_and_sub(node, latex);
 
@@ -84,12 +99,23 @@ Node* derivate_node(Node* node, FILE* latex) {
 		if(node->value == ARCTG || node->value == ARCCTG)
 			node = derivate_arctg_and_arcctg(node, latex, (OPERATION_CODES)node->value);
 
+		fprintf(latex, "Come back to our expression: \n$$ (");
+		latex_node(old_node, latex, true);
+		fprintf(latex, ")' = \n");
+		latex_node(node, latex, false);
+		fprintf(latex, " $$\n");
+
+		FREE_NODE(old_node)
 
 	} else {
-		if(node->value == 'e')
+		if(node->value == 'e') {
+			fprintf(latex, "e is a number, so its derivative is extremely simple: \n$$ e' = 0 $$\n");
 			node->value = 0;
-		else
+		}
+		else {
+			fprintf(latex, "Variable is fairly easy to work with when differentiating: \n$$ %c' = 1 $$\n", (int)node->value);
 			node->value = 1;
+		}
 		node->type = NUMBER;
 	}
 
@@ -128,6 +154,9 @@ static inline Node* do_derivating_mul(Node* left, Node* right, Node* der_left, N
 
 	node_make_copy(new_left,  result_derivating->left);
 	node_make_copy(new_right, result_derivating->right);
+
+	FREE_NODE(new_left)
+	FREE_NODE(new_right)
 
 	return result_derivating;
 }
@@ -172,6 +201,12 @@ static inline Node* do_derivating_div(Node* left, Node* right, Node* der_left, N
 	Node* answer = node_construct(OPERATOR, DIV, NULL, NULL);
 	node_make_copy(answer_left,  answer->left);
 	node_make_copy(answer_right, answer->right);
+
+	FREE_NODE(answer_left)
+	FREE_NODE(answer_left_left)
+	FREE_NODE(answer_left_right)
+	FREE_NODE(answer_right)			          
+	FREE_NODE(answer_right_right)
 
 	return answer;
 }
@@ -232,6 +267,15 @@ static inline Node* do_derivating_pow(Node* left, Node* right, Node* der_left, N
 	node_make_copy(answer_left,  answer->left);
 	node_make_copy(answer_right, answer->right);
 
+	FREE_NODE(answer_left)
+	FREE_NODE(answer_left_left)
+	FREE_NODE(answer_left_left_right)
+	FREE_NODE(answer_left_left_right_right)
+	FREE_NODE(answer_right)
+	FREE_NODE(answer_right_left)
+	FREE_NODE(answer_right_left_left)
+	FREE_NODE(answer_right_left_right)
+
 	return answer;
 }
 
@@ -250,6 +294,8 @@ static Node* derivate_sin(Node* node, FILE* latex) {
 
 	der_arg = derivate_node(der_arg, latex);
 	node_make_copy(der_arg, answer->right);
+
+	FREE_NODE(der_arg)
 
 	return answer;
 }
@@ -274,6 +320,9 @@ static Node* derivate_cos(Node* node, FILE* latex) {
 	Node* answer = node_construct(OPERATOR, MUL, NULL, NULL);
 	answer->left = node_construct(NUMBER, -1, NULL, NULL);
 	node_make_copy(answer_without_minus, answer->right);
+
+	FREE_NODE(answer_without_minus)
+	FREE_NODE(der_arg)
 
 	return answer;
 }
@@ -311,6 +360,13 @@ static Node* derivate_tg_and_ctg(Node* node, FILE* latex, const OPERATION_CODES 
 	Node* answer = node_construct(OPERATOR, MUL, NULL, NULL);
 	node_make_copy(answer_left, answer->left);
 	node_make_copy(answer_right, answer->right);
+
+	FREE_NODE(answer_left)
+	FREE_NODE(answer_left_left)
+	FREE_NODE(answer_left_right)
+	FREE_NODE(answer_left_right_left)
+	FREE_NODE(answer_left_right_right)
+	FREE_NODE(answer_right)
 
 	return answer;
 }
@@ -357,6 +413,17 @@ static Node* derivate_arcsin_and_arccos(Node* node, FILE* latex, const OPERATION
 	node_make_copy(answer_left, answer->left);
 	node_make_copy(der_arg,     answer->right);
 
+	FREE_NODE(answer_left)
+	FREE_NODE(answer_left_left)
+	FREE_NODE(answer_left_right)
+	FREE_NODE(answer_left_right_right)
+	FREE_NODE(answer_left_right_left)
+	FREE_NODE(answer_left_right_left_left)
+	FREE_NODE(answer_left_right_left_right)
+	FREE_NODE(answer_left_right_left_right_left)
+	FREE_NODE(answer_left_right_left_right_right)
+	FREE_NODE(der_arg)
+
 	return answer;
 }
 
@@ -396,6 +463,15 @@ static Node* derivate_arctg_and_arcctg(Node* node, FILE* latex, const OPERATION_
 	node_make_copy(answer_left, answer->left);
 	node_make_copy(der_arg,     answer->right);
 
+	FREE_NODE(answer_left)
+	FREE_NODE(answer_left_left)
+	FREE_NODE(answer_left_right)
+	FREE_NODE(answer_left_right_left)
+	FREE_NODE(answer_left_right_right)
+	FREE_NODE(answer_left_right_right_left)
+	FREE_NODE(answer_left_right_right_right)
+	FREE_NODE(der_arg)
+
 	return answer;
 }
 
@@ -419,6 +495,11 @@ static Node* derivate_ln(Node* node, FILE* latex) {
 	node_make_copy(answer_left, answer->left);
 	node_make_copy(der_old_arg, answer->right);
 
+	FREE_NODE(old_arg)
+	FREE_NODE(answer_left)
+	FREE_NODE(answer_left_left)
+	FREE_NODE(der_old_arg)
+
 	return answer;
 }
 
@@ -432,6 +513,9 @@ static Node* derivate_lg(Node* node, FILE* latex) {
 	Node* answer = node_construct(OPERATOR, DIV, NULL, NULL);
 	node_make_copy(get_der_ln, answer->left);
 	node_make_copy(answer_right, answer->right);
+
+	FREE_NODE(get_der_ln)
+	FREE_NODE(answer_right)
 
 	return answer;
 }
@@ -459,15 +543,22 @@ static inline Node* take_derivate_from_children_and_call_func(Node* node, FILE* 
 	der_old_left  = derivate_node(der_old_left,  latex);
 	der_old_right = derivate_node(der_old_right, latex);
 
-	if(now_operation == POW)
-		return do_derivating_pow(old_left, old_right, der_old_left, der_old_right, latex);
+	Node* answer = NULL;
+
+	if(now_operation == POW) 
+		node_make_copy(do_derivating_pow(old_left, old_right, der_old_left, der_old_right, latex), answer);
 	else
 	if(now_operation == DIV)
-		return do_derivating_div(old_left, old_right, der_old_left, der_old_right, latex);
+		node_make_copy(do_derivating_div(old_left, old_right, der_old_left, der_old_right, latex), answer);
 
 	else
 	if(now_operation == MUL)
-		return do_derivating_mul(old_left, old_right, der_old_left, der_old_right, latex);
+		node_make_copy(do_derivating_mul(old_left, old_right, der_old_left, der_old_right, latex), answer);
 
-	return node;
+	FREE_NODE(old_left)
+	FREE_NODE(old_right)
+	FREE_NODE(der_old_left)
+	FREE_NODE(der_old_right)
+
+	return answer;
 }

@@ -1,26 +1,56 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\title{k}
-\author{heiduk.k.k.s }
-\date{April 2021}
+\title{Research paper on the topic "Differentiation of complex functions"}
+\author{Kolesnikova Xenia}
+\date{July 2021}
 \usepackage{natbib}
 \usepackage{graphicx}
 \begin{document}
 \maketitle
 \centering
+\section{\Large{Simplification before differentiation}}
+\centering
 We want to differentiate this expression:
-$$ (e)^{x}$$
-\centering
-Let's simplify the expression:
-$$ (e)^{x}$$
-\centering
+$$ x+5*arcctg(ln(6*y)) $$
+\section{\Large{Differentiation}}
+This expression is quite complex. Let's try to differentiate it piece by piece: 
+$$ (x+5*arcctg(ln(6*y)))'$$
+Variable is fairly easy to work with when differentiating: 
+$$ x' = 1 $$
+This expression is quite complex. Let's try to differentiate it piece by piece: 
+$$ (5*arcctg(ln(6*y)))'$$
+Derivatives of a number are easy! Look at it: 
+$$ 5' = 0 $$
+This expression is quite complex. Let's try to differentiate it piece by piece: 
+$$ (arcctg(ln(6*y)))'$$
+This expression is quite complex. Let's try to differentiate it piece by piece: 
+$$ (ln(6*y))'$$
+This expression is quite complex. Let's try to differentiate it piece by piece: 
+$$ (6*y)'$$
+Derivatives of a number are easy! Look at it: 
+$$ 6' = 0 $$
+Variable is fairly easy to work with when differentiating: 
+$$ y' = 1 $$
+Come back to our expression: 
+$$ (6*y)' = 
+(6*1+y*0) $$
+Come back to our expression: 
+$$ (ln(6*y))' = 
+\frac{1}{6*y}*6*1+y*0 $$
+Come back to our expression: 
+$$ (arcctg(ln(6*y)))' = 
+\frac{(-1)}{1+(ln(6*y))^{2}}*\frac{1}{6*y}*(6*1+y*0) $$
+Come back to our expression: 
+$$ (5*arcctg(ln(6*y)))' = 
+(5*\frac{(-1)}{1+(ln(6*y))^{2}}*\frac{1}{6*y}*(6*1+y*0)+arcctg(ln(6*y))*0) $$
+Come back to our expression: 
+$$ (x+5*arcctg(ln(6*y)))' = 
+(1+5*\frac{(-1)}{1+(ln(6*y))^{2}}*\frac{1}{6*y}*6*1+y*0+arcctg(ln(6*y))*0) $$
 Result:
-$$ (x*(e)^{(x-1)}*0+lne*(e)^{x}*1)$$
-\centering
-Let's simplify the expression:
-$$ (0+lne*(e)^{x})$$
-\centering
-Let's simplify the expression:
-$$ (0+lne*(e)^{x})$$
-$$ (0+lne*(e)^{x})$$
+$$ 1+(5*\frac{(-1)}{1+(ln(6*y))^{2}}*\frac{1}{6*y}*(6*1+y*0)+arcctg(ln(6*y))*0) $$
+\section{\Large{Simplification after differentiation}}$$ 1+(5*\frac{(-1)}{1+(ln(6*y))^{2}}*\frac{1}{6*y}*(6*1+y*0)+arcctg(ln(6*y))*0) $$
+\section{\Large{References}}
+\begin{enumerate} \item Author's repository - https://github.com/x-ENIAC/MIPT\underline{ }projects\underline{ }1\underline{ }sem/tree/master/Differentiator
+ \item Redkozubov's lectures
+\end{enumerate}
 \end{document}

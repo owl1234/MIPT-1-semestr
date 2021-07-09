@@ -100,8 +100,10 @@ struct Parser {
   		if(*pointer == '(') {
   			++pointer;
   			new_node = get_expression();
-  			if(new_node == NULL)
+  			if(new_node == NULL) {
+  				node_destruct(new_node);
   				return NULL;
+  			}
 
   			skip_spaces();
   			if(!require(')')) {
@@ -124,6 +126,8 @@ struct Parser {
   		new_node = get_variable();
   		if(new_node != NULL)
   			return new_node;
+
+  		node_destruct(new_node);
 
   		return NULL;
   	}
@@ -152,13 +156,17 @@ struct Parser {
 	  	Node* left_son = get_unary();
 	  	skip_spaces();
 
-	  	if(left_son == NULL)
+	  	if(left_son == NULL) {
+	  		node_destruct(left_son);
 	  		return NULL;
+	  	}
 
 	  	if(*pointer != '^')
 	  		return left_son;
 
-	  	Node* new_node = node_construct(OPERATOR, POW, left_son, NULL);
+	  	Node* new_node = node_construct(OPERATOR, POW, NULL, NULL);
+	  	node_make_copy(left_son, new_node->left);
+	  	free(left_son);
 	  	++pointer;
 	  	new_node->right = get_degree();
 	  	return new_node;
@@ -182,7 +190,9 @@ struct Parser {
   		else
   			return left_son;
 
-  		Node* new_node = node_construct(OPERATOR, code_operation, left_son, NULL);
+  		Node* new_node = node_construct(OPERATOR, code_operation, NULL, NULL);
+  	  	node_make_copy(left_son, new_node->left);
+	  	free(left_son);
   		++pointer;
   		new_node->right = get_term();
 
@@ -206,7 +216,9 @@ struct Parser {
   		else
   			return left_son;
 
-  		Node* new_node = node_construct(OPERATOR, code_operation, left_son, NULL);
+  		Node* new_node = node_construct(OPERATOR, code_operation, NULL, NULL);
+  	  	node_make_copy(left_son, new_node->left);
+	  	free(left_son);
   		++pointer;
   		new_node->right = get_expression();
 

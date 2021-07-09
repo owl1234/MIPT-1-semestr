@@ -3,15 +3,13 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				July 9, 2021, 18:08:12
+        				July 9, 2021, 23:53:28
     
     What was changed?
-						1. Added inverse trigonometric functions: arcsin, arccos, arctg, arcctg       
-						2. Added e as a constant              
+						1. The latex file has become more informative.           
 
 	To-do list
 						1. Add simplifying the formula in which there is a degree, lg and others
-						2. Deal with parentheses when outputting in latex file
 */
 
 #include <stdio.h>
@@ -38,9 +36,9 @@ int main() {
 				   "\\usepackage[utf8]{inputenc}\n"
 
 					
-				    "\\title{k}\n"
-			 		"\\author{heiduk.k.k.s }\n"
-					"\\date{April 2021}\n"
+				    "\\title{Research paper on the topic \"Differentiation of complex functions\"}\n"
+			 		"\\author{Kolesnikova Xenia}\n"
+					"\\date{July 2021}\n"
 
 					"\\usepackage{natbib}\n"
 					"\\usepackage{graphicx}\n"
@@ -48,6 +46,8 @@ int main() {
 					"\\begin{document}\n"
 
 					"\\maketitle\n"
+					"\\centering\n"
+					"\\section{\\Large{Simplification before differentiation}}\n"
 			);
     
     fprintf(latex, "\\centering\nWe want to differentiate this expression:\n");
@@ -57,20 +57,32 @@ int main() {
 
     draw_tree(&tree);
 
+    fprintf(latex, "\\section{\\Large{Differentiation}}\n");
+
     derivate_tree(&tree, latex);
 
-    fprintf(latex, "\\centering\nResult:\n");
+    fprintf(latex, "Result:\n");
 	latex_tree(&tree, latex);
 	
 	draw_tree(&tree);
 
-	simplify_expression(&tree, latex);
+	fprintf(latex, "\\section{\\Large{Simplification after differentiation}}");
+
+	//simplify_expression(&tree, latex);
 
 	latex_tree(&tree, latex);
 	
 	draw_tree(&tree);	
 
-    fprintf(latex, "\\end{document}\n");
+	fprintf(latex, "\\section{\\Large{References}}\n"
+
+					"\\begin{enumerate} \\item Author's repository - https://github.com/x-ENIAC/MIPT\\underline{ }projects\\underline{ }1\\underline{ }sem/tree/master/Differentiator\n"
+
+									  " \\item Redkozubov's lectures\n"
+
+					"\\end{enumerate}\n"
+					
+					"\\end{document}\n");
 
     fclose(latex);
 
