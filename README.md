@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/29b09e22d54f499f96ea23995d2d2116)](https://www.codacy.com/gh/x-ENIAC/MIPT_projects_1_sem/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=x-ENIAC/MIPT_projects_1_sem&amp;utm_campaign=Badge_Grade)
+
 ### Hello everyone who sees this repo! Don't worry, be happy and always be in a good mood! Happy New Year! 🎄🍊
 
 ![image](https://s1.1zoom.ru/big3/913/Cats_Christmas_Toys_463561.jpg)
