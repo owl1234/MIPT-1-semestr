@@ -1,0 +1,45 @@
+digraph graphname {
+	node2 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="q"]
+	node8 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node8 -> node2
+	node8 -> node4
+	node9 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="2"]
+	node4 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="*"]
+	node4 -> node9
+	node4 -> node10
+	node11 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="8"]
+	node10 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="+"]
+	node10 -> node11
+	node10 -> node12
+	node12 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
+	node1 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label=";"]
+	node1 -> node8
+	node1 -> node13
+	node14 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
+	node19 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node19 -> node14
+	node19 -> node16
+	node20 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="9"]
+	node16 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="+"]
+	node16 -> node20
+	node16 -> node21
+	node22 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
+	node21 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="ln"]
+	node21 -> node22
+	node13 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label=";"]
+	node13 -> node19
+	node13 -> node23
+	node24 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="p"]
+	node28 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node28 -> node24
+	node28 -> node26
+	node29 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="9"]
+	node26 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="+"]
+	node26 -> node29
+	node26 -> node30
+	node30 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="8"]
+	node23 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label=";"]
+	node23 -> node28
+	node23 -> node31
+	node31 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label=";"]
+}
