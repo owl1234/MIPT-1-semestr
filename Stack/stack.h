@@ -1,6 +1,8 @@
 #ifndef H_STACK
 #define H_STACK
 
+#include "warnings.h"
+
 #define IF_CANARY_PROTECTION(code) code
 #define IF_HASH_PROTECTION(code) code
 #define IF_DEBUG(code) code
@@ -30,14 +32,8 @@ struct Stack_t {
     size_t size_stack;
     size_t capacity;
     stack_t_status stack_status;
-    int stack_hash;
+    size_t stack_hash;
     IF_CANARY_PROTECTION(int canary_right[1] = { CANARY };)
-};
-
-struct call_of_dump {
-    const char* name_file;
-    int number_of_line;
-    const char* name_function;
 };
 
 /**
@@ -48,18 +44,18 @@ struct call_of_dump {
 *   @return Hash of the stack
 */
 
-int get_hash(Stack_t* node);
+size_t get_hash(Stack_t* node);
 
 /**
-*   \brief This function prints int number to file
+*   \brief This function prints size_t number to file
 *
-*   @param value Int number
+*   @param value size_t number
 *   @param file The file to which the value will be written
 *
 *   @return Nothing
 */
 
-void print_Elem_T(int value, FILE* file);
+void print_Elem_T(size_t value, FILE* file);
 
 /**
 *   \brief This function prints double number to file
@@ -112,7 +108,7 @@ void error_print_data(Stack_t* node, FILE* file);
 *   @return Number of digits
 */
 
-int get_len_indent(size_t number);
+size_t get_len_indent(size_t number);
 
 /**
 *   \brief This function prints indetns (tabulations and space bars to file
@@ -123,7 +119,7 @@ int get_len_indent(size_t number);
 *   @return Nothing
 */
 
-void write_indent(FILE* file, int count_indent);
+void write_indent(FILE* file, size_t count_indent);
 
 /**
 *   \brief This function displays all information about the stack and the reason for calling it
@@ -147,7 +143,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call);
 */
 
 
-struct call_of_dump create_struct(const char* file_name, int number, const char* function_name);
+struct call_of_dump create_struct(const char* file_name, size_t number, const char* function_name);
 
 /**
 *   \brief This function checks the stack for simple errors and calls diagnostics in their case
@@ -170,7 +166,7 @@ void fell(Stack_t* node);
 *   @return Size of stack
 */
 
-int stack_size(Stack_t* node);
+size_t stack_size(Stack_t* node);
 
 /**
 *   \brief This function returns capacity of the stack
@@ -180,7 +176,7 @@ int stack_size(Stack_t* node);
 *   @return Capacity of stack
 */
 
-int stack_capacity(Stack_t* node);
+size_t stack_capacity(Stack_t* node);
 
 /**
 *   \brief This function constructs the stack
@@ -251,7 +247,7 @@ void fill_stack_stuff(Stack_t* node);
 *   @return Nothing
 */
 
-void stack_push(Stack_t* node, int value);
+void stack_push(Stack_t* node, Elem_t value);
 
 /**
 *   \brief This function deletes last added element of the stack

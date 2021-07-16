@@ -4,11 +4,11 @@
 #include <string.h>
 #include "stack.h"
 
-const int DIMENSION = 8;
+const size_t DIMENSION = 8;
 const long long HASH_NUMBER = 1000000009;
-const int TABULATION_IN_PROBELS = 7;
+const size_t TABULATION_IN_PROBELS = 7;
 const char* name_log_file = "log.txt";
-const struct call_of_dump base_arguments_of_call = {__FILE__, -1, " "};
+//const struct call_of_dump base_arguments_of_call = {__FILE__, -1, " "};
 
 const char* text_stack_t_status[] = {
     "Stack is okey",
@@ -26,11 +26,11 @@ const char* text_stack_t_status[] = {
 };
 
 #ifdef IF_CANARY_PROTECTION
-int get_hash(Stack_t* node) {
+size_t get_hash(Stack_t* node) {
     long long hash_st = 0;
-    int size_stack = node->size_stack;
+    size_t size_stack = node->size_stack;
     if(node->stack_status != STACK_EMPTY) {
-        for(int i=0; i<=size_stack; ++i) {
+        for(size_t i=0; i<=size_stack; ++i) {
             hash_st = (hash_st + node->data[i] % HASH_NUMBER)  % HASH_NUMBER;
         }
     } else {
@@ -65,10 +65,9 @@ bool is_canary(Elem_t value) {
 }
 
 void error_print_data(Stack_t* node, FILE* file) {
-    int stack_all_size  = node->capacity;
-    int stack_real_size = node->size_stack;
-    int len_indent = get_len_indent(node->capacity);
-    const int base_indent = 2 * TABULATION_IN_PROBELS;
+    size_t stack_all_size  = node->capacity;
+    size_t len_indent = get_len_indent(node->capacity);
+    const size_t base_indent = 2 * TABULATION_IN_PROBELS;
 
     if(node->stack_status == STACK_BAD_CAPACITY) {
         fprintf(file, "\n");
@@ -84,14 +83,12 @@ void error_print_data(Stack_t* node, FILE* file) {
             write_indent(file, base_indent);
             fprintf(file, "!!! ERROR !!! DATA IS NULL !!!\n");
         } else {
-            for(int i=0; i<stack_all_size; ++i) {
+            for(size_t i=0; i<stack_all_size; ++i) {
                 write_indent(file, base_indent - (get_len_indent(i) - len_indent));
-                if(node->data[i] == NULL) {
-                    fprintf(file, " [%d] - [%p] - !!!  NULL  !!! \t ( !!! ATTENTION !!! DATA IS NULL !!! )\n", i, &(node->data[i]));
-                } else if(node->data[i] == POISON) {
-                    fprintf(file, " [%d] - [%p] - !!! POISON !!!\n", i, &(node->data[i]));
+                if(node->data[i] == POISON) {
+                    fprintf(file, " [%lu] - [%p] - !!! POISON !!!\n", i, &(node->data[i]));
                 } else {
-                    fprintf(file, "*[%d] - [%p] \n", i, &(node->data[i]));
+                    fprintf(file, "*[%lu] - [%p] \n", i, &(node->data[i]));
                     print_Elem_T(node->data[i], file);
                 }
             }
@@ -99,8 +96,8 @@ void error_print_data(Stack_t* node, FILE* file) {
     }
 }
 
-int get_len_indent(size_t number) {
-    int len = 0;
+size_t get_len_indent(size_t number) {
+    size_t len = 0;
 
     if(number == 0) {
         ++len;
@@ -114,8 +111,8 @@ int get_len_indent(size_t number) {
     return len;
 }
 
-void write_indent(FILE* file, int count_indent) {
-    int i = 1;
+void write_indent(FILE* file, size_t count_indent) {
+    size_t i = 1;
     for(; TABULATION_IN_PROBELS * i < count_indent; i *= TABULATION_IN_PROBELS) {
         fprintf(file, "\t");
     }
@@ -128,7 +125,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     FILE* log_errors = fopen(name_log_file, "a");
 
     fprintf(log_errors, "Stack_t [%p]\n", node);
-    fprintf(log_errors, "File from which the dump is called %s from line %d (called the function %s)\n", arguments_of_call.name_file, arguments_of_call.number_of_line, arguments_of_call.name_function);
+    fprintf(log_errors, "File from which the dump is called %s from line %lu (called the function %s)\n", arguments_of_call.name_file, arguments_of_call.number_of_line, arguments_of_call.name_function);
     fprintf(log_errors, "{\n");
     fprintf(log_errors, "\tsize_stack = %ld\n", node->size_stack);
     fprintf(log_errors, "\tcapacity   = %ld\n", node->capacity);
@@ -149,7 +146,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     }
     #endif
 
-    IF_HASH_PROTECTION(fprintf(log_errors, "\tHash: %d\n", node->stack_hash);)
+    IF_HASH_PROTECTION(fprintf(log_errors, "\tHash: %lu\n", node->stack_hash);)
     fprintf(log_errors, "\tdata [%p]\n", node->data);
     fprintf(log_errors, "\t{");
     error_print_data(node, log_errors);
@@ -160,7 +157,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     fclose(log_errors);
 }
 
-struct call_of_dump create_struct(const char* file_name, int number, const char* function_name) {
+struct call_of_dump create_struct(const char* file_name, size_t number, const char* function_name) {
     struct call_of_dump tmp = {};
     tmp.name_file      = file_name;
     tmp.number_of_line = number;
@@ -223,11 +220,11 @@ void fell(Stack_t* node) {
     abort();
 }
 
-int stack_size(Stack_t* node) {
+size_t stack_size(Stack_t* node) {
     return node->size_stack;
 }
 
-int stack_capacity(Stack_t* node) {
+size_t stack_capacity(Stack_t* node) {
     IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
     return node->capacity;
@@ -260,7 +257,7 @@ void stack_destruct(Stack_t* node) {
 bool stack_is_empty(Stack_t* node){
     IF_DEBUG(stack_err(node, create_struct(__FILE__, __LINE__, __FUNCTION__));)
 
-    int size_of_stack = stack_size(node);
+    size_t size_of_stack = stack_size(node);
     if(size_of_stack == 0) {
         node->stack_status = STACK_EMPTY;
     }
@@ -287,12 +284,12 @@ void stack_resize(Stack_t* node) {
 }
 
 void fill_stack_stuff(Stack_t* node) {
-    int begin_pos = node->size_stack + 1, new_capacity = node->capacity;
+    size_t begin_pos = node->size_stack + 1, new_capacity = node->capacity;
     if(node->stack_status == STACK_IS_CREATED) {
         begin_pos = 0;
     }
 
-    for(int i=begin_pos; i<new_capacity; ++i) {
+    for(size_t i=begin_pos; i<new_capacity; ++i) {
         node->data[i] = POISON;
     }
 }

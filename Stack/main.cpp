@@ -18,7 +18,6 @@ int main(const int argc, const char* argv[]) {
     const int args_for_stack = 2;
 
     if(argc == args_for_stack) {
-        const char* name_log_file = argv[2];
         if(argv[1][0] == '-' && argv[1][1] == 's' && argc == args_for_stack) {
             return initialization_stack();
         }
