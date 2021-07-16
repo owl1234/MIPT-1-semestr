@@ -80,6 +80,8 @@ void reverse_string(char* text);
 
 int reversed_number(int value, int* length);
 
+size_t get_number_of_register_from_ram_reg_elem_t(char* search_string);
+
 void work_with_registers(int last_operation_code, int operation_code, char* assembled_text, int* index_in_assembled_text);
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition);

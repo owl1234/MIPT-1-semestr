@@ -30,9 +30,8 @@ int type_of_value(const char* operation) {
     int length = strlen(operation);
 
     for(int registr=0; registr<number_of_register_vars; ++registr) {
-        if(!strcmp(TEXT_REGISTERS[registr], operation)) {
+        if(!strcmp(TEXT_REGISTERS[registr], operation))
             return IS_REGISTER;
-        }
     }
 
     if(!(operation[0] == '[' && operation[length-1] == ']')) {
@@ -50,6 +49,10 @@ int type_of_value(const char* operation) {
             return (IS_RAM | IS_REGISTER);
         }
     }
+
+    for(int i=1; i<length-1; ++i)
+        if(!(operation[i] >= '0' && operation[i] <= '9'))
+            return (IS_RAM | IS_REGISTER | IS_ELEM_T);
 
     return (IS_ELEM_T | IS_RAM);
 }

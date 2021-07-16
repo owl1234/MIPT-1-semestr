@@ -1,5 +1,5 @@
 #define GET_ADDRESS_LABEL_GO_TO                                         \
-    int address_label = get_byte_from_text(processor, &now_byte);     \
+    int address_label = get_byte_from_text(processor, &now_byte);       \
                                                                         \
     if(address_label == OPERATION_CODE_RECURSIVE_RET) {                 \
         COMMAND_ret;                                                    \
@@ -9,16 +9,16 @@
     }
 
 #define PUT_ADDRESS_LABEL_GO_TO(code_of_operation)                                                                                      \
-    print_labels(disasm_struct.labels, disasm_struct.index_in_labels);    \
-    put_char_into_disassembled_text(TEXT_OPERATION[(int)now_command], &disasm_struct, SPACE);                                          \
-    printf("put_address: command %lg\n", now_command);      \
-    now_command = (int)get_byte_from_text(input_file, &disasm_struct);                                                                 \
-    printf("put_address: command %lg\n", now_command);                                                                                   \
+    print_labels(disasm_struct.labels, disasm_struct.index_in_labels);                                                                  \
+    put_char_into_disassembled_text(TEXT_OPERATION[(int)now_command], &disasm_struct, SPACE);                                           \
+    printf("put_address: command %lg\n", now_command);                                                                                  \
+    now_command = (int)get_byte_from_text(input_file, &disasm_struct);                                                                  \
+    printf("put_address: command %lg\n", now_command);                                                                                  \
                                                                                                                                         \
     for(int label=0; label<disasm_struct.index_in_labels; ++label) {                                                                    \
-        printf("\tput_address: %d %lg\n", disasm_struct.labels[label].byte_address, now_command);                                        \
-        if(abs(disasm_struct.labels[label].byte_address - now_command) < EPSILON) {                                                                  \
-            put_char_into_disassembled_text("meow", &disasm_struct, END_LINE);                                \
+        printf("\tput_address: %d %lg\n", disasm_struct.labels[label].byte_address, now_command);                                       \
+        if(abs(disasm_struct.labels[label].byte_address - now_command) < EPSILON) {                                                     \
+            put_char_into_disassembled_text("meow", &disasm_struct, END_LINE);                                                          \
         }                                                                                                                               \
     }                                                                                                                                   \
     printf("\t# %d, label: %d\n", disasm_struct.now_position_in_labels, disasm_struct.labels[disasm_struct.now_position_in_labels].byte_address);                                                                                                                                 \
@@ -32,7 +32,7 @@
 
 
 #define PUT_COMMAND_WITHOUT_ARGUMENTS(code_of_command)                                                                                  \
-    put_opcode_into_assembled_text(code_of_command, assembled_text, &index_in_assembled_text, &number_of_byte);                            \
+    put_opcode_into_assembled_text(code_of_command, assembled_text, &index_in_assembled_text, &number_of_byte);                         \
                                                                                                                                         \
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, code_of_command);                                                          \
     listing(input_file->listing_file, "|", SPACE);                                                                                      \
@@ -41,7 +41,7 @@
 
 #define CONDITION_COMMANDS(number_of_condition)                                                                                         \
     is_find_label = false;                                                                                                              \
-    put_opcode_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);                        \
+    put_opcode_into_assembled_text(number_of_condition, assembled_text, &index_in_assembled_text, &number_of_byte);                     \
                                                                                                                                         \
     temp_string = strtok(NULL, SEPARATORS);                                                                                             \
     for(int label=0; label<index_in_labels; ++label) {                                                                                  \
@@ -59,7 +59,7 @@
     }                                                                                                                                   \
                                                                                                                                         \
     if(!is_find_label && !strcmp(temp_string, "recret")) {                                                                              \
-        put_opcode_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);           \
+        put_opcode_into_assembled_text(OPERATION_CODE_RECURSIVE_RET, assembled_text, &index_in_assembled_text, &number_of_byte);        \
                                                                                                                                         \
         listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, number_of_condition, OPERATION_CODE_RECURSIVE_RET);                   \
         listing(input_file->listing_file, "|", SPACE);                                                                                  \
@@ -67,18 +67,31 @@
         listing(input_file->listing_file, temp_string, END_LINE);                                                                       \
     }
 
-#define FROM_RAM_TO_ELEM_T                                              \
-    for(int i=1; i<MAX_SIZE-1; ++i) {                                   \
-        handle_ram_variable[i-1] = temp_string[i];                      \
+#define FROM_RAM_TO_ELEM_T                                                  \
+    for(size_t i=1; i<MAX_SIZE-1; ++i) {                                    \
+        handle_ram_variable[i-1] = temp_string[i];                          \
     }
+
+#define TAKE_ELEM_T_FROM_RAM_REG_ELEM_T                                     \
+    size_t index_for_take_elem_t = 0;                                       \
+    for(; index_for_take_elem_t < MAX_SIZE - 1 && temp_string[index_for_take_elem_t] != '\0'; ++index_for_take_elem_t)      \
+        if(temp_string[index_for_take_elem_t] >= '0' && temp_string[index_for_take_elem_t] <= '9')                          \
+            break;                                                                                                          \
+                                                                                                                            \
+    for(size_t i = 0; i < MAX_SIZE; ++i)                                                                                    \
+        handle_ram_variable[i] = temp_string[index_for_take_elem_t + i];                                                    \
+
+#define TAKE_ELEM_T_FROM_RAM_ELEM_T                                                                                         \
+    for(size_t i = 1; i < MAX_SIZE - 1; ++i)                                                                                    \
+        handle_ram_variable[i - 1] = temp_string[i];                                                                            \
 
 
 #define ASSEMBLER(code) code
 #define PROCESSOR(code) code
 #define DISASSEMBLER(code) code;
 
-#define STACK_BACK(stack) stack_back(&stack);
-#define STACK_POP(stack)  stack_pop(&stack);
+#define STACK_BACK(stack) stack_back(&stack)
+#define STACK_POP(stack)  stack_pop(&stack)
 
 DEFINE_COMMANDS ( recursive_return, -1, 0,
 PROCESSOR (
@@ -131,7 +144,7 @@ PROCESSOR (
     } else if(flag_of_registers == IS_ELEM_T) {
         ++now_byte;
         now_value = get_long_long_number_from_binary(processor, &now_byte);
-        printf("\t\t push %d\n", now_value);
+        IF_DEBUG_PROCESSOR(printf("\t\t push %d\n", now_value);)
         stack_push(&(processor->proc_stack), now_value);
         --now_byte;
     } else if(flag_of_registers == (IS_RAM | IS_REGISTER)) {
@@ -140,22 +153,39 @@ PROCESSOR (
         if(ram_index < MAX_SIZE_RAM) {
             stack_push(&(processor->proc_stack), processor->ram[ram_index]);
         } else {
-            printf("Bad index in RAM\n");
+            printf("Bad index (%d) in RAM\n", ram_index);
         }
     } else if(flag_of_registers == (IS_RAM | IS_ELEM_T)) {
+        ++now_byte;
         now_value = get_long_long_number_from_binary(processor, &now_byte);
+        --now_byte;
         ram_index = (int)now_value;
         if(ram_index < MAX_SIZE_RAM) {
             stack_push(&(processor->proc_stack), processor->ram[ram_index]);
         } else {
             printf("Bad index in RAM\n");
         }
+    } else if(flag_of_registers == (IS_RAM | IS_REGISTER | IS_ELEM_T)) {
+        now_value = get_byte_from_text(processor, &now_byte);
+        ++now_byte;
+        int now_elem_t = get_long_long_number_from_binary(processor, &now_byte);
+        --now_byte;
+        IF_DEBUG_PROCESSOR(printf("\t\tnow_value: %d - it's reg, %d - delta\n", now_value, now_elem_t);)
+        ram_index = (int)(processor->registers_variables[(int)now_value]) + now_elem_t;
+
+        if(ram_index < MAX_SIZE_RAM) {
+            stack_push(&(processor->proc_stack), processor->ram[ram_index]);
+        } else {
+            printf("Bad index (%d) in RAM\n", ram_index);
+        }
+
+
     } else {
-        printf("Unknown value to add to the stack");
+        printf("Unknown value to add to the stack\n");
         return PROC_UNKNOWN_COMMAND;
     }
 
-    printf("\tmade push %d\n", now_value);
+    IF_DEBUG_PROCESSOR(printf("\tmade push %d, flag_of_registers %d\n", now_value, flag_of_registers);)
 ),
 DISASSEMBLER (
     put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_PUSH], &disasm_struct, SPACE);
@@ -174,6 +204,7 @@ ASSEMBLER (
     temp_string = strtok(NULL, SEPARATORS);
 
     int type_push_value = type_of_value(temp_string);
+
     put_char_into_assembled_text(type_push_value, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     if(type_push_value == IS_REGISTER || type_push_value == (IS_RAM | IS_REGISTER)) {
@@ -193,8 +224,6 @@ ASSEMBLER (
             now_value = strtod(temp_string, NULL);
         }
 
-        printf("now value: %d, %s\n", now_value, temp_string);
-
         put_int_into_assembled_text(now_value, assembled_text, &index_in_assembled_text, &number_of_byte);
 
         listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_PUSH, type_push_value);
@@ -202,6 +231,16 @@ ASSEMBLER (
         listing(input_file->listing_file, "| push ", NOTHING);
         listing(input_file->listing_file, END_LINE, (double)ONE_ARGUMENT, now_value);
 
+    } else if(type_push_value == (IS_RAM | IS_REGISTER | IS_ELEM_T)) {
+        put_char_into_assembled_text(get_number_of_register_from_ram_reg_elem_t(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
+
+        TAKE_ELEM_T_FROM_RAM_REG_ELEM_T
+
+        now_value = strtod(handle_ram_variable, NULL);
+
+        put_int_into_assembled_text(now_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+
+        IF_DEBUG_ASSEMBLER(printf("now value push: %d, %s\n", now_value, temp_string);)
     } else {
         printf("Bad type of push value! (%d)\n", type_push_value);
         return ASM_BAD_COMMAND;
@@ -220,7 +259,34 @@ PROCESSOR (
         STACK_POP(processor->proc_stack);
     } else {
         int number_of_register = get_byte_from_text(processor, &now_byte);
-        processor->registers_variables[number_of_register] = STACK_BACK(processor->proc_stack);
+        IF_DEBUG_PROCESSOR(printf("\t\t!!! number of reg: %d\n", number_of_register);)
+        IF_DEBUG_PROCESSOR(printf("\t\tstack back: %d, register #%d = %d\n", stack_back(&processor->proc_stack), number_of_register, processor->registers_variables[number_of_register]);)
+        
+        if(flag_of_registers == (IS_RAM | IS_REGISTER)) {
+            if(processor->registers_variables[number_of_register] < MAX_SIZE_RAM)
+                processor->ram[processor->registers_variables[number_of_register]] = STACK_BACK(processor->proc_stack);
+            else
+                processor->status = PROC_BAD_SIZE_PROC_STACK;
+        } else if(flag_of_registers == IS_REGISTER) {
+            processor->registers_variables[number_of_register] = STACK_BACK(processor->proc_stack);
+        } else if(flag_of_registers == (IS_RAM | IS_REGISTER | IS_ELEM_T)) {
+            ++now_byte;
+            now_value = get_long_long_number_from_binary(processor, &now_byte);
+            processor->ram[processor->registers_variables[number_of_register] + now_value] = STACK_BACK(processor->proc_stack);
+            --now_byte;
+        } else if(flag_of_registers == (IS_RAM | IS_ELEM_T)) {
+            now_value = get_long_long_number_from_binary(processor, &now_byte);
+            --now_byte;
+            if(now_value < MAX_SIZE_RAM)
+                processor->ram[now_value] = STACK_BACK(processor->proc_stack);
+            else
+                processor->status = PROC_BAD_SIZE_PROC_STACK;
+        }
+        else
+            abort();
+
+        IF_DEBUG_PROCESSOR(printf("\t\tstack back: %d, register #%d = %d (%d)\n", stack_back(&processor->proc_stack), number_of_register, processor->registers_variables[number_of_register], now_value);)
+        IF_DEBUG_PROCESSOR(printf("\t\tWell............. answer: [%d] = %d\n", processor->registers_variables[number_of_register] + now_value, processor->ram[processor->registers_variables[number_of_register] + now_value]);)
         STACK_POP(processor->proc_stack);
     }
 ),
@@ -241,17 +307,55 @@ ASSEMBLER (
     put_opcode_into_assembled_text(OPERATION_CODE_POP, assembled_text, &index_in_assembled_text, &number_of_byte);
 
     temp_string = strtok(NULL, SEPARATORS);
+    int type_pop_value = type_of_value(temp_string);
+    IF_DEBUG_ASSEMBLER(printf("\t\ttype value: %d\n", type_pop_value);)
 
-    if(type_of_value(temp_string) == IS_REGISTER) {
+    if(type_pop_value == IS_REGISTER || type_pop_value == (IS_REGISTER | IS_RAM)) {
 
-        put_char_into_assembled_text(IS_REGISTER, assembled_text, &index_in_assembled_text, &number_of_byte);
+        put_char_into_assembled_text(type_pop_value, assembled_text, &index_in_assembled_text, &number_of_byte);
         put_char_into_assembled_text(get_number_of_register(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
 
-        listing(input_file->listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_POP, IS_REGISTER, get_number_of_register(temp_string));
+        listing(input_file->listing_file, NOTHING, THREE_AGRUMENTS, OPERATION_CODE_POP, type_pop_value, get_number_of_register(temp_string));
         listing(input_file->listing_file, "| pop ", NOTHING);
         listing(input_file->listing_file, temp_string, END_LINE);
 
-    } else {
+    } else if(type_pop_value == (IS_REGISTER | IS_RAM | IS_ELEM_T)) {
+        IF_DEBUG_ASSEMBLER(printf("\tPOP IS_REGISTER | IS_RAM | IS_ELEM_T \n");)
+        put_char_into_assembled_text(type_pop_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+        IF_DEBUG_ASSEMBLER(printf("get num %d\n", get_number_of_register(temp_string));)
+        put_char_into_assembled_text(get_number_of_register_from_ram_reg_elem_t(temp_string), assembled_text, &index_in_assembled_text, &number_of_byte);
+
+        TAKE_ELEM_T_FROM_RAM_REG_ELEM_T
+
+        now_value = strtod(handle_ram_variable, NULL);
+
+        put_int_into_assembled_text(now_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+
+        IF_DEBUG_ASSEMBLER(printf("now value pop: %d, %s\n", now_value, temp_string);)
+
+        listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_POP, type_pop_value);
+        listing(input_file->listing_file, END_LINE, (double)ONE_ARGUMENT, now_value);
+        //listing(input_file->listing_file, "| pop [", NOTHING);
+        //listing(input_file->listing_file, NOTHING, (double)ONE_ARGUMENT, now_value); 
+    }  else if(type_pop_value == (IS_RAM | IS_ELEM_T)) {
+        IF_DEBUG_ASSEMBLER(printf("\tPOP IS_RAM | IS_ELEM_T \n");)
+        put_char_into_assembled_text(type_pop_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+
+        TAKE_ELEM_T_FROM_RAM_ELEM_T
+
+        now_value = strtod(handle_ram_variable, NULL);
+
+        put_int_into_assembled_text(now_value, assembled_text, &index_in_assembled_text, &number_of_byte);
+
+        IF_DEBUG_ASSEMBLER(printf("now value pop: %d, %s\n", now_value, temp_string);)
+
+        listing(input_file->listing_file, NOTHING, TWO_ARGUMENTS, OPERATION_CODE_POP, type_pop_value);
+        listing(input_file->listing_file, END_LINE, (double)ONE_ARGUMENT, now_value);
+        //listing(input_file->listing_file, "| pop [", NOTHING);
+        //listing(input_file->listing_file, NOTHING, (double)ONE_ARGUMENT, now_value); 
+    }
+
+    else {
 
         put_char_into_assembled_text(NOT_ARGS, assembled_text, &index_in_assembled_text, &number_of_byte);
 

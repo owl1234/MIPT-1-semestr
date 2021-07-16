@@ -2,12 +2,11 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  May 14, 2021, 14:25:25
+ *                  July 17, 2021, 00:15:00
+ * 
  *  @par What was changed?
- *                      1. All... ha-ha-ha. To be honest, it not well code,
-                           so I have to rewrite part of it
-                        2. For example, print assembly code into binary was changed 
-                        3. Double was killed, int is real power
+ *                      1. Add if_debug()
+ * 
  *  @par To-do list
  *                      
  *
@@ -39,6 +38,8 @@ void help() {
         code_assembler;                                                                          \
         break;                                                                                   \
     }
+
+#define IF_DEBUG_ASSEMBLER(code) //code
 
 int file_construct(File* file, char* name_file, const char* reading_mode) {
     assert(file);
@@ -151,7 +152,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
     while(temp_string != NULL) {
         number_of_command = get_number_of_command(temp_string);
-        printf("now_command: %d\n", number_of_command);
+        //printf("\n\nnow_command: %d\n", number_of_command);
 
         switch(number_of_command) {
             #include "COMMANDS.H"
@@ -242,6 +243,7 @@ bool is_it_label(const char* word) {
 
 int get_number_of_command(char* text) {
     int length = sizeof(TEXT_OPERATION) / sizeof(TEXT_OPERATION[0]);
+    //printf("%s\n", text);
 
     for(int i=0; i<length; ++i)
         if(!strcmp(text, TEXT_OPERATION[i]))
@@ -411,6 +413,18 @@ int reversed_number(int value, int* length) {
     }
 
     return reverse_number;
+}
+
+size_t get_number_of_register_from_ram_reg_elem_t(char* search_string) {
+    printf("\t\t\t\t!!!!!!!!!!!!\n");
+    for(size_t registr=0; registr<number_of_register_vars; ++registr) 
+        if(strstr(search_string, TEXT_REGISTERS[registr])) {
+            printf("\t\t\t\t!!!!!!!!!!!! %d\n", registr);
+            return registr;
+        }
+
+    printf("\t\t\t\t!!!!!!!!!!!! \n");
+    return ERROR_NUMBER;
 }
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition) {

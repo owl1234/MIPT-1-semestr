@@ -69,6 +69,6 @@ void destruct_processor(Processor* processor);
 
 PROCESSOR_ERRORS check_signature(Processor* processor, int* now_byte);
 
-inline long long get_long_long_number_from_binary(Processor* processor, int* now_byte);
+inline int get_long_long_number_from_binary(Processor* processor, int* now_byte);
 
 #endif // PROCESSOR_H

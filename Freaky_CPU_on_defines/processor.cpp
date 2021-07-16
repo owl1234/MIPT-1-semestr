@@ -2,13 +2,11 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  May 14, 2021, 14:25:25
+ *                  July 17, 2021, 00:15:00
  *  @par What was changed?
- *                      1. All... ha-ha-ha. To be honest, it not well code,
-                           so I have to rewrite part of it
-                        2. For example, print assembly code into binary was changed 
-                        3. Double was killed, int is real power
+ *                      1. Fixed [reg + num], [reg], [num]
  *  @par To-do list
+ *                      1. Fix, fix and fix...
  *                      
  *
  */
@@ -31,6 +29,8 @@
         code_processor;                                                                          \
         break;                                                                                   \
     }
+
+#define IF_DEBUG_PROCESSOR(code) //code
 
 
 /*void POPADOS() {
@@ -186,13 +186,18 @@ PROCESSOR_ERRORS processing(Processor* processor) {
 
     while(now_byte < processor->symbols && now_command != OPERATION_CODE_HLT) {
         now_command = processor->text[now_byte];
+        IF_DEBUG_PROCESSOR(
         for(int i = 0; i < processor->symbols; ++i) {
             if(i == now_byte)
                 printf("!!!");
             printf("%d ", processor->text[i]);
         }
         printf("\n");
-        printf("\nnow byte: %d, symbols: %d\n", now_byte, processor->symbols);
+        printf("\n-----------------------------------------------------------------------\n");
+        printf("\nRAX = %d, RBX = %d, RCX = %d, RDX = %d\n\n\n", processor->registers_variables[0], processor->registers_variables[1], 
+                                                                processor->registers_variables[2], processor->registers_variables[3]);
+        printf("now byte: %d, symbols: %d\n", now_byte, processor->symbols);
+        )
         //IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
 
        switch (now_command) {
@@ -203,10 +208,23 @@ PROCESSOR_ERRORS processing(Processor* processor) {
                 return PROC_UNKNOWN_COMMAND;
         }
         ++now_byte;
+
+        IF_DEBUG_PROCESSOR(
+        printf("\n\n RAX = %d, RBX = %d, RCX = %d, RDX = %d\n", processor->registers_variables[0], processor->registers_variables[1], 
+                                                                processor->registers_variables[2], processor->registers_variables[3]);
+        printf("\n\nRAM:\n");
+        for(int i = 0; i < 15; ++i)
+            if(i % 5 == 0 && i != 0)
+                printf("\n");
+            else
+                printf("[%d] = %d, ", i, processor->ram[i]);
+        )
+
+        IF_DEBUG_PROCESSOR(printf("\n-----------------------------------------------------------------------\n\n\n\n\n\n\n\n\n");)
         IF_DEBUG(processor_verificator(processor, create_struct(__FILE__, __LINE__, __FUNCTION__));)
     }
 
-    printf("end now byte: %d, symbols: %d\n", now_byte, processor->symbols);
+    IF_DEBUG_PROCESSOR(printf("end now byte: %d, symbols: %d\n", now_byte, processor->symbols);)
 
     return PROC_OKEY;
 }
@@ -255,17 +273,21 @@ Elem_t get_double_from_text(Processor* processor, int* now_byte) {
     return processor->text[*now_byte];
 }
 
-inline long long get_long_long_number_from_binary(Processor* processor, int* now_byte) {
-    long long result_number = 0ll;
+inline int get_long_long_number_from_binary(Processor* processor, int* now_byte) {
+    IF_DEBUG_PROCESSOR(printf("\t@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");)
+    IF_DEBUG_PROCESSOR(printf("\tbegin get long long\n");)
+    int result_number = 0ll;
 
     char* ptr_to_number = processor->text + (*now_byte);
+    IF_DEBUG_PROCESSOR(
+    printf("\tptr to num: %c\n", *ptr_to_number);
 
     for(int i = 0; i < processor->symbols; ++i) {
         if(i == *now_byte)
             printf("!!!");
         printf("%d ", processor->text[i]);
     }
-    printf("\n");
+    printf("\n");)
 
     for(int i = SIZE_BYTE - 1; i >= 0; --i) {
         long long byte = ptr_to_number[i];
@@ -279,6 +301,10 @@ inline long long get_long_long_number_from_binary(Processor* processor, int* now
         }
     }
     (*now_byte) += BYTE_IN_ELEM_TYPE;
+
+    IF_DEBUG_PROCESSOR(printf("NOW VALUE %d\n", result_number);)
+
+    IF_DEBUG_PROCESSOR(printf("\t@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");)
 
     return result_number;
 }
