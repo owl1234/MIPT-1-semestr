@@ -9,9 +9,11 @@
 #define TREE_CONSTS
 
 enum NODE_TYPE {
-	NUMBER 	 = 1,
-	VARIABLE = 2,
-	OPERATOR = 3
+	STRANGE 		= 0,
+	NUMBER 	 		= 1,
+	VARIABLE 		= 2,
+	OPERATOR 		= 3,
+	COMPARE_SIGN 	= 4,
 };
 
 const int ALPHABET = 26;

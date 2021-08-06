@@ -82,7 +82,52 @@ const int COUNT_OF_ARGS[] = {
 	2
 };
 
-const int LENGTH_PHRASE_TO_VARIABLE_DECLARATION = 52;
-const char PHRASE_TO_VARIABLE_DECLARATION[128] = "Introducing a new word into the Newspeak Dictionary:";
+enum COMPARISON_SIGNS {
+	SIGN_NOTHING		= 0,
+	SIGN_EQUAL 			= 1,
+	SIGN_LESS 			= 2,
+	SIGN_LESS_OR_EQUAL 	= 3,
+	SIGN_MORE 			= 4,
+	SIGN_MORE_OR_EQUAL  = 5
+};
+
+const char TEXT_COMPARISON_SIGNS[][7] = {
+	"",
+	"==",
+	"<",
+	"<=",
+	">",
+	">="
+};
+
+const int LENGTH_TEXT_COMPARISON_SIGNS[] = {
+	0,
+	2,
+	1,
+	2,
+	1,
+	2
+};
+
+const int COUNT_OF_COMPARISON_SIGNS = 5;
+
+const int LENGTH_PHRASE_TO_VARIABLE_DECLARATION 		= 52;
+const int LENGTH_PHRASE_TO_CONDITION					= 33;
+const int LENGTH_PHRASE_BEGIN_CONDITION					= 2;
+const int LENGTH_PHRASE_END_CONDITION					= 2;
+const int LENGTH_PHRASE_BEGIN_ACTION_1					= 25;
+const int LENGTH_PHRASE_BEGIN_ACTION_2					= 39;
+const int LENGTH_PHRASE_BEGIN_BLOCK						= 1;
+const int LENGTH_PHRASE_END_BLOCK						= 1;
+
+const char PHRASE_TO_VARIABLE_DECLARATION[128]  = "Introducing a new word into the Newspeak Dictionary:";
+const char PHRASE_TO_CONDITION			 [128] 	= "if Big Brother didn't notice that";
+const char PHRASE_BEGIN_CONDITION		 [4] 	= "<<";
+const char PHRASE_END_CONDITION			 [4] 	= ">>";
+const char PHRASE_BEGIN_ACTION_1		 [128]	= "then calmly exhale and do";
+const char PHRASE_BEGIN_ACTION_2		 [128] 	= "otherwise you will be taken to room 101";
+const char PHRASE_BEGIN_BLOCK		 	 [2] 	= "{";
+const char PHRASE_END_BLOCK				 [2] 	= "}";
+
 
 #endif

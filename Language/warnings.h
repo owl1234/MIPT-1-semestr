@@ -3,7 +3,7 @@
 
 #define INFORMATION_ABOUT_CALL (call_of_dump){__FILE__, (size_t)__LINE__, __FUNCTION__}
 
-const size_t SIZE_OF_WARNINGS = 70;
+const size_t SIZE_OF_WARNINGS = 128;
 
 struct call_of_dump {
     const char* name_file;

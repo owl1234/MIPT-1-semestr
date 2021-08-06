@@ -15,17 +15,19 @@ void tree_fill(Tree* tree, const char* name_file) {
 		return;
 
 	Parser parser = {};
-	parser.construct();
+	parser.construct(tree->used_vars);
 
 	printf("begin parse\n");
 
 	tree->root = parser.get_G(file.buffer);
 
+	for(int i = 0; i < ALPHABET; ++i)
+		tree->used_vars[i] = parser.used_vars[i];
+
 	printf("end parse\n");
 
 	file_destruct(&file);
-	get_variables(tree);
-
+	
 	printf("end fill the tree\n");
 }
 

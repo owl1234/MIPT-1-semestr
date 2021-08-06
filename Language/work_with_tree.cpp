@@ -120,11 +120,21 @@ void draw_node(Node* node, FILE* picture) {
 }
 
 static void draw_type_node(Node* node, FILE* picture) {
-	if(node->type == OPERATOR) {
+	if(node->type == OPERATOR && node->value == SEMICOLON)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d2504\", fillcolor=\"#ffdb99\", label=\";\"]\n", node->number_node);
+	else
+	if(node->type == OPERATOR) 
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"red\", fillcolor=\"#ffeeed\", label=\"%s\"]\n", node->number_node, TEXT_OPERATIONS[(int)node->value]);
-	} else if(node->type == VARIABLE) {
+	else
+	if(node->type == VARIABLE)
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"blue\", fillcolor=\"#dbefff\", label=\"%c\"]\n", node->number_node, (int)node->value);
-	} else
+	else
+	if(node->type == COMPARE_SIGN)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#4a4432\", fillcolor=\"#d6d6b0\", label=\"\\%s\"]\n", node->number_node, TEXT_COMPARISON_SIGNS[(int)node->value]);
+	else
+	if(node->type == STRANGE)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"\"]\n", node->number_node);
+	else
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#1c3612\", fillcolor=\"#ccffcc\", label=\"%lg\"]\n", node->number_node, node->value);
 }
 

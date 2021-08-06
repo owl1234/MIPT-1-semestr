@@ -1,3 +1,12 @@
-Introducing a new word into the Newspeak Dictionary:                  q = 2 * (8 + x);
-x = 9 + ln(x);
-p=9+8;
+
+Introducing a new word into the Newspeak Dictionary:  x = 9 + ln(5);
+
+if Big Brother didn't notice that << x == 5 >>
+then calmly exhale and do 
+	x = 5;
+
+otherwise you will be taken to room 101
+	x = 6 + 9372;
+	
+	
+x = arcsin(2);
