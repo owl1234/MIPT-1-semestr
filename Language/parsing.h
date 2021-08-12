@@ -14,7 +14,8 @@
 		Bdy_cond::= PHRASE_BEGIN_COND E COMPARISON_SIGNS E PHRASE_END_COND												
 		Act_cond::= L 																							
 		V_DECL  ::= PHRASE_DECL V {'=' E}*													- var decl
-		L 		::= V_DECL | A ;															- line
+		L 		::= V_DECL | A | PRINT;														- line
+		PRINT   ::= PHRASE_PRINT PHRASE_BEGIN_BLOCK [V N] PHRASE_END_BLOCK 					- print
 		A 		::= V '=' E 																- assignment
 		E 		::= T {[+ -], T}* 															- expression
 		T 		::= D {[* /], D}* 															- term
@@ -102,15 +103,22 @@ struct Parser {
   	Node* get_variable() {
   		IF_DEBUG_PARSING(printf("GET_V\n");)
   		skip_spaces();
+
+  		if(get_phrase(PHRASE_TO_VARIABLE_DECLARATION, LENGTH_PHRASE_TO_VARIABLE_DECLARATION) ||
+  		   get_phrase(PHRASE_TO_CONDITION,            LENGTH_PHRASE_TO_CONDITION)			 ||
+  		   get_phrase(PHRASE_BEGIN_ACTION_1, 		  LENGTH_PHRASE_BEGIN_ACTION_1)			 ||
+  		   get_phrase(PHRASE_BEGIN_ACTION_2, 		  LENGTH_PHRASE_BEGIN_ACTION_2))
+  			return NULL;
+
   		if('a' <= *pointer && *pointer <= 'z') {
-  			if(used_vars[*pointer] == false && !(special_info == FIND_VAR_INTO_DECL)) {
+  			if(used_vars[*pointer - 'a'] == false && !(special_info == FIND_VAR_INTO_DECL)) {
   				char msg[128] = "";
   				sprintf(msg, "variable %c not declared", *pointer);
   				syntax_error(INFORMATION_ABOUT_CALL, msg);
   				return NULL;
   			}
 
-  			used_vars[*pointer] = true;
+  			used_vars[*pointer - 'a'] = true;
   			Node* new_node = node_construct(VARIABLE, *pointer, NULL, NULL);
   			++pointer;
   			return new_node;
@@ -362,6 +370,43 @@ struct Parser {
   		return new_node;
   	}
 
+  	Node* get_print() {
+   		IF_DEBUG_PARSING(printf("GET_PRINT\n");)
+  		skip_spaces();
+
+   		if(!get_phrase(PHRASE_PRINT, LENGTH_PHRASE_PRINT)) {
+   			//printf("don't find print(((\n");
+  			return NULL;
+   		}
+
+  		pointer += LENGTH_PHRASE_PRINT; 
+  		skip_spaces();
+
+   		if(!get_phrase(PHRASE_BEGIN_BLOCK, LENGTH_PHRASE_BEGIN_BLOCK))
+  			return NULL;
+
+  		pointer += LENGTH_PHRASE_BEGIN_BLOCK;
+
+  		skip_spaces();	
+
+  		Node* new_node = node_construct(PRINT, PRINT, NULL, NULL);
+  		new_node->left = get_variable();
+
+  		if(new_node->left == NULL)
+  			new_node->left = get_number();
+
+  		skip_spaces();
+
+   		if(!get_phrase(PHRASE_END_BLOCK, LENGTH_PHRASE_END_BLOCK))
+  			return NULL;
+
+  		pointer += LENGTH_PHRASE_END_BLOCK;	
+
+  		skip_spaces();
+
+  		return new_node;	
+  	}
+
   	Node* get_body_condition() {
   		IF_DEBUG_PARSING(printf("GET_BODY_CONDITION\n");)
   		skip_spaces();
@@ -412,13 +457,17 @@ struct Parser {
   		Node* left_son = get_body_condition();
   		if(left_son == NULL) {
   			syntax_error(INFORMATION_ABOUT_CALL, "Body condition not found"); return NULL;
-  		}
+  		} /*else
+  			printf("find body cond\n");*/
+
+  		//printf("%c%c%c%c\n", *pointer, *(pointer + 1), *(pointer + 2), *(pointer + 3));
 
   		skip_spaces();
 
   		if(!get_phrase(PHRASE_BEGIN_ACTION_1, LENGTH_PHRASE_BEGIN_ACTION_1)) {
   			syntax_error(INFORMATION_ABOUT_CALL, "don't find phrase to action 1\n"); return NULL;
-  		}
+  		}/* else
+  			printf("find phrase act 1\n");*/
 		
 		pointer += LENGTH_PHRASE_BEGIN_ACTION_1;
   		skip_spaces();
@@ -429,7 +478,8 @@ struct Parser {
 
   		if(!get_phrase(PHRASE_BEGIN_ACTION_2, LENGTH_PHRASE_BEGIN_ACTION_2)) {
   			syntax_error(INFORMATION_ABOUT_CALL, "don't find phrase to action 2\n"); return NULL;
-  		}
+  		} /*else
+  			printf("find phrase act 2\n");*/
 		
 		pointer += LENGTH_PHRASE_BEGIN_ACTION_2;
   		skip_spaces();
@@ -438,15 +488,17 @@ struct Parser {
 
   		if(right_left_son == NULL || right_right_son == NULL) {
   			syntax_error(INFORMATION_ABOUT_CALL, " not found"); return NULL;
-  		}
+  		}  /*else
+  			printf("find act 1 & 2\n");*/
 
-  		Node* right_son = node_construct(STRANGE, NOTHING, NULL, NULL);
+  		Node* right_son = node_construct(COND_TYPE, ACTIONS, NULL, NULL);
   		node_make_copy(right_left_son,  right_son->left);
   		node_make_copy(right_right_son, right_son->right);
 
-  		Node* answer = node_construct(STRANGE, NOTHING, NULL, NULL);
+  		Node* answer = node_construct(COND_TYPE, CONDITION, NULL, NULL);
   		node_make_copy(left_son,  answer->left);
   		node_make_copy(right_son, answer->right);
+  		//printf("before ret cond: %c%c%c%c\n", *pointer, *(pointer + 1), *(pointer + 2), *(pointer + 3));
 
   		return answer;
   	}
@@ -476,14 +528,23 @@ struct Parser {
 		Node* new_node = node_construct(OPERATOR, SEMICOLON, NULL, NULL);
 		new_node->left = get_condition();
 
+		//printf("%p\n", new_node->left);
+
+		if(new_node->left == NULL) {
+			new_node->left = get_print();
+			is_it_condition = false;
+		} else
+			printf("find cond\n");
+
+		//printf("%p\n", new_node->left);
+
 		if(new_node->left == NULL) {
   			new_node->left = get_variable_declaration();
-  			is_it_condition = false;
-		}
+		} /*else
+			printf("find cond!!!\n");*/
 
   		if(new_node->left == NULL) {
   			new_node->left = get_assignment();
-  			is_it_condition = false;
   		}
 
   		if(new_node->left == NULL)
@@ -493,7 +554,7 @@ struct Parser {
   		if(is_it_condition)
   			is_one_action = false;
 
-  		if(*pointer == ';' || is_it_condition) {
+  		if(*pointer == ';' || !is_it_condition) {
   			if(!is_it_condition)
   				++pointer;
   			skip_spaces();
@@ -544,3 +605,5 @@ struct Parser {
 void tree_fill(Tree* tree, const char* name_file);
 void get_variables(Tree* tree);
 void get_variables(Node* node, bool* used_vars);
+
+

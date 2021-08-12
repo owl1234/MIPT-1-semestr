@@ -3,9 +3,9 @@
 
 #include "warnings.h"
 
-#define IF_CANARY_PROTECTION(code) code
-#define IF_HASH_PROTECTION(code) code
-#define IF_DEBUG(code) code
+#define IF_CANARY_PROTECTION(code) //code
+#define IF_HASH_PROTECTION(code) //code
+#define IF_DEBUG(code) //code
 
 typedef int Elem_t;
 const int POISON = -3802;
@@ -22,7 +22,7 @@ typedef enum {
     STACK_DATA_NULL         = 7,
     STACK_BAD_SIZE          = 8,
     STACK_IS_DECTRUCT       = 9,
-    IF_HASH_PROTECTION  (STACK_BAD_HASH   = 10),
+    IF_HASH_PROTECTION  (STACK_BAD_HASH   = 10)
     IF_CANARY_PROTECTION(STACK_BAD_CANARY = 11)
 } stack_t_status;
 

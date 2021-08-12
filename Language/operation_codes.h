@@ -2,6 +2,8 @@
 #ifndef OPCODES
 #define OPCODES
 
+const int ALPHABET = 26;
+
 enum OPERATION_CODES {
 	SEMICOLON = 0,
 	ADD = 1,
@@ -109,6 +111,11 @@ const int LENGTH_TEXT_COMPARISON_SIGNS[] = {
 	2
 };
 
+enum CONDITION_TYPES {
+	CONDITION = 0,
+	ACTIONS   = 1,
+};
+
 const int COUNT_OF_COMPARISON_SIGNS = 5;
 
 const int LENGTH_PHRASE_TO_VARIABLE_DECLARATION 		= 52;
@@ -119,6 +126,7 @@ const int LENGTH_PHRASE_BEGIN_ACTION_1					= 25;
 const int LENGTH_PHRASE_BEGIN_ACTION_2					= 39;
 const int LENGTH_PHRASE_BEGIN_BLOCK						= 1;
 const int LENGTH_PHRASE_END_BLOCK						= 1;
+const int LENGTH_PHRASE_PRINT 							= 49;
 
 const char PHRASE_TO_VARIABLE_DECLARATION[128]  = "Introducing a new word into the Newspeak Dictionary:";
 const char PHRASE_TO_CONDITION			 [128] 	= "if Big Brother didn't notice that";
@@ -128,6 +136,7 @@ const char PHRASE_BEGIN_ACTION_1		 [128]	= "then calmly exhale and do";
 const char PHRASE_BEGIN_ACTION_2		 [128] 	= "otherwise you will be taken to room 101";
 const char PHRASE_BEGIN_BLOCK		 	 [2] 	= "{";
 const char PHRASE_END_BLOCK				 [2] 	= "}";
+const char PHRASE_PRINT 				 [64]   = "We will bring praise to Big Brother on TV screens";
 
 
 #endif

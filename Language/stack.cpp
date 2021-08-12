@@ -20,11 +20,11 @@ const char* text_stack_t_status[] = {
     "Data is null",
     "Size is bad",
     "Stack is destructed",
-    IF_HASH_PROTECTION("Bad hash of stack"),
+    IF_HASH_PROTECTION("Bad hash of stack")
     IF_CANARY_PROTECTION("Canary is killed")
 };
 
-#ifdef IF_CANARY_PROTECTION
+IF_CANARY_PROTECTION(
 int get_hash(Stack_t* node) {
     long long hash_st = 0;
     int size_stack = node->size_stack;
@@ -45,7 +45,12 @@ int get_hash(Stack_t* node) {
 
     return hash_st;
 }
-#endif // IF_CANARY_PROTECTION
+
+bool is_canary(Elem_t value) {
+    return (value == CANARY);
+}
+
+)
 
 void print_Elem_T(int value, FILE* file) {
     fprintf(file, "%d", value);
@@ -57,10 +62,6 @@ void print_Elem_T(double value, FILE* file) {
 
 void print_Elem_T(char value, FILE* file) {
     fprintf(file, "%c", value);
-}
-
-bool is_canary(Elem_t value) {
-    return (value == CANARY);
 }
 
 void error_print_data(Stack_t* node, FILE* file) {
@@ -131,7 +132,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     fprintf(log_errors, "\tcapacity   = %ld\n", node->capacity);
     fprintf(log_errors, "\tStatus of stack: %s\n", text_stack_t_status[node->stack_status]);
 
-    #ifdef IF_CANARY_PROTECTION
+    IF_CANARY_PROTECTION(
     fprintf(log_errors, "\tLeft  canary of stack: %d ", node->canary_left[0]);
     if(node->canary_left[0] == CANARY) {
         fprintf(log_errors, "(okey canary)\n");
@@ -139,12 +140,13 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
         fprintf(log_errors, "(BAD CANARY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)\n");
     }
     fprintf(log_errors, "\tRight canary of stack: %d ", node->canary_right[0]);
+    
     if(node->canary_right[0] == CANARY) {
         fprintf(log_errors, "(okey canary)\n");
     } else {
         fprintf(log_errors, "(BAD CANARY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)\n");
     }
-    #endif
+    )
 
     IF_HASH_PROTECTION(fprintf(log_errors, "\tHash: %d\n", node->stack_hash);)
     fprintf(log_errors, "\tdata [%p]\n", node->data);
@@ -157,7 +159,7 @@ void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_argu
     fclose(log_errors);
 }
 
-#ifdef IF_DEBUG
+IF_DEBUG(
 void stack_err(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
     //printf("stack_err: status: %d, line: %d\n", node->stack_status, arguments_of_call.number_of_line);
     if(node == nullptr) {
@@ -200,7 +202,7 @@ void stack_err(Stack_t* node, struct call_of_dump arguments_of_call = base_argum
         fell(node);
     }
 }
-#endif
+)
 
 void fell(Stack_t* node) {
     FILE* log_errors = fopen(name_log_file, "a");
@@ -263,12 +265,25 @@ void stack_resize(Stack_t* node) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
     assert(node->capacity >= stack_size(node));
 
-    Elem_t* new_data = (Elem_t*)realloc(node->data, stack_capacity(node) * 2 * sizeof(Elem_t) + 1);
+    size_t old_node_capacity = stack_capacity(node);
+
+    Elem_t* new_data = (Elem_t*)calloc(old_node_capacity * 2 + 1, sizeof(Elem_t));
+
+    for(size_t index = 0; index < old_node_capacity; ++index) 
+        new_data[index] = node->data[index];
+
+    free(node->data);
+    node->data = (Elem_t*)calloc(old_node_capacity * 2 + 1, sizeof(Elem_t));
+    assert(new_data != nullptr);
+
+    for(size_t index = 0; index < old_node_capacity; ++index) {
+        new_data[index] = node->data[index];
+    }
+
     node->capacity *= 2;
     fill_stack_stuff(node);
 
-    assert(new_data != nullptr);
-    node->data = new_data;
+    free(new_data);
 
     IF_HASH_PROTECTION(node->stack_hash = get_hash(node);)
 

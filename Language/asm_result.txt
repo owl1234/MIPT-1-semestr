@@ -1,0 +1,28 @@
+PUSH rdx
+PUSH 87
+POP rdx
+PUSH 9
+POP [rdx]
+POP rdx
+
+PUSH rdx
+PUSH 88
+POP rdx
+PUSH 3
+POP [rdx]
+POP rdx
+
+PUSH rdx
+PUSH 89
+POP rdx
+PUSH 9
+POP [rdx]
+POP rdx
+
+PUSH rdx
+PUSH 76
+POP rdx
+PUSH 0
+POP [rdx]
+POP rdx
+

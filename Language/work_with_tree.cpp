@@ -11,6 +11,7 @@ int destruct_count = 0;
 ERRORS_TYPE tree_construct(Tree* tree) {
 	if(!tree)
 		return BAD_TREE_PTR;
+
 	tree->root = NULL;
 
 	for(int index = 0; index < ALPHABET; ++index) 
@@ -33,9 +34,7 @@ ERRORS_TYPE tree_destruct(Tree* tree) {
 }
 
 Node* node_construct(const NODE_TYPE type, const Type_value value, Node* left_son, Node* right_son) {
-
 	Node* new_node = (Node*)calloc(1, sizeof(Node));
-
 	if(!new_node)
 		return NULL;
 
@@ -132,8 +131,15 @@ static void draw_type_node(Node* node, FILE* picture) {
 	if(node->type == COMPARE_SIGN)
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#4a4432\", fillcolor=\"#d6d6b0\", label=\"\\%s\"]\n", node->number_node, TEXT_COMPARISON_SIGNS[(int)node->value]);
 	else
-	if(node->type == STRANGE)
-		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"\"]\n", node->number_node);
+	if(node->type == COND_TYPE) {
+		if(node->value == CONDITION)
+			fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"COND\"]\n", node->number_node);
+		else
+			fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"ACTIONS\"]\n", node->number_node);
+	}
+	else
+	if(node->type == PRINT)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"PRINT\"]\n", node->number_node);
 	else
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#1c3612\", fillcolor=\"#ccffcc\", label=\"%lg\"]\n", node->number_node, node->value);
 }

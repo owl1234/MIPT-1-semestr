@@ -1,57 +1,33 @@
 digraph graphname {
 	node2 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node7 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node7 -> node2
-	node7 -> node4
-	node8 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="9"]
-	node4 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="+"]
-	node4 -> node8
-	node4 -> node9
-	node10 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="5"]
-	node9 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="ln"]
-	node9 -> node10
+	node4 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node4 -> node2
+	node4 -> node3
+	node3 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="9"]
 	node1 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node1 -> node7
-	node1 -> node11
-	node37 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node14 [shape="record", style="filled", color="#4a4432", fillcolor="#d6d6b0", label="\=="]
-	node14 -> node37
-	node14 -> node38
-	node38 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="5"]
-	node36 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label=""]
-	node36 -> node14
-	node36 -> node27
-	node41 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node40 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node40 -> node41
-	node40 -> node42
-	node42 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="5"]
-	node39 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node39 -> node40
-	node27 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label=""]
-	node27 -> node39
-	node27 -> node43
-	node45 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node44 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node44 -> node45
-	node44 -> node46
-	node47 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="6"]
-	node46 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="+"]
-	node46 -> node47
-	node46 -> node48
-	node48 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="9372"]
-	node43 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node43 -> node44
-	node11 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node11 -> node36
-	node11 -> node49
-	node50 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node53 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node53 -> node50
-	node53 -> node51
-	node54 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="2"]
-	node51 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="arcsin"]
-	node51 -> node54
-	node49 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node49 -> node53
+	node1 -> node4
+	node1 -> node5
+	node6 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="y"]
+	node8 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node8 -> node6
+	node8 -> node7
+	node7 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="3"]
+	node5 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
+	node5 -> node8
+	node5 -> node9
+	node10 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="z"]
+	node12 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node12 -> node10
+	node12 -> node11
+	node11 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
+	node9 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
+	node9 -> node12
+	node9 -> node13
+	node14 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
+	node16 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node16 -> node14
+	node16 -> node15
+	node15 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="0"]
+	node13 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
+	node13 -> node16
 }

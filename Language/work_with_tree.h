@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "operation_codes.h"
 
 #define Type_value double
 
@@ -9,14 +10,14 @@
 #define TREE_CONSTS
 
 enum NODE_TYPE {
-	STRANGE 		= 0,
+	COND_TYPE 		= 0,
 	NUMBER 	 		= 1,
 	VARIABLE 		= 2,
 	OPERATOR 		= 3,
 	COMPARE_SIGN 	= 4,
+	PRINT 			= 5,
 };
 
-const int ALPHABET = 26;
 const char name_picture_with_tree[] = "tree";
 
 struct Node {

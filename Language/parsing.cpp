@@ -26,6 +26,8 @@ void tree_fill(Tree* tree, const char* name_file) {
 
 	printf("end parse\n");
 
+	printf("tree into parser: %p\n", tree);
+
 	file_destruct(&file);
 	
 	printf("end fill the tree\n");
