@@ -1,11 +1,5 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/29b09e22d54f499f96ea23995d2d2116)](https://www.codacy.com/gh/x-ENIAC/MIPT_projects_1_sem/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=x-ENIAC/MIPT_projects_1_sem&amp;utm_campaign=Badge_Grade)
 
-### Hello everyone who sees this repo! Don't worry, be happy and always be in a good mood! Happy New Year! 🎄🍊
-
-![image](https://s1.1zoom.ru/big3/913/Cats_Christmas_Toys_463561.jpg)
-
-
-
 
 Well, this repo is created for 1 semester study projects at MIPT. Below you can see the names of the projects and their small descriptions.
 
@@ -26,3 +20,9 @@ It is a CPU emulator with a custom assembler language. A program written in this
 
 ## [Decision tree](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Akinator)
 Akinator's likeness. He can guess the object, compare two objects, name their similarities and differences, and much more (text voice acting works).
+
+## [Differentiator](https://github.com/x-ENIAC/MIPT_projects_1_sem/tree/master/Differentiator)
+The program that can differentiate any expression. Try it!
+
+## [C-like language](https://github.com/x-ENIAC/MIPT_projects_1_sem/tree/master/Language)
+C-like programming language written using its own [processor](https://github.com/owl1234/MIPT_projects_1_sem/tree/master/Freaky_CPU_on_defines).
