@@ -1,6 +1,43 @@
-push 5
-pop rcx
-push 98
-push rcx
-sub
+jmp main
 
+main:
+push rdx
+push 87
+pop rdx
+push 9
+pop [rdx]
+pop rdx
+
+push rdx
+push 88
+pop rdx
+push 3
+pop [rdx]
+pop rdx
+
+cmp 9 3
+ja L0
+
+push rdx
+push 87
+pop rdx
+push 3
+pop [rdx]
+pop rdx
+jmp L1
+
+L0:
+push rdx
+push 88
+pop rdx
+push 9
+pop [rdx]
+pop rdx
+L1:
+
+push [87]
+out
+push [88]
+out
+
+hlt

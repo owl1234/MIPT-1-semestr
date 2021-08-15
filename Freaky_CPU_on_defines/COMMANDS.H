@@ -6,22 +6,26 @@
     } else {                                                            \
         stack_push(&(processor->call_stack), now_byte);                 \
         now_byte = address_label - 2;                                   \
+        /*printf("!!! NOW BYTE !!! %d !!!\n", now_byte);*/              \
     }
+
+    //- 2 + SIGNATURE_SIZE - 1 + BYTE_IN_ELEM_TYPE;
 
 #define PUT_ADDRESS_LABEL_GO_TO(code_of_operation)                                                                                      \
     print_labels(disasm_struct.labels, disasm_struct.index_in_labels);                                                                  \
     put_char_into_disassembled_text(TEXT_OPERATION[(int)now_command], &disasm_struct, SPACE);                                           \
-    printf("put_address: command %lg\n", now_command);                                                                                  \
+    /*printf("put_address: command %lg\n", now_command);*/                                                                              \
     now_command = (int)get_byte_from_text(input_file, &disasm_struct);                                                                  \
-    printf("put_address: command %lg\n", now_command);                                                                                  \
+    /*printf("put_address: command %lg\n", now_command);*/                                                                              \
                                                                                                                                         \
     for(int label=0; label<disasm_struct.index_in_labels; ++label) {                                                                    \
-        printf("\tput_address: %d %lg\n", disasm_struct.labels[label].byte_address, now_command);                                       \
+        /*printf("\tput_address: %d %lg\n", disasm_struct.labels[label].byte_address, now_command);*/                                   \
         if(abs(disasm_struct.labels[label].byte_address - now_command) < EPSILON) {                                                     \
             put_char_into_disassembled_text("meow", &disasm_struct, END_LINE);                                                          \
         }                                                                                                                               \
     }                                                                                                                                   \
-    printf("\t# %d, label: %d\n", disasm_struct.now_position_in_labels, disasm_struct.labels[disasm_struct.now_position_in_labels].byte_address);                                                                                                                                 \
+
+    /*printf("\t# %d, label: %d\n", disasm_struct.now_position_in_labels, disasm_struct.labels[disasm_struct.now_position_in_labels].byte_address);*/                                                                                                                                 
 
 
 #define RECURSIVE_RETURN                                                \
@@ -509,9 +513,11 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( cmp, OPERATION_CODE_CMP, 4,
 PROCESSOR (
+    ++now_byte;
     first_comparison  = get_value_to_compare(processor, &now_byte);
 
     second_comparison = get_value_to_compare(processor, &now_byte);
+    --now_byte;
 ),
 DISASSEMBLER (
     put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_CMP], &disasm_struct, SPACE);
@@ -577,6 +583,7 @@ PROCESSOR (
         GET_ADDRESS_LABEL_GO_TO
     } else {
         int address_label = get_byte_from_text(processor, &now_byte);
+        now_byte += BYTE_IN_ELEM_TYPE - 1;
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -596,6 +603,7 @@ PROCESSOR (
         GET_ADDRESS_LABEL_GO_TO
     } else {
         int address_label = get_byte_from_text(processor, &now_byte);
+        now_byte += BYTE_IN_ELEM_TYPE - 1;
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -615,6 +623,7 @@ PROCESSOR (
         GET_ADDRESS_LABEL_GO_TO
     } else {
         int address_label = get_byte_from_text(processor, &now_byte);
+        now_byte += BYTE_IN_ELEM_TYPE - 1;
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }
@@ -634,6 +643,7 @@ PROCESSOR (
         GET_ADDRESS_LABEL_GO_TO
     } else {
         int address_label = get_byte_from_text(processor, &now_byte);
+        now_byte += BYTE_IN_ELEM_TYPE - 1;
         if(fabs(address_label - OPERATION_CODE_RECURSIVE_RET) < EPSILON) {
             RECURSIVE_RETURN;
         }

@@ -2,9 +2,13 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  July 17, 2021, 00:15:00
+ *                  August 14, 2021, 16:58:15
+ * 
  *  @par What was changed?
- *                      1. Fixed [reg + num], [reg], [num]
+ *                      1. At the beginning of the summer, I changed this code. Instead of representing each command as 4 bytes (an integer), 
+ *                         it was decided to replace the command encoding with one byte. The sad truth: I didn't change it everywhere.
+ * 
+ *                         Facepalm...
  *  @par To-do list
  *                      1. Fix, fix and fix...
  *                      
@@ -40,7 +44,7 @@
 
 
 void help() {
-    printf("That is my realisarion of softprocessor.\n"
+    printf("That is my realisation of softprocessor.\n"
            "The required parameters look like this:\n"
                     "[-h]                                                         - if you want to read this help again\n"
                     "[-p name_input_file_to_processor name_log_file_to_processor] - if you want to follow instructions\n"
@@ -173,8 +177,8 @@ PROCESSOR_ERRORS processing(Processor* processor) {
 
     int now_command = OPERATION_CODE_MEOW;
 
-    Elem_t back_element = 0.0, last = 0.0, penultimate = 0.0, input_value = 0.0, now_value = 0;
-    int flag_of_registers = -1, number_of_register = -1, now_byte = 0, ram_index = 0;
+    Elem_t last = 0.0, penultimate = 0.0, input_value = 0.0, now_value = 0;
+    int now_byte = 0, ram_index = 0;
 
     PROCESSOR_ERRORS status = check_signature(processor, &now_byte);
     if(status != PROC_OKEY) {
@@ -182,7 +186,7 @@ PROCESSOR_ERRORS processing(Processor* processor) {
     }
 
     Elem_t first_comparison = 0.0, second_comparison = 0.0;
-    int number_of_condition = -1;
+    //int number_of_condition = -1;
 
     while(now_byte < processor->symbols && now_command != OPERATION_CODE_HLT) {
         now_command = processor->text[now_byte];
@@ -198,7 +202,8 @@ PROCESSOR_ERRORS processing(Processor* processor) {
                                                                 processor->registers_variables[2], processor->registers_variables[3]);
         printf("now byte: %d, symbols: %d\n", now_byte, processor->symbols);
         )
-        //IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
+        //IF_DEBUG(
+        printf("> now_command: %d (byte: %d) \n", now_command, now_byte);
 
        switch (now_command) {
             #include "COMMANDS.H"
@@ -259,7 +264,7 @@ Elem_t get_value_to_compare(Processor* processor, int* now_byte) {
         int number_of_register = get_byte_from_text(processor, now_byte);
         return processor->registers_variables[number_of_register];
     } else {
-        return get_byte_from_text(processor, now_byte);
+        return get_long_long_number_from_binary(processor, now_byte);
     }
 }
 

@@ -2,10 +2,13 @@
  *  @file
  *  @author Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
  *  @par Last edition
- *                  July 17, 2021, 00:15:00
+ *                  August 14, 2021, 16:57:12
  * 
  *  @par What was changed?
- *                      1. Add if_debug()
+ *                      1. At the beginning of the summer, I changed this code. Instead of representing each command as 4 bytes (an integer), 
+ *                         it was decided to replace the command encoding with one byte. The sad truth: I didn't change it everywhere.
+ * 
+ *                         Facepalm...
  * 
  *  @par To-do list
  *                      
@@ -135,6 +138,7 @@ int assembling_file(File* input_file, const char* name_output_file) {
     int index_in_assembled_text = 0, number_of_byte = 0;
 
     write_signature(assembled_text, &index_in_assembled_text, &number_of_byte);
+    printf("!!! AFTER SIGNATURE BYTE %d\n", number_of_byte);
 
     Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
     int status = 0, index_in_labels = 0, number_of_condition = 0, number_of_command = 0, first_type_of_value = 0, second_type_of_value = 0;
@@ -189,11 +193,14 @@ int assembling_file(File* input_file, const char* name_output_file) {
 
 void write_signature(char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     put_char_into_assembled_text(VERSION, assembled_text, index_in_assembled_text, number_of_byte);
+    printf("\t\t!!! %d\n", *number_of_byte);
     put_int_into_assembled_text(SIGNATURE_NAME_HASH, assembled_text, index_in_assembled_text, number_of_byte);
+    printf("\t\t!!! %d\n", *number_of_byte);
 }
 
 void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels, int* number_of_byte) {
     int copy_number_of_byte = *number_of_byte;
+    int number_of_condition = 0;
 
     char* copy_of_text_for_assembling = (char*)calloc(input_file->information.st_size + 2, sizeof(char));
     strcpy(copy_of_text_for_assembling, input_file->text_for_assembling);
@@ -206,15 +213,60 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
         if(is_it_label(temp_string)) {
             labels[*index_in_labels].name = (char*)calloc(strlen(temp_string), sizeof(char));
             strcpy(labels[*index_in_labels].name, temp_string);
-            labels[*index_in_labels].byte_address = copy_number_of_byte;
+            printf("\tWARNING !!! %d\n", copy_number_of_byte);
+            labels[*index_in_labels].byte_address = copy_number_of_byte; 
             ++(*index_in_labels);
 
         } else if(!strcmp("push", temp_string)) {
-            copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_PUSH];
+            printf("\t\tfind push, byte %d\n", copy_number_of_byte);
+            ++copy_number_of_byte;
+
+            strcpy(prev_string, temp_string);
+            temp_string = strtok(NULL, SEPARATORS);
+
+            int type_value = type_of_value(temp_string);
+            
+            if(type_value == IS_REGISTER || type_value == (IS_RAM | IS_REGISTER))  
+                copy_number_of_byte += 2;
+            else
+            if(type_value == IS_ELEM_T || type_value == (IS_RAM | IS_ELEM_T))
+                copy_number_of_byte += BYTE_IN_ELEM_TYPE + 1;
+            else
+            if(type_value == (IS_RAM | IS_REGISTER | IS_ELEM_T))
+                copy_number_of_byte += 1 + BYTE_IN_ELEM_TYPE + 1;
+            
+            printf("\t\tend push, byte %d\n", copy_number_of_byte);        
         } else if(!strcmp("pop", temp_string)) {
             copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_POP] + 1;
         } else if(!strcmp("cmp", temp_string)) {
-            copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_CMP] - 1;
+            printf("\t\tfind cmp, byte %d\n", copy_number_of_byte);
+            ++copy_number_of_byte;
+
+            strcpy(prev_string, temp_string);
+            temp_string = strtok(NULL, SEPARATORS);
+            int type_first_value = type_of_value(temp_string);
+
+            if(type_first_value == IS_ELEM_T)
+                copy_number_of_byte += BYTE_IN_ELEM_TYPE + 1;
+            else
+            if(type_first_value == IS_REGISTER)
+                copy_number_of_byte += 2;
+
+            strcpy(prev_string, temp_string);
+            temp_string = strtok(NULL, SEPARATORS);
+
+            int type_second_value = type_of_value(temp_string);
+
+            if(type_second_value == IS_ELEM_T)
+                copy_number_of_byte += BYTE_IN_ELEM_TYPE + 1;
+            else
+            if(type_second_value == IS_REGISTER)
+                copy_number_of_byte += 2;
+            
+            printf("\t\tsecond cmp arg find, byte %d - end!\n", copy_number_of_byte);
+        } else if(!strcmp("jmp", temp_string) || !strcmp("call", temp_string) || is_text_connected_with_labels(temp_string, &number_of_condition)) {
+            printf("\tfind %s on %d byte\n", temp_string, copy_number_of_byte);
+            copy_number_of_byte += BYTE_IN_ELEM_TYPE;
         } else {
             ++copy_number_of_byte;
         }
@@ -243,7 +295,6 @@ bool is_it_label(const char* word) {
 
 int get_number_of_command(char* text) {
     int length = sizeof(TEXT_OPERATION) / sizeof(TEXT_OPERATION[0]);
-    //printf("%s\n", text);
 
     for(int i=0; i<length; ++i)
         if(!strcmp(text, TEXT_OPERATION[i]))
@@ -303,7 +354,7 @@ void put_opcode_into_assembled_text(int code_of_operation, char* assembled_text,
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
-    ++(*number_of_byte);
+    *number_of_byte += sizeof(char);
 }
 
 void put_char_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
@@ -313,7 +364,7 @@ void put_char_into_assembled_text(int code_of_operation, char* assembled_text, i
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
-    ++(*number_of_byte);
+    *number_of_byte += sizeof(char);
 }
 
 void put_int_into_assembled_text(char code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
@@ -323,7 +374,7 @@ void put_int_into_assembled_text(char code_of_operation, char* assembled_text, i
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
-    ++(*number_of_byte);
+    *number_of_byte += sizeof(char);
 }
 
 void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
@@ -333,7 +384,7 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(int)); //
     *index_in_assembled_text += sizeof(int);
 
-    ++(*number_of_byte);
+    *number_of_byte += sizeof(int);
 }
 
 void put_int_into_assembled_text(long long code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
@@ -343,7 +394,7 @@ void put_int_into_assembled_text(long long code_of_operation, char* assembled_te
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(long long)); //
     *index_in_assembled_text += sizeof(long long);
 
-    ++(*number_of_byte);
+    *number_of_byte += sizeof(long long);
 }
 /*
 void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
@@ -416,19 +467,19 @@ int reversed_number(int value, int* length) {
 }
 
 size_t get_number_of_register_from_ram_reg_elem_t(char* search_string) {
-    printf("\t\t\t\t!!!!!!!!!!!!\n");
+    //printf("\t\t\t\t!!!!!!!!!!!!\n");
     for(size_t registr=0; registr<number_of_register_vars; ++registr) 
         if(strstr(search_string, TEXT_REGISTERS[registr])) {
-            printf("\t\t\t\t!!!!!!!!!!!! %d\n", registr);
+            //printf("\t\t\t\t!!!!!!!!!!!! %d\n", registr);
             return registr;
         }
 
-    printf("\t\t\t\t!!!!!!!!!!!! \n");
+    //printf("\t\t\t\t!!!!!!!!!!!! \n");
     return ERROR_NUMBER;
 }
 
 bool is_text_connected_with_labels(char* text, int* number_of_condition) {
-    int command_is_condition = true;
+    bool command_is_condition = true;
 
     if(!strcmp(text, "jmp")) {
         *number_of_condition = OPERATION_CODE_JMP;

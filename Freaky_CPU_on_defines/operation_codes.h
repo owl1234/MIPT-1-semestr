@@ -181,7 +181,7 @@ const int NUMBER_ARGUMENTS_FOR_OPERATION[] = {
     0,
     0,
     0,
-    4,
+    4, // cmp
     1,
     1,
     1,
