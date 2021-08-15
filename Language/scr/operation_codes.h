@@ -84,18 +84,22 @@ const int COUNT_OF_ARGS[] = {
 	2
 };
 
+const int COUNT_OF_COMPARISON_SIGNS = 7;
+
 enum COMPARISON_SIGNS {
 	SIGN_NOTHING		= 0,
 	SIGN_EQUAL 			= 1,
-	SIGN_LESS 			= 2,
-	SIGN_LESS_OR_EQUAL 	= 3,
-	SIGN_MORE 			= 4,
-	SIGN_MORE_OR_EQUAL  = 5
+	SIGN_NOT_EQUAL 		= 2,
+	SIGN_LESS 			= 3,
+	SIGN_LESS_OR_EQUAL 	= 4,
+	SIGN_MORE 			= 5,
+	SIGN_MORE_OR_EQUAL  = 6
 };
 
-const char TEXT_COMPARISON_SIGNS[][7] = {
+const char TEXT_COMPARISON_SIGNS[][COUNT_OF_COMPARISON_SIGNS] = {
 	"",
 	"==",
+	"!=",
 	"<",
 	"<=",
 	">",
@@ -104,6 +108,7 @@ const char TEXT_COMPARISON_SIGNS[][7] = {
 
 const int LENGTH_TEXT_COMPARISON_SIGNS[] = {
 	0,
+	2,
 	2,
 	1,
 	2,
@@ -116,7 +121,6 @@ enum CONDITION_TYPES {
 	ACTIONS   = 1,
 };
 
-const int COUNT_OF_COMPARISON_SIGNS = 5;
 
 const int LENGTH_PHRASE_TO_VARIABLE_DECLARATION 		= 52;
 const int LENGTH_PHRASE_TO_CONDITION					= 33;

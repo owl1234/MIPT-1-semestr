@@ -3,13 +3,11 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				August 12, 2021, 13:30:17
+        				August 15, 2021, 23:06:08
     
     What was changed?
-    					0. Happy birthday to me!))
-						1. Fixed memory leaks on stack resizing  
-						2. Attempts to generate assembly code begin. 
-						   It can be seen in the assignment examples.   
+    					1. Added assembly and processing. Hooray!
+						2. Fixed stack_back. Even in such a simple function, I made a mistake. Ha-ha!
 
 	To-do list
 						1. Make loops (for/while)

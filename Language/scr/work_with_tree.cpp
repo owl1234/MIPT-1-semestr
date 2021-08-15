@@ -75,13 +75,10 @@ ERRORS_TYPE draw_tree(Tree* tree) {
 		return BAD_TREE_PTR;
 
 	FILE* picture = {};
-	char buffer_for_name_file[64]; // = (char*)calloc(100, sizeof(char));
+	char buffer_for_name_file[MAX_SIZE_BUFFER_FOR_FILE];
 	sprintf(buffer_for_name_file, "%s%d.dot", name_picture_with_tree, count_draw);
 
-	//if(count_draw == 0)
-		picture = fopen(buffer_for_name_file, "w");
-	//else
-	//	picture = fopen("second.dot", "w");
+	picture = fopen(buffer_for_name_file, "w");
 
     fprintf(picture, "digraph graphname {\n");	
 
@@ -91,7 +88,7 @@ ERRORS_TYPE draw_tree(Tree* tree) {
     fclose(picture);
 
 
-	char buffer_for_system[128]; // = (char*)calloc(100, sizeof(char));
+	char buffer_for_system[MAX_SIZE_BUFFER_FOR_FILE]; 
 	sprintf(buffer_for_system, "dot %s -Tpng -O", buffer_for_name_file);
 
 	system(buffer_for_system);
@@ -128,7 +125,7 @@ static void draw_type_node(Node* node, FILE* picture) {
 	if(node->type == VARIABLE)
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"blue\", fillcolor=\"#dbefff\", label=\"%c\"]\n", node->number_node, (int)node->value);
 	else
-	if(node->type == COMPARE_SIGN)
+	if(node->type == COMPARE_SIGN) 
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#4a4432\", fillcolor=\"#d6d6b0\", label=\"\\%s\"]\n", node->number_node, TEXT_COMPARISON_SIGNS[(int)node->value]);
 	else
 	if(node->type == COND_TYPE) {
@@ -149,7 +146,7 @@ void draw_draw_node(Node* node) {
 		return;
 
 	FILE* picture = {};
-	char buffer_for_name_file[64];
+	char buffer_for_name_file[MAX_SIZE_BUFFER_FOR_FILE];
 	sprintf(buffer_for_name_file, "%s%d.dot", name_picture_with_tree, count_draw);
 
 	picture = fopen(buffer_for_name_file, "w");
@@ -161,7 +158,7 @@ void draw_draw_node(Node* node) {
     fprintf(picture, "}");
     fclose(picture);
 
-	char buffer_for_system[128];
+	char buffer_for_system[MAX_SIZE_BUFFER_FOR_FILE];
 	sprintf(buffer_for_system, "dot %s -Tpng -O", buffer_for_name_file);
 
 	system(buffer_for_system);

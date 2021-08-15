@@ -8,6 +8,9 @@
 #define IF_DEBUG(code) //code
 
 typedef int Elem_t;
+typedef int Flag_t;
+const char identity[] = "%d";
+
 const int POISON = -3802;
 IF_CANARY_PROTECTION(const int CANARY = -57005;)
 
@@ -120,6 +123,8 @@ int get_len_indent(size_t number);
 */
 
 void write_indent(FILE* file, int count_indent);
+
+struct call_of_dump create_struct(const char* file_name, int number, const char* function_name);
 
 /**
 *   \brief This function displays all information about the stack and the reason for calling it

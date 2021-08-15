@@ -1,4 +1,8 @@
 Introducing a new word into the Newspeak Dictionary:  	x = 9;
 Introducing a new word into the Newspeak Dictionary: 	y = 3;
-Introducing a new word into the Newspeak Dictionary: 	z = x;
-Introducing a new word into the Newspeak Dictionary: 	m = 0;
+
+if Big Brother didn't notice that << x > y >>
+then calmly exhale and do 
+	x = y;
+otherwise you will be taken to room 101
+	y = x;

@@ -19,6 +19,7 @@ enum NODE_TYPE {
 };
 
 const char name_picture_with_tree[] = "tree";
+const size_t MAX_SIZE_BUFFER_FOR_FILE = 128;
 
 struct Node {
 	NODE_TYPE type;

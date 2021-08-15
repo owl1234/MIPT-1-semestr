@@ -79,6 +79,7 @@ struct Parser {
 
   	COMPARISON_SIGNS get_sign_condition() {
   		for(int index = 1; index < COUNT_OF_COMPARISON_SIGNS; ++index) {
+  			printf("\tcheck index %d... %s now, len %lu\n", index, TEXT_COMPARISON_SIGNS[index], LENGTH_TEXT_COMPARISON_SIGNS[index]);
   			if(get_phrase(TEXT_COMPARISON_SIGNS[index], LENGTH_TEXT_COMPARISON_SIGNS[index]) == true)
   				return (COMPARISON_SIGNS)index;
   		}
@@ -420,11 +421,18 @@ struct Parser {
   			syntax_error(INFORMATION_ABOUT_CALL, "Left part of expression not found"); return NULL;
   		}
 
+  		for(int i=0; i < 7; ++i)
+  			printf("%c", *(pointer + i));
+  		printf("\n");
+
+
   		COMPARISON_SIGNS sign_cnd = get_sign_condition();
   		if(sign_cnd == 0) {
   			syntax_error(INFORMATION_ABOUT_CALL, "Sign of condition not found"); return NULL;
   		}
   		pointer += LENGTH_TEXT_COMPARISON_SIGNS[sign_cnd];
+
+  		printf("SING OF COND %s\n", TEXT_COMPARISON_SIGNS[sign_cnd]);
 
   		Node* right_son = get_expression();
   		if(right_son == NULL) {

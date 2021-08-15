@@ -1,28 +1,39 @@
-PUSH rdx
-PUSH 87
-POP rdx
-PUSH 9
-POP [rdx]
-POP rdx
+jmp main
 
-PUSH rdx
-PUSH 88
-POP rdx
-PUSH 3
-POP [rdx]
-POP rdx
+main:
+push rdx
+push 87
+pop rdx
+push 9
+pop [rdx]
+pop rdx
 
-PUSH rdx
-PUSH 89
-POP rdx
-PUSH 9
-POP [rdx]
-POP rdx
+push rdx
+push 88
+pop rdx
+push 3
+pop [rdx]
+pop rdx
 
-PUSH rdx
-PUSH 76
-POP rdx
-PUSH 0
-POP [rdx]
-POP rdx
+cmp 9 3
+ja L0
 
+push rdx
+push 87
+pop rdx
+push 3
+pop [rdx]
+pop rdx
+jmp L1
+
+L0:
+push rdx
+push 88
+pop rdx
+push 9
+pop [rdx]
+pop rdx
+
+L1:
+
+hlt

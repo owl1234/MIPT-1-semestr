@@ -122,6 +122,14 @@ void write_indent(FILE* file, int count_indent) {
     }
 }
 
+struct call_of_dump create_struct(const char* file_name, int number, const char* function_name) {
+    struct call_of_dump tmp = {};
+    tmp.name_file      = file_name;
+    tmp.number_of_line = number;
+    tmp.name_function  = function_name;
+    return tmp;
+}
+
 void stack_dump(Stack_t* node, struct call_of_dump arguments_of_call = base_arguments_of_call) {
     FILE* log_errors = fopen(name_log_file, "a");
 
@@ -343,11 +351,11 @@ Elem_t stack_back(Stack_t* node) {
     IF_DEBUG(stack_err(node, INFORMATION_ABOUT_CALL);)
 
     if(stack_is_empty(node)) {
-        printf("Don't delete end element from stack\n");
+        printf("End element into stack don't exist\n");
         return POISON;
     }
 
-    return node->data[stack_size(node)];
+    return node->data[stack_size(node) - 1];
 }
 
 void stack_clear(Stack_t* node) {
