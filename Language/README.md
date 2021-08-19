@@ -14,3 +14,12 @@ This is a tree of this program.
 ![program_tree_example](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Language/pictures/program_tree_example.png)
 
 [Assembly](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Language/pictures/asm_example.png) and [binary](https://github.com/owl1234/MIPT_projects_1_sem/blob/master/Language/pictures/binary_example.png) code.
+
+### Syntax
+*variable declaration* is **Introducing a new word into the Newspeak Dictionary:**
+*if* is **if Big Brother didn't notice that < cond > then calmly exhale and do**
+*else* is  **otherwise you will be taken to room 101**
+
+
+
+
