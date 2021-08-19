@@ -130,7 +130,7 @@ const int LENGTH_PHRASE_BEGIN_ACTION_1					= 25;
 const int LENGTH_PHRASE_BEGIN_ACTION_2					= 39;
 const int LENGTH_PHRASE_BEGIN_BLOCK						= 1;
 const int LENGTH_PHRASE_END_BLOCK						= 1;
-const int LENGTH_PHRASE_PRINT 							= 49;
+const int LENGTH_PHRASE_PRINT 							= 71;
 
 const char PHRASE_TO_VARIABLE_DECLARATION[128]  = "Introducing a new word into the Newspeak Dictionary:";
 const char PHRASE_TO_CONDITION			 [128] 	= "if Big Brother didn't notice that";
@@ -140,7 +140,7 @@ const char PHRASE_BEGIN_ACTION_1		 [128]	= "then calmly exhale and do";
 const char PHRASE_BEGIN_ACTION_2		 [128] 	= "otherwise you will be taken to room 101";
 const char PHRASE_BEGIN_BLOCK		 	 [2] 	= "{";
 const char PHRASE_END_BLOCK				 [2] 	= "}";
-const char PHRASE_PRINT 				 [64]   = "We will bring praise to Big Brother on TV screens";
+const char PHRASE_PRINT 				 [128]   = "Display the face of Big Brother on the telescreen with the inscription:";
 
 
 #endif

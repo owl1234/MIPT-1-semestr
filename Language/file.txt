@@ -1,8 +1,12 @@
 Introducing a new word into the Newspeak Dictionary:  	x = 9;
 Introducing a new word into the Newspeak Dictionary: 	y = 3;
 
+
 if Big Brother didn't notice that << x > y >>
 then calmly exhale and do 
 	x = y;
 otherwise you will be taken to room 101
 	y = x;
+	
+
+
