@@ -90,30 +90,30 @@ enum COMPARISON_SIGNS {
 	SIGN_NOTHING		= 0,
 	SIGN_EQUAL 			= 1,
 	SIGN_NOT_EQUAL 		= 2,
-	SIGN_LESS 			= 3,
-	SIGN_LESS_OR_EQUAL 	= 4,
-	SIGN_MORE 			= 5,
-	SIGN_MORE_OR_EQUAL  = 6
+	SIGN_LESS_OR_EQUAL	= 3,
+	SIGN_LESS		 	= 4,
+	SIGN_MORE_OR_EQUAL 	= 5,
+	SIGN_MORE 			= 6
 };
 
-const char TEXT_COMPARISON_SIGNS[][COUNT_OF_COMPARISON_SIGNS] = {
+const char TEXT_COMPARISON_SIGNS[][3] = {
 	"",
 	"==",
 	"!=",
-	"<",
 	"<=",
-	">",
-	">="
+	"<",
+	">=",
+	">"
 };
 
 const int LENGTH_TEXT_COMPARISON_SIGNS[] = {
 	0,
 	2,
 	2,
-	1,
 	2,
 	1,
-	2
+	2,
+	1
 };
 
 enum CONDITION_TYPES {
@@ -140,7 +140,7 @@ const char PHRASE_BEGIN_ACTION_1		 [128]	= "then calmly exhale and do";
 const char PHRASE_BEGIN_ACTION_2		 [128] 	= "otherwise you will be taken to room 101";
 const char PHRASE_BEGIN_BLOCK		 	 [2] 	= "{";
 const char PHRASE_END_BLOCK				 [2] 	= "}";
-const char PHRASE_PRINT 				 [128]   = "Display the face of Big Brother on the telescreen with the inscription:";
+const char PHRASE_PRINT 				 [128]  = "Display the face of Big Brother on the telescreen with the inscription:";
 
 
 #endif

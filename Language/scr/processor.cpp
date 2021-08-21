@@ -199,7 +199,8 @@ PROCESSOR_ERRORS processing(Processor* processor) {
                                                                 processor->registers_variables[2], processor->registers_variables[3]);
         printf("now byte: %d, symbols: %d\n", now_byte, processor->symbols);
         )
-        IF_DEBUG(printf("> now_command: %d (byte: %d) \n", now_command, now_byte);)
+        //IF_DEBUG(
+        printf("> now_command: %d (byte: %d) \n", now_command, now_byte);//)
 
        switch (now_command) {
             #include "COMMANDS.H"
@@ -266,6 +267,7 @@ Elem_t get_value_to_compare(Processor* processor, int* now_byte) {
 
 Elem_t get_byte_from_text(Processor* processor, int* now_byte) {
     ++(*now_byte);
+    //printf("%!!! %x\n", processor->text[*now_byte]);
     return processor->text[*now_byte];
 }
 
@@ -281,7 +283,7 @@ inline int get_long_long_number_from_binary(Processor* processor, int* now_byte)
 
     char* ptr_to_number = processor->text + (*now_byte);
     IF_DEBUG_PROCESSOR(
-    printf("\tptr to num: %c\n", *ptr_to_number);
+    printf("\t ptr to num: %x %x %x %x\n", *(ptr_to_number), *(ptr_to_number + 1), *(ptr_to_number + 2), *(ptr_to_number + 3));
 
     for(int i = 0; i < processor->symbols; ++i) {
         if(i == *now_byte)
@@ -292,10 +294,13 @@ inline int get_long_long_number_from_binary(Processor* processor, int* now_byte)
 
     for(int i = SIZE_BYTE - 1; i >= 0; --i) {
         long long byte = ptr_to_number[i];
+        //printf("\t\t\tbyte %lld\n", byte);
         if(byte < 0 && i != SIZE_BYTE - 1)
             byte += (1 << SIZE_BYTE);
+        //printf("\t\t\tbyte %lld\n", byte);
 
         result_number += byte;
+        //printf("\t\tres num %lld\n\n", result_number);
 
         if(i > 0) {
             result_number <<= SIZE_BYTE;

@@ -3,11 +3,10 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				August 15, 2021, 23:06:08
+        				August 21, 2021, 22:32:18
     
     What was changed?
-    					1. Added assembly and processing. Hooray!
-						2. Fixed stack_back. Even in such a simple function, I made a mistake. Ha-ha!
+    					1. Fixed bugs in conditions
 
 	To-do list
 						1. Make loops (for/while)

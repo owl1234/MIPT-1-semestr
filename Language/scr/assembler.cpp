@@ -135,7 +135,6 @@ int assembling_file(File* input_file, const char* name_output_file) {
     int index_in_assembled_text = 0, number_of_byte = 0;
 
     write_signature(assembled_text, &index_in_assembled_text, &number_of_byte);
-    printf("!!! AFTER SIGNATURE BYTE %d\n", number_of_byte);
 
     Label* labels = (Label*)calloc(MAX_COUNT_LABELS, sizeof(Label));
     int status = 0, index_in_labels = 0, number_of_condition = 0, number_of_command = 0, first_type_of_value = 0, second_type_of_value = 0;
@@ -215,7 +214,7 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
             ++(*index_in_labels);
 
         } else if(!strcmp("push", temp_string)) {
-            printf("\t\tfind push, byte %d\n", copy_number_of_byte);
+            //printf("\t\tfind push, byte %d\n", copy_number_of_byte);
             ++copy_number_of_byte;
 
             strcpy(prev_string, temp_string);
@@ -232,11 +231,11 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
             if(type_value == (IS_RAM | IS_REGISTER | IS_ELEM_T))
                 copy_number_of_byte += 1 + BYTE_IN_ELEM_TYPE + 1;
             
-            printf("\t\tend push, byte %d\n", copy_number_of_byte);        
+            //printf("\t\tend push, byte %d\n", copy_number_of_byte);        
         } else if(!strcmp("pop", temp_string)) {
             copy_number_of_byte += NUMBER_ARGUMENTS_FOR_OPERATION[OPERATION_CODE_POP] + 1;
         } else if(!strcmp("cmp", temp_string)) {
-            printf("\t\tfind cmp, byte %d\n", copy_number_of_byte);
+            //printf("\t\tfind cmp, byte %d\n", copy_number_of_byte);
             ++copy_number_of_byte;
 
             strcpy(prev_string, temp_string);
@@ -260,9 +259,9 @@ void find_labels_into_text(File* input_file, Label* labels, int* index_in_labels
             if(type_second_value == IS_REGISTER)
                 copy_number_of_byte += 2;
             
-            printf("\t\tsecond cmp arg find, byte %d - end!\n", copy_number_of_byte);
+            //printf("\t\tsecond cmp arg find, byte %d - end!\n", copy_number_of_byte);
         } else if(!strcmp("jmp", temp_string) || !strcmp("call", temp_string) || is_text_connected_with_labels(temp_string, &number_of_condition)) {
-            printf("\tfind %s on %d byte\n", temp_string, copy_number_of_byte);
+            //printf("\tfind %s on %d byte\n", temp_string, copy_number_of_byte);
             copy_number_of_byte += BYTE_IN_ELEM_TYPE;
         } else {
             ++copy_number_of_byte;
@@ -347,7 +346,7 @@ int put_cmp_value(char* text, char* assembled_text, int* index_in_assembled_text
 void put_opcode_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     char converted_code = (char)code_of_operation;
 
-    printf("put_opcode_into_assembled_text, %c\n", code_of_operation);
+    //printf("put_opcode_into_assembled_text, %c\n", code_of_operation);
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
@@ -357,7 +356,7 @@ void put_opcode_into_assembled_text(int code_of_operation, char* assembled_text,
 void put_char_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     char converted_code = (char)code_of_operation;
 
-    printf("put_char_into_assembled_text, %c\n", converted_code);
+    //printf("put_char_into_assembled_text, %c\n", converted_code);
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
@@ -367,7 +366,7 @@ void put_char_into_assembled_text(int code_of_operation, char* assembled_text, i
 void put_int_into_assembled_text(char code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     char converted_code = (char)code_of_operation;
 
-    printf("put_int_into_assembled_text (c->i), %c\n", converted_code);
+    //printf("put_int_into_assembled_text (c->i), %c\n", converted_code);
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
@@ -376,7 +375,7 @@ void put_int_into_assembled_text(char code_of_operation, char* assembled_text, i
 
 void put_int_into_assembled_text(int code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     int converted_code = (int)code_of_operation;
-    printf("put_int_into_assembled_text (i), %d\n", code_of_operation);
+    //printf("put_int_into_assembled_text (i), %d\n", code_of_operation);
 
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(int)); //
     *index_in_assembled_text += sizeof(int);
@@ -386,7 +385,7 @@ void put_int_into_assembled_text(int code_of_operation, char* assembled_text, in
 
 void put_int_into_assembled_text(long long code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
     long long converted_code = code_of_operation;
-    printf("put_int_into_assembled_text (%lld)\n", code_of_operation);
+    //printf("put_int_into_assembled_text (%lld)\n", code_of_operation);
 
     memcpy(assembled_text + *index_in_assembled_text, &converted_code, sizeof(long long)); //
     *index_in_assembled_text += sizeof(long long);
@@ -395,7 +394,7 @@ void put_int_into_assembled_text(long long code_of_operation, char* assembled_te
 }
 /*
 void put_double_into_assembled_text(double code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
-    printf("put_double_into_assembled_text, %lg (%x)\n", code_of_operation, code_of_operation);
+    //printf("put_double_into_assembled_text, %lg (%x)\n", code_of_operation, code_of_operation);
     memcpy(assembled_text + *index_in_assembled_text, &code_of_operation, sizeof(double)); //
     *index_in_assembled_text += sizeof(double);
 
@@ -403,7 +402,7 @@ void put_double_into_assembled_text(double code_of_operation, char* assembled_te
 }
 
 void put_double_into_assembled_text(char code_of_operation, char* assembled_text, int* index_in_assembled_text, int* number_of_byte) {
-    printf("put_char_into_assembled_text, %c\n", code_of_operation);
+    //printf("put_char_into_assembled_text, %c\n", code_of_operation);
     memcpy(assembled_text + *index_in_assembled_text, &code_of_operation, sizeof(char)); //
     *index_in_assembled_text += sizeof(char);
 
@@ -464,14 +463,12 @@ int reversed_number(int value, int* length) {
 }
 
 size_t get_number_of_register_from_ram_reg_elem_t(char* search_string) {
-    //printf("\t\t\t\t!!!!!!!!!!!!\n");
     for(size_t registr=0; registr<number_of_register_vars; ++registr) 
         if(strstr(search_string, TEXT_REGISTERS[registr])) {
             //printf("\t\t\t\t!!!!!!!!!!!! %d\n", registr);
             return registr;
         }
 
-    //printf("\t\t\t\t!!!!!!!!!!!! \n");
     return ERROR_NUMBER;
 }
 

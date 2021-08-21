@@ -1,5 +1,8 @@
 #define GET_ADDRESS_LABEL_GO_TO                                         \
-    int address_label = get_byte_from_text(processor, &now_byte);       \
+    /*int address_label = get_byte_from_text(processor, &now_byte); */  \
+    ++now_byte;                                                         \
+    int address_label = get_long_long_number_from_binary(processor, &now_byte); \
+    --now_byte;                                                         \
                                                                         \
     if(address_label == OPERATION_CODE_RECURSIVE_RET) {                 \
         COMMAND_ret;                                                    \
@@ -9,7 +12,6 @@
         /*printf("!!! NOW BYTE !!! %d !!!\n", now_byte);*/              \
     }
 
-    //- 2 + SIGNATURE_SIZE - 1 + BYTE_IN_ELEM_TYPE;
 
 #define PUT_ADDRESS_LABEL_GO_TO(code_of_operation)                                                                                      \
     print_labels(disasm_struct.labels, disasm_struct.index_in_labels);                                                                  \
@@ -39,7 +41,7 @@
                                                                                                                                         \
     listing(input_file->listing_file, NOTHING, ONE_ARGUMENT, code_of_command);                                                          \
     listing(input_file->listing_file, "|", SPACE);                                                                                      \
-    listing(input_file->listing_file, CPU_TEXT_OPERATION[code_of_command], END_LINE);                                                       \
+    listing(input_file->listing_file, CPU_TEXT_OPERATION[code_of_command], END_LINE);                                                   \
 
 
 #define CONDITION_COMMANDS(number_of_condition)                                                                                         \
@@ -498,8 +500,9 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( jmp, OPERATION_CODE_JMP, 1,
 PROCESSOR (
-    int address_label = get_byte_from_text(processor, &now_byte);
-    now_byte = address_label - 2;
+    int address_label = get_long_long_number_from_binary(processor, &now_byte);
+    //now_byte = address_label - 2;
+    //printf("ja byte %d, label %x\n", now_byte, address_label);
 ),
 DISASSEMBLER (
     PUT_ADDRESS_LABEL_GO_TO(OPERATION_CODE_JMP)
@@ -511,11 +514,11 @@ ASSEMBLER (
 
 DEFINE_COMMANDS ( cmp, OPERATION_CODE_CMP, 4,
 PROCESSOR (
-    ++now_byte;
+    //++now_byte;
     first_comparison  = get_value_to_compare(processor, &now_byte);
 
     second_comparison = get_value_to_compare(processor, &now_byte);
-    --now_byte;
+    //--now_byte;
 ),
 DISASSEMBLER (
     put_char_into_disassembled_text(TEXT_OPERATION[OPERATION_CODE_CMP], &disasm_struct, SPACE);
@@ -578,7 +581,9 @@ ASSEMBLER (
 DEFINE_COMMANDS ( ja, OPERATION_CODE_JA, 1,
 PROCESSOR (
     if(first_comparison > second_comparison) {
+
         GET_ADDRESS_LABEL_GO_TO
+        printf("ja byte %d, label %x\n", now_byte, address_label);
     } else {
         int address_label = get_byte_from_text(processor, &now_byte);
         now_byte += BYTE_IN_ELEM_TYPE - 1;
@@ -599,6 +604,7 @@ DEFINE_COMMANDS ( jae, OPERATION_CODE_JAE, 1,
 PROCESSOR (
     if(first_comparison >= second_comparison) {
         GET_ADDRESS_LABEL_GO_TO
+        printf("jae byte %d, label %d\n", now_byte, address_label);
     } else {
         int address_label = get_byte_from_text(processor, &now_byte);
         now_byte += BYTE_IN_ELEM_TYPE - 1;
