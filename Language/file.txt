@@ -1,22 +1,10 @@
-Introducing a new word into the Newspeak Dictionary:  	x = 5;
-Introducing a new word into the Newspeak Dictionary: 	y = 3;
-Introducing a new word into the Newspeak Dictionary: 	z = 8;
-Introducing a new word into the Newspeak Dictionary: 	m = 0;
+Introducing a new word into the Newspeak Dictionary:  	x = 3;
+Introducing a new word into the Newspeak Dictionary: 	y = 2;
 
-if Big Brother didn't notice that << x > y >>
-then calmly exhale and do {
-	m = x;
-}
-otherwise you will be taken to room 101 {
-	m = y;
-}
+x = 12;
+y *= 12;
 
-if Big Brother didn't notice that << z > m >>
-then calmly exhale and do {
-	m = z;
-}
-otherwise you will be taken to room 101 {
-	m = m;
-}
 
-Display the face of Big Brother on the telescreen with the inscription: {m};
+Display the face of Big Brother on the telescreen with the inscription: {x};
+Display the face of Big Brother on the telescreen with the inscription: {y};
+

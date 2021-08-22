@@ -21,6 +21,11 @@ struct Name_table {
 	size_t address;
 };
 
+struct Condition_parts {
+	int left_value;
+	int right_value;
+};
+
 struct Compiler {
 	FILE* asm_code;
 	Stack_t stack_frame;
@@ -65,8 +70,14 @@ struct Compiler {
   			case COND_TYPE:
   				compiling_condition(node->left, remember_or_not);
   				break;
+  			case LOOP_TYPE:
+  				compiling_loop(node->left, remember_or_not);
+  				break;
   			case PRINT:
   				compiling_print(node->left, remember_or_not);
+  				break;
+  			case ASSIGN_TYPE:
+  				compiling_operator(node->left, remember_or_not);
   				break;
   		};
 
@@ -76,13 +87,19 @@ struct Compiler {
 
   	void compiling_operator(Node* node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
   		printf("begin compile oper\n");
-  		switch((int)node->value) {
-  			case EQUAL:
-  				printf("equal\n");
-  				compiling_assignment(node, asm_code, remember_or_not);
-  				break;
+  		if(node->type == OPERATOR) {
+  			switch((int)node->value) {
+	  			case EQUAL:
+	  				printf("equal\n");
+	  				compiling_assignment(node, asm_code, remember_or_not);
+	  				break;
 
-  		};
+	  		};
+	  	}
+
+	  	else
+	  	if(node->type == ASSIGN_TYPE)
+	  		compiling_assignment(node, asm_code, remember_or_not);
   		printf("end compile oper\n");
   	}
 
@@ -100,7 +117,45 @@ struct Compiler {
   	}
 
   	void compiling_condition(Node* node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
-  		enum TYPE_CONDS {
+  		Condition_parts values_in_cond = compiling_condition_expression(node);
+  		
+  		size_t else_label = count_of_functions;
+  		fprintf(asm_code, "%s L%lu\n\n", CPU_TEXT_OPERATION[(int)get_index_of_CPU_operation((COMPARISON_SIGNS)node->left->value)], 
+  									     else_label);
+  		++count_of_functions;
+
+  		bool is_condition_right = get_truth_of_cond(node->left, values_in_cond.left_value, values_in_cond.right_value);
+  		compiling(node->right->right, (OPER_INTO_COND)!is_condition_right);
+
+  		fprintf(asm_code, "jmp L%lu\n"
+  						  "\nL%lu:\n", count_of_functions, else_label);
+  		++count_of_functions;
+  		compiling(node->right->left, (OPER_INTO_COND)is_condition_right);
+
+  		fprintf(asm_code, "\nL%lu:\n", count_of_functions - 1);
+  	}
+
+  	void compiling_loop(Node* node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
+		size_t loop_label = count_of_functions, exit_from_loop_label = 0;
+  		++count_of_functions;
+
+  		fprintf(asm_code, "\nL%lu:\n", loop_label);
+		Condition_parts values_in_cond = compiling_condition_expression(node);
+
+		exit_from_loop_label = count_of_functions;
+		++count_of_functions;
+
+		bool is_condition_right = get_truth_of_cond(node->left, values_in_cond.left_value, values_in_cond.right_value);
+
+  		fprintf(asm_code, "%s L%lu\n\n", CPU_TEXT_OPERATION[(int)get_index_of_opposite_CPU_operation(get_index_of_CPU_operation((COMPARISON_SIGNS)node->left->value))], 
+  									     exit_from_loop_label);
+
+  		compiling(node->right->left, (OPER_INTO_COND)is_condition_right);
+		fprintf(asm_code, "jmp L%lu\n\nL%lu:\n", loop_label, exit_from_loop_label);
+  	}
+
+  	Condition_parts compiling_condition_expression(Node* node) {
+		enum TYPE_CONDS {
   			NOTHING_TYPE 	   = 0,
   			LEFT_VAR_RIGHT_VAR = 1,
   			LEFT_NUM_RIGHT_VAR = 2,
@@ -119,8 +174,8 @@ struct Compiler {
   							  "pop rax\n"
   							  "push [%lu]\n"
   							  "pop rbx\n"
-  							  "cmp rax rbx\n", left_var_addrss, right_var_addrss); //, memory[left_var_addrss], memory[right_var_addrss]);
-  			left_value = memory[left_var_addrss]; right_value = memory[right_var_addrss];
+  							  "cmp rax rbx\n", left_var_addrss, right_var_addrss);
+  			left_value = memory[left_var_addrss];      right_value = memory[right_var_addrss];
   		} 
   		else
   		if((int)node->left->left->type == NUMBER && (int)node->left->right->type == VARIABLE) {		// 5 < x
@@ -138,66 +193,88 @@ struct Compiler {
   			fprintf(asm_code, "push [%lu]\n"
   							  "pop rax\n"
 							  "cmp rax %d\n", left_var_addrss, (int)node->left->right->value);
-  			left_value = memory[left_var_addrss]; right_value = (int)node->left->right->value;
+  			left_value = memory[left_var_addrss];      right_value = (int)node->left->right->value;
   		}
   		else
   		if((int)node->left->left->type == NUMBER && (int)node->left->right->type == NUMBER)	{		// 3 < 5
   			now_type = LEFT_NUM_RIGHT_NUM;
   			fprintf(asm_code, "cmp %d %d\n", (int)node->left->left->value, (int)node->left->right->value);
   			left_value = (int)node->left->left->value; right_value = (int)node->left->right->value;
-  		}
-  		
-  		size_t else_label = count_of_functions;
-  		fprintf(asm_code, "%s L%lu\n\n", CPU_TEXT_OPERATION[(int)get_index_of_CPU_operation((COMPARISON_SIGNS)node->left->value)], 
-  									     else_label);
-  		++count_of_functions;
+  		}  		
 
-  		bool is_condition_right = get_truth_of_cond(node->left, left_value, right_value);
-  		//printf("\t\t\t\t%d\n", is_condition_right);
-  		compiling(node->right->right, (OPER_INTO_COND)!is_condition_right);
+  		Condition_parts values = {};
+  		values.left_value  = left_value;
+  		values.right_value = right_value;
 
-  		fprintf(asm_code, "jmp L%lu\n"
-  						  "\nL%lu:\n", count_of_functions, else_label);
-  		++count_of_functions;
-  		compiling(node->right->left, (OPER_INTO_COND)is_condition_right);
-
-  		fprintf(asm_code, "\nL%lu:\n", count_of_functions - 1);
+  		return values;
   	}
 
   	void compiling_assignment(Node* node, FILE* need_buffer, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
   		size_t var_addrss = find_variable_address(node->left->value);
   		printf("\tassignment! var address %lu, var %c\n", var_addrss, (char)node->left->value);
-  		fprintf(need_buffer, "push rdx\n"
+  		fprintf(need_buffer, "push rax\n"
+  							 "push rdx\n"
   						     "push %ld\n"
   						     "pop rdx\n", var_addrss);
-  		
 
-  		if(node->right->type == NUMBER) {
-  			printf("\tleft is number, %d\n", (int)node->right->value);
-  			fprintf(need_buffer, "push %d\n"
-  							     "pop [rdx]\n", (int)node->right->value);
+  		if(node->type != ASSIGN_TYPE || node->type == ASSIGN_TYPE && node->value == SIGN_ASSIGNMENT) {
+	  		if(node->right->type == NUMBER) {
+	  			printf("\tright is number, %d\n", (int)node->right->value);
+	  			fprintf(need_buffer, "push %d\n"
+	  							     "pop [rdx]\n", (int)node->right->value);
 
-  			if(remember_or_not != INTO_FALSE_OPTION)
-  				memory[var_addrss] = (int)node->right->value;
-  		}  			
-  	  	else
-  	  	if(node->right->type == VARIABLE) {
-  	  		size_t right_var_addrss = find_variable_address(node->right->value);
-  	  		printf("\tleft is var, %c, flag %d\n", (char)node->right->value, remember_or_not);
-  			fprintf(need_buffer, "push %d\n"
-  			                     "pop [rdx]\n", memory[right_var_addrss]);
+	  			if(remember_or_not != INTO_FALSE_OPTION)
+	  				memory[var_addrss] = (int)node->right->value;
+	  		}  			
+	  	  	else
+	  	  	if(node->right->type == VARIABLE) {
+	  	  		size_t right_var_addrss = find_variable_address(node->right->value);
+	  	  		printf("\tright is var, %c, flag %d\n", (char)node->right->value, remember_or_not);
+	  			fprintf(need_buffer, "push %d\n"
+	  			                     "pop [rdx]\n", memory[right_var_addrss]);
 
-  			if(remember_or_not != INTO_FALSE_OPTION)
-  				memory[var_addrss] = memory[right_var_addrss];
-  	  	}
-  	  	else
-  			compilation_error(INFORMATION_ABOUT_CALL, "assignment error!");
+	  			if(remember_or_not != INTO_FALSE_OPTION)
+	  				memory[var_addrss] = memory[right_var_addrss];
+	  	  	}
+	  	  	else
+	  			compilation_error(INFORMATION_ABOUT_CALL, "assignment error!");
+  		}
+  		else {
+  			fprintf(asm_code, "push [rdx]\n"
+  							  "push %d\n", (int)node->right->value);
 
-  		fprintf(need_buffer, "pop rdx\n");
+  			switch((int)node->value) {
+  				case SIGN_ASSIGN_NOTHING:
+  				case SIGN_ASSIGNMENT:
+  					break;
+  				default:
+  					fprintf(asm_code, "%s\n"
+  									  "pop [rdx]\n", TEXT_ASM_ARITHMETIC_OPERATIONS[(int)node->value]);
+  			}
+
+  			if(remember_or_not != INTO_FALSE_OPTION) {
+	  			switch((int)node->value) {
+	  				case SIGN_ADDITION:
+	  					memory[var_addrss] += node->right->value;
+	  					break;
+	  				case SIGN_SUBTRACTION:
+	  					memory[var_addrss] -= node->right->value;
+	  					break;
+	  				case SIGN_MULTIPLICATION:
+	  					memory[var_addrss] *= node->right->value;
+	  					break;
+	  				case SIGN_DIVISION:
+	  					memory[var_addrss] /= node->right->value;
+	  					break;
+	  			};
+	  		}
+  		}
+
+  		fprintf(need_buffer, "pop rdx\n"
+  							 "pop rax\n");
   	}
 
   	CPU_OPERATIONS_CODES get_index_of_CPU_operation(const COMPARISON_SIGNS operation) {
-  		//printf("!!!!!\n!!!! %d operation !!!\n", operation);
   		switch(operation) {
   			case SIGN_EQUAL:
   				return OPERATION_CODE_JE;
@@ -238,7 +315,6 @@ struct Compiler {
   	}
 
   	bool get_truth_of_cond(Node* node, int left_value, int right_value) {
-  		//printf("\t\t\t\ttype: %d %d (%d) %d\n", left_value, (int)node->value, SIGN_MORE, right_value);
   		switch((int)node->value) {
   			case SIGN_EQUAL:
   				return left_value == right_value;

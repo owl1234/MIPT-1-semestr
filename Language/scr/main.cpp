@@ -3,14 +3,15 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				August 21, 2021, 22:32:18
+        				August 22, 2021, 19:49:01
     
     What was changed?
-    					1. Fixed bugs in conditions
+    					1. Added loops 
+    					2. Added +=, -=, *=, /=
 
 	To-do list
-						1. Make loops (for/while)
-						2. Make functions
+						1. Make functions
+						2. Make expression evaluations
 
 */
 

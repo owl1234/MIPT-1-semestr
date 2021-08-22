@@ -6,16 +6,20 @@
 #include "warnings.h"
 
 /*
-		G 		::= Cond | L {L}* '\0'																					//L {L}* '\0'
-																													//L 		::= V_DECL | A ;															- line
+		G 		::= Cond | Loop | L {Cond | Loop | L}* '\0'		
+
+		Loop    ::= PHRASE_LOOP_COND Bdy_cond
+					PHRASE_BEGIN_LOOP_BODY `{` Loop_body `}`								- loop
+		Loop_bdy::= L
+
 		Cond 	::= PHRASE_COND Bdy_cond 
-					PHRASE_BEGIN_ACTION_1 PHRASE_BEGIN_BLOCK Act_cond PHRASE_END_BLOCK 
-					PHRASE_BEGIN_ACTION_2 PHRASE_BEGIN_BLOCK Act_cond PHRASE_END_BLOCK 		- condition
-		Bdy_cond::= PHRASE_BEGIN_COND E COMPARISON_SIGNS E PHRASE_END_COND												
+					PHRASE_BEGIN_ACTION_1 `{` Act_cond `}` 
+					PHRASE_BEGIN_ACTION_2 `{` Act_cond `}`									- condition
+		Bdy_cond::= `<<` E COMPARISON_SIGNS E `>>`												
 		Act_cond::= L 																							
 		V_DECL  ::= PHRASE_DECL V {'=' E}*													- var decl
 		L 		::= V_DECL | A | PRINT;														- line
-		PRINT   ::= PHRASE_PRINT PHRASE_BEGIN_BLOCK [V N] PHRASE_END_BLOCK 					- print
+		PRINT   ::= PHRASE_PRINT `{` [V N] `}`							 					- print
 		A 		::= V '=' E 																- assignment
 		E 		::= T {[+ -], T}* 															- expression
 		T 		::= D {[* /], D}* 															- term
@@ -89,17 +93,29 @@ struct Parser {
 
   	COMPARISON_SIGNS get_sign_condition() {
   		for(int index = 1; index < COUNT_OF_COMPARISON_SIGNS; ++index) {
-  			//printf("\tcheck index %d... now %s, len %lu\n", index, TEXT_COMPARISON_SIGNS[index], LENGTH_TEXT_COMPARISON_SIGNS[index]);
   			if(get_phrase(TEXT_COMPARISON_SIGNS[index], LENGTH_TEXT_COMPARISON_SIGNS[index]) == true)
   				return (COMPARISON_SIGNS)index;
   		}
 
-  		return SIGN_NOTHING;
+  		return SIGN_COMPAR_NOTHING;
+  	}
+
+  	ASSIGNMENT_SIGNS get_sign_assignment() {
+  		for(int index = 1; index < COUNT_OF_ASSIGNMENT_SIGNS; ++index) {
+  			if(get_phrase(TEXT_ASSIGNMENT_SIGNS[index], LENGTH_TEXT_ASSIGNMENT_SIGNS[index]) == true)
+  				return (ASSIGNMENT_SIGNS)index;
+  		}
+
+  		return SIGN_ASSIGN_NOTHING;
   	}
 
   	Node* get_number() {
   		IF_DEBUG_PARSING(printf("GET_N\n");)
   		char* ptr_after_number = NULL;
+  		printf("$$$$$");
+  		for(int i=0; i<10; ++i)
+  			printf("%c", *(pointer+i));
+  		printf("$$$$$$\n\n");
 		double value = strtod(pointer, &ptr_after_number);
 
 		if(pointer == ptr_after_number)
@@ -315,16 +331,19 @@ struct Parser {
   		if(left_son == NULL)
   			return NULL;
 
-  		if(*pointer != '=') {
-  			syntax_error(INFORMATION_ABOUT_CALL);;
-  			return NULL;
+  		ASSIGNMENT_SIGNS assign_sign = get_sign_assignment();
+  		if(assign_sign == SIGN_ASSIGN_NOTHING) {
+  			syntax_error(INFORMATION_ABOUT_CALL, "Sign of assignment not found"); return NULL;
   		}
+  		pointer += LENGTH_TEXT_ASSIGNMENT_SIGNS[assign_sign];
 
-  		++pointer;
+  		skip_spaces();
 
+  		printf("begin right son - expr, sign %s\n", TEXT_ASSIGNMENT_SIGNS[(int)assign_sign]);
   		Node* right_son = get_expression();
+  		printf("right son type %d, value %d\n", right_son->type, (int)right_son->value);
 
-  		Node* new_node = node_construct(OPERATOR, EQUAL, NULL, NULL);
+  		Node* new_node = node_construct(ASSIGN_TYPE, (int)assign_sign, NULL, NULL);
   	  	node_make_copy(left_son,  new_node->left);
   	  	node_make_copy(right_son, new_node->right);
 
@@ -438,8 +457,8 @@ struct Parser {
 
 
   		COMPARISON_SIGNS sign_cnd = get_sign_condition();
-  		printf("Find sign comparison %d\n", sign_cnd);
-  		if(sign_cnd == 0) {
+  		//printf("Find sign comparison %d\n", sign_cnd);
+  		if(sign_cnd == SIGN_COMPAR_NOTHING) {
   			syntax_error(INFORMATION_ABOUT_CALL, "Sign of condition not found"); return NULL;
   		}
   		pointer += LENGTH_TEXT_COMPARISON_SIGNS[sign_cnd];
@@ -477,10 +496,7 @@ struct Parser {
   		Node* left_son = get_body_condition();
   		if(left_son == NULL) {
   			syntax_error(INFORMATION_ABOUT_CALL, "Body condition not found"); return NULL;
-  		} /*else
-  			printf("find body cond\n");*/
-
-  		//printf("%c%c%c%c\n", *pointer, *(pointer + 1), *(pointer + 2), *(pointer + 3));
+  		}
 
   		skip_spaces();
 
@@ -515,10 +531,6 @@ struct Parser {
 
    		SEARCH_END_BLOCK
 
-  		if(right_left_son == NULL || right_right_son == NULL) {
-  			syntax_error(INFORMATION_ABOUT_CALL, " not found"); return NULL;
-  		} 
-
   		Node* right_son = node_construct(COND_TYPE, ACTIONS, NULL, NULL);
   		node_make_copy(right_left_son,  right_son->left);
   		node_make_copy(right_right_son, right_son->right);
@@ -546,13 +558,57 @@ struct Parser {
  		return new_node;
   	}
 
+  	Node* get_loop() {
+  		IF_DEBUG_PARSING(printf("GET_LOOP\n");)
+  		skip_spaces();
+
+  		if(!get_phrase(PHRASE_BEGIN_LOOP_CONDITION, LENGTH_PHRASE_BEGIN_LOOP_CONDITION)) {
+  			return NULL;
+  		}
+		
+		pointer += LENGTH_PHRASE_BEGIN_LOOP_CONDITION;
+  		skip_spaces();
+
+  		Node* left_son = get_body_condition();
+  		if(left_son == NULL) {
+  			syntax_error(INFORMATION_ABOUT_CALL, "Body condition not found"); return NULL;
+  		}
+
+  		skip_spaces();
+
+  		if(!get_phrase(PHRASE_BEGIN_LOOP_BODY, LENGTH_PHRASE_BEGIN_LOOP_BODY)) {
+  			syntax_error(INFORMATION_ABOUT_CALL, "don't find phrase to begin loop\n"); return NULL;
+  		}
+		
+		pointer += LENGTH_PHRASE_BEGIN_LOOP_BODY;
+  		skip_spaces();
+
+   		SEARCH_BEGIN_BLOCK
+
+  		Node* loop_actions  = get_line();
+
+  		skip_spaces();
+
+   		SEARCH_END_BLOCK
+
+  		skip_spaces();
+
+  		Node* right_son = node_construct(LOOP_TYPE, ACTIONS, NULL, NULL);
+  		node_make_copy(loop_actions, right_son->left);
+
+  		Node* answer = node_construct(LOOP_TYPE, CONDITION, NULL, NULL);
+  		node_make_copy(left_son,  answer->left);
+  		node_make_copy(right_son, answer->right);
+
+  		return answer;
+
+  	}
+
   	Node* get_line() {
 		IF_DEBUG_PARSING(printf("GET_LINE\n");)
 		skip_spaces();
 
 		bool is_it_condition = true;
-
-		//printf("\tline!!\n");
 
 		Node* new_node = node_construct(OPERATOR, SEMICOLON, NULL, NULL);
 		new_node->left = get_condition();
@@ -563,11 +619,18 @@ struct Parser {
 		} else printf("find cond\n");
 
 		if(new_node->left == NULL) {
+  			new_node->left = get_loop();
+  			is_it_condition = true;
+		} /*else printf("find loop!!!\n");*/
+
+		if(new_node->left == NULL) {
   			new_node->left = get_variable_declaration();
+  			is_it_condition = false;
 		} /*else printf("find print!!!\n");*/
 
   		if(new_node->left == NULL) {
   			new_node->left = get_assignment();
+  			is_it_condition = false;
   		} /*else printf("find var declare\n");*/
 
   		if(new_node->left == NULL)
@@ -584,6 +647,7 @@ struct Parser {
 
   			new_node->right = get_line();
   		} else if(is_it_condition == false) {
+  			printf("####%c%c%c%c%c%c\n", *(pointer-2), *pointer, *(pointer+1), *(pointer+2), *(pointer+3), *(pointer+4));
   			syntax_error(INFORMATION_ABOUT_CALL, "Semicolon not found\n");
   		}
 

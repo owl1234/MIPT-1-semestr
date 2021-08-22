@@ -3,7 +3,7 @@ digraph graphname {
 	node4 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
 	node4 -> node2
 	node4 -> node3
-	node3 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="5"]
+	node3 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="3"]
 	node1 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
 	node1 -> node4
 	node1 -> node5
@@ -11,85 +11,35 @@ digraph graphname {
 	node8 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
 	node8 -> node6
 	node8 -> node7
-	node7 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="3"]
+	node7 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="2"]
 	node5 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
 	node5 -> node8
 	node5 -> node9
-	node10 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="z"]
+	node10 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
 	node12 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
 	node12 -> node10
 	node12 -> node11
-	node11 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="8"]
+	node11 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="12"]
 	node9 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
 	node9 -> node12
 	node9 -> node13
-	node14 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node16 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
+	node14 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="y"]
+	node16 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="*="]
 	node16 -> node14
 	node16 -> node15
-	node15 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="0"]
+	node15 [shape="record", style="filled", color="#1c3612", fillcolor="#ccffcc", label="12"]
 	node13 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
 	node13 -> node16
 	node13 -> node17
-	node39 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node20 [shape="record", style="filled", color="#4a4432", fillcolor="#d6d6b0", label="\>"]
-	node20 -> node39
-	node20 -> node40
-	node40 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="y"]
-	node38 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="COND"]
-	node38 -> node20
-	node38 -> node31
-	node43 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node42 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node42 -> node43
-	node42 -> node44
-	node44 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
-	node41 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node41 -> node42
-	node31 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="ACTIONS"]
-	node31 -> node41
-	node31 -> node45
-	node47 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node46 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node46 -> node47
-	node46 -> node48
-	node48 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="y"]
-	node45 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node45 -> node46
+	node19 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="x"]
+	node18 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="PRINT"]
+	node18 -> node19
 	node17 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node17 -> node38
-	node17 -> node49
-	node71 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="z"]
-	node52 [shape="record", style="filled", color="#4a4432", fillcolor="#d6d6b0", label="\>"]
-	node52 -> node71
-	node52 -> node72
-	node72 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node70 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="COND"]
-	node70 -> node52
-	node70 -> node63
-	node75 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node74 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node74 -> node75
-	node74 -> node76
-	node76 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="z"]
-	node73 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node73 -> node74
-	node63 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="ACTIONS"]
-	node63 -> node73
-	node63 -> node77
-	node79 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node78 [shape="record", style="filled", color="red", fillcolor="#ffeeed", label="="]
-	node78 -> node79
-	node78 -> node80
-	node80 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node77 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node77 -> node78
-	node49 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node49 -> node70
-	node49 -> node81
-	node83 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="m"]
-	node82 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="PRINT"]
-	node82 -> node83
-	node81 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
-	node81 -> node82
+	node17 -> node18
+	node17 -> node20
+	node22 [shape="record", style="filled", color="blue", fillcolor="#dbefff", label="y"]
+	node21 [shape="record", style="filled", color="#3d0e69", fillcolor="#eddefa", label="PRINT"]
+	node21 -> node22
+	node20 [shape="record", style="filled", color="#3d2504", fillcolor="#ffdb99", label=";"]
+	node20 -> node21
 }

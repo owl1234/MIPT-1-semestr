@@ -128,17 +128,20 @@ static void draw_type_node(Node* node, FILE* picture) {
 	if(node->type == COMPARE_SIGN) 
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#4a4432\", fillcolor=\"#d6d6b0\", label=\"\\%s\"]\n", node->number_node, TEXT_COMPARISON_SIGNS[(int)node->value]);
 	else
-	if(node->type == COND_TYPE) {
-		if(node->value == CONDITION)
-			fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"COND\"]\n", node->number_node);
-		else
-			fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"ACTIONS\"]\n", node->number_node);
-	}
+	if(node->type == COND_TYPE || node->type == LOOP_TYPE && node->value == ACTIONS)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"%s\"]\n", node->number_node, PHRASE_CONDITION_OR_LOOP_TYPES[(int)node->value]);
+	else
+	if(node->type == LOOP_TYPE)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"LOOP\"]\n", node->number_node);
 	else
 	if(node->type == PRINT)
 		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#3d0e69\", fillcolor=\"#eddefa\", label=\"PRINT\"]\n", node->number_node);
 	else
-		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#1c3612\", fillcolor=\"#ccffcc\", label=\"%lg\"]\n", node->number_node, node->value);
+	if(node->type == ASSIGN_TYPE)
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"red\", fillcolor=\"#ffeeed\", label=\"%s\"]\n", node->number_node, TEXT_ASSIGNMENT_SIGNS[(int)node->value]);
+		//printf("!!!!!!!!!!!!!!!!!!!!!!!!11\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n");
+	else
+		fprintf(picture, "\tnode%d [shape=\"record\", style=\"filled\", color=\"#1c3612\", fillcolor=\"#ccffcc\", label=\"%d\"]\n", node->number_node, (int)node->value);
 }
 
 void draw_draw_node(Node* node) {

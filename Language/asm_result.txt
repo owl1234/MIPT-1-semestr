@@ -1,89 +1,48 @@
 jmp main
 
 main:
+push rax
 push rdx
 push 87
 pop rdx
-push 5
+push 3
 pop [rdx]
 pop rdx
+pop rax
 
+push rax
 push rdx
 push 88
 pop rdx
-push 3
+push 2
 pop [rdx]
 pop rdx
-
-push rdx
-push 89
-pop rdx
-push 8
-pop [rdx]
-pop rdx
-
-push rdx
-push 76
-pop rdx
-push 0
-pop [rdx]
-pop rdx
-
-push [87]
 pop rax
-push [88]
-pop rbx
-cmp rax rbx
-ja L0
 
+push rax
 push rdx
-push 76
+push 87
 pop rdx
-push 3
+push 12
 pop [rdx]
 pop rdx
-
-jmp L1
-
-L0:
-push rdx
-push 76
-pop rdx
-push 5
-pop [rdx]
-pop rdx
-
-
-L1:
-
-push [89]
 pop rax
-push [76]
-pop rbx
-cmp rax rbx
-ja L2
 
+push rax
 push rdx
-push 76
+push 88
 pop rdx
-push 5
+push [rdx]
+push 12
+mul
 pop [rdx]
 pop rdx
+pop rax
 
-jmp L3
+push 12
+out
 
-L2:
-push rdx
-push 76
-pop rdx
-push 8
-pop [rdx]
-pop rdx
-
-
-L3:
-
-push 8
+push 24
 out
 
 hlt

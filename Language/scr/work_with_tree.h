@@ -16,6 +16,8 @@ enum NODE_TYPE {
 	OPERATOR 		= 3,
 	COMPARE_SIGN 	= 4,
 	PRINT 			= 5,
+	LOOP_TYPE       = 6,
+	ASSIGN_TYPE 	= 7,
 };
 
 const char name_picture_with_tree[] = "tree";
