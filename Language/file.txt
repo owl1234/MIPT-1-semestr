@@ -1,8 +1,8 @@
-Introducing a new word into the Newspeak Dictionary:  	x = 3;
-Introducing a new word into the Newspeak Dictionary: 	y = 2;
+Introducing a new word into the Newspeak Dictionary:  	x = 3 + 7 * 2;
+Introducing a new word into the Newspeak Dictionary: 	y = (24 / x) * 2 + x;
 
 x = 12;
-y *= 12;
+y *= x;
 
 
 Display the face of Big Brother on the telescreen with the inscription: {x};

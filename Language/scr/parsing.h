@@ -48,8 +48,8 @@
 const int BIG_NUMBER = 16;
 
 enum SPECIAL_INFO {
-	NOTHING 		   = 0,
-	FIND_VAR_INTO_DECL = 1,
+	NOTHING_SPECIAL_INFO  = 0,
+	FIND_VAR_INTO_DECL 	  = 1,
 };
 
 struct Parser {
@@ -112,10 +112,6 @@ struct Parser {
   	Node* get_number() {
   		IF_DEBUG_PARSING(printf("GET_N\n");)
   		char* ptr_after_number = NULL;
-  		printf("$$$$$");
-  		for(int i=0; i<10; ++i)
-  			printf("%c", *(pointer+i));
-  		printf("$$$$$$\n\n");
 		double value = strtod(pointer, &ptr_after_number);
 
 		if(pointer == ptr_after_number)
@@ -339,9 +335,7 @@ struct Parser {
 
   		skip_spaces();
 
-  		printf("begin right son - expr, sign %s\n", TEXT_ASSIGNMENT_SIGNS[(int)assign_sign]);
   		Node* right_son = get_expression();
-  		printf("right son type %d, value %d\n", right_son->type, (int)right_son->value);
 
   		Node* new_node = node_construct(ASSIGN_TYPE, (int)assign_sign, NULL, NULL);
   	  	node_make_copy(left_son,  new_node->left);
@@ -364,7 +358,7 @@ struct Parser {
 
   		special_info = FIND_VAR_INTO_DECL;
   		Node* left_son = get_variable();
-  		special_info = NOTHING;
+  		special_info = NOTHING_SPECIAL_INFO;
 
   		if(left_son == NULL) {
   			syntax_error(INFORMATION_ABOUT_CALL);

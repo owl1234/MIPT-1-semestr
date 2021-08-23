@@ -3,15 +3,13 @@
 						Kolesnikova Xenia <heiduk.k.k.s@yandex.ru>
 
     Last edition:
-        				August 22, 2021, 19:49:01
+        				August 23, 2021, 21:47:39
     
     What was changed?
-    					1. Added loops 
-    					2. Added +=, -=, *=, /=
+    					1. Make expression evaluations    					
 
 	To-do list
 						1. Make functions
-						2. Make expression evaluations
 
 */
 
@@ -21,7 +19,7 @@
 
 #define CHECK_STATUS(status)								\
 	if(!(status == TREE_OKEY || status == NODE_OKEY))		\
-		printf("awful!!!\n");
+		printf("An error occured\n");
 
 int main() {
 	Tree tree = {};
@@ -38,6 +36,8 @@ int main() {
 	printf("\n\n");
 
 	compile(&tree);
+
+	//draw_tree(&tree);
 
     tree_destruct(&tree);
 	

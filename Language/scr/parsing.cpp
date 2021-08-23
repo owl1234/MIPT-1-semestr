@@ -24,13 +24,13 @@ void tree_fill(Tree* tree, const char* name_file) {
 	for(int i = 0; i < ALPHABET; ++i)
 		tree->used_vars[i] = parser.used_vars[i];
 
-	printf("end parse\n");
+	printf("end parse\n\n");
 
 	printf("tree into parser: %p\n", tree);
 
 	file_destruct(&file);
 	
-	printf("end fill the tree\n");
+	printf("end fill the tree\n\n");
 }
 
 void get_variables(Tree* tree) {

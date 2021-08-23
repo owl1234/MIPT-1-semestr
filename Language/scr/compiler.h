@@ -1,8 +1,11 @@
 #include <stdlib.h>
-#include "stack.h"
+#include <math.h>
+
+//#include "stack.h"
+#include "common.h"
 #include "warnings.h"
 #include "work_with_tree.h"
-#include "operation_codes_for_CPU.h"
+//#include "operation_codes_for_CPU.h"
 
 #ifndef COMPILER_H
 #define COMPILER_H
@@ -34,7 +37,6 @@ struct Compiler {
 	Name_table* name_table;
 	size_t size_name_table;
 	int* memory;
-	FILE* buffer_with_functions;
 	size_t count_of_functions;
 
   private:
@@ -56,7 +58,7 @@ struct Compiler {
   		return 0;
   	}
 
-  	void compiling(Node* node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
+  	void compiling(Node* &node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
   		if(!node || !node->left)
   			return;
 
@@ -85,7 +87,7 @@ struct Compiler {
   		compiling(node->right);
   	}
 
-  	void compiling_operator(Node* node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
+  	void compiling_operator(Node* &node, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
   		printf("begin compile oper\n");
   		if(node->type == OPERATOR) {
   			switch((int)node->value) {
@@ -209,17 +211,20 @@ struct Compiler {
   		return values;
   	}
 
-  	void compiling_assignment(Node* node, FILE* need_buffer, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
+  	void compiling_assignment(Node* &node, FILE* need_buffer, const OPER_INTO_COND remember_or_not = NOT_INTO_COND) {
   		size_t var_addrss = find_variable_address(node->left->value);
-  		printf("\tassignment! var address %lu, var %c\n", var_addrss, (char)node->left->value);
+  		//printf("\tassignment! var address %lu, var %c\n", var_addrss, (char)node->left->value);
   		fprintf(need_buffer, "push rax\n"
   							 "push rdx\n"
   						     "push %ld\n"
   						     "pop rdx\n", var_addrss);
 
+  		node = evaluate_expression(node);
+  		//draw_draw_node(prog_tree->root);
+
   		if(node->type != ASSIGN_TYPE || node->type == ASSIGN_TYPE && node->value == SIGN_ASSIGNMENT) {
 	  		if(node->right->type == NUMBER) {
-	  			printf("\tright is number, %d\n", (int)node->right->value);
+	  			//printf("\tright is number, %d\n", (int)node->right->value);
 	  			fprintf(need_buffer, "push %d\n"
 	  							     "pop [rdx]\n", (int)node->right->value);
 
@@ -229,7 +234,7 @@ struct Compiler {
 	  	  	else
 	  	  	if(node->right->type == VARIABLE) {
 	  	  		size_t right_var_addrss = find_variable_address(node->right->value);
-	  	  		printf("\tright is var, %c, flag %d\n", (char)node->right->value, remember_or_not);
+	  	  		//printf("\tright is var, %c, flag %d\n", (char)node->right->value, remember_or_not);
 	  			fprintf(need_buffer, "push %d\n"
 	  			                     "pop [rdx]\n", memory[right_var_addrss]);
 
@@ -333,6 +338,76 @@ struct Compiler {
   		}
   	}
 
+  	void substitute_variable_values(Node* &node) {
+  		if(!node)
+  			return;
+
+  		//printf("substitute_variable_values, node: type %d, value %d, number: %lu\n", (int)node->type, (int)node->value, node->number_node);
+  		substitute_variable_values(node->left);
+  		substitute_variable_values(node->right);
+
+  		if(node->type == OPERATOR && node->left && node->left->type == VARIABLE && node->value != EQUAL) {
+  			node->left->type  = NUMBER;
+  			node->left->value = memory[find_variable_address((char)node->left->value)];
+  		}
+
+  		if((node->type == OPERATOR || node->type == ASSIGN_TYPE) && node->right && node->right->type == VARIABLE) {
+  			node->right->type  = NUMBER;
+  			node->right->value = memory[find_variable_address((char)node->right->value)];
+  		}
+
+  		left_num_right_num(node);
+  	}
+
+  	void left_num_right_num(Node* &node) {
+  		if(!node || !node->left || !node->right || node && node->type != OPERATOR)
+  			return;
+
+  		switch((int)node->value) {
+  			case ADD:
+  				node->value = node->left->value + node->right->value; 		break;
+  			case SUB:
+  				node->value = node->left->value - node->right->value; 		break;  			
+  			case MUL:
+  				node->value = node->left->value * node->right->value; 		break;  			
+			case DIV:
+				if(fabs(node->right->value) < EPSILON) {
+					compilation_error(INFORMATION_ABOUT_CALL, "Division by zero");
+					return;
+				}
+  				node->value = node->left->value / node->right->value; 		break;			
+			case POW:
+  				node->value = pow(node->left->value, node->right->value); 	break;			
+			case SIN:
+  				node->value = sin(node->left->value); 						break;			
+			case COS:
+  				node->value = cos(node->left->value); 						break;			
+			case TG: 
+  				node->value = tan(node->left->value); 						break;			
+			case CTG:
+  				node->value = 1.0 / tan(node->left->value); 				break;			
+			case ARCSIN:
+  				node->value = asin(node->left->value); 						break;			
+			case ARCCOS:
+  				node->value = acos(node->left->value); 						break;			
+			case ARCTG: 
+  				node->value = atan(node->left->value); 						break;			
+			case ARCCTG:
+  				node->value = 1.0 / atan(node->left->value); 				break;			
+			case LN :   
+  				node->value = log(node->left->value) / log(exp(1)); 		break;			
+			case LG :	
+  				node->value = log(node->left->value); 						break;	
+  			default:
+  				return;		
+  		}
+
+  		node->type = NUMBER;
+  		node->left = node->right = NULL;
+  		free(node->left);
+  		free(node->right);
+  	}
+
   public:
   	void construct() {
   		stack_construct(&stack_frame);
@@ -358,19 +433,6 @@ struct Compiler {
   			warning("bad memory", INFORMATION_ABOUT_CALL);
   			return;
   		}
-
-  		/*buffer_with_functions = (char*)calloc(SIZE_FUNC_BUFFER, sizeof(char));
-  		if(!buffer_with_functions) {
-  			warning("bad buffer for functions", INFORMATION_ABOUT_CALL);
-  			return;
-  		}*/
-
-  		buffer_with_functions = fopen("func_file.txt", "w");
-  		if(!buffer_with_functions) {
-  			warning("bad func file", INFORMATION_ABOUT_CALL);
-  			return;
-  		}
-
   	}
 
   	void initialize(Tree* tree) {
@@ -387,7 +449,6 @@ struct Compiler {
   		fclose(asm_code);
   		tree_destruct(prog_tree);
   		free(memory);
-  		fclose(buffer_with_functions);
   	}
 
   	void compile() {
@@ -419,6 +480,29 @@ struct Compiler {
   			}
 
   		size_name_table = counter_used_vars;
+  	}
+
+
+  	Node* evaluate_expression(Node* node) {
+  		//printf("eval! node: type %d, value %d, number: %lu\n", (int)node->type, (int)node->value, node->number_node);
+  		if(!node)
+  			return NULL;
+
+  		if(node->left &&  node->left->type == OPERATOR)
+  			node->left  = evaluate_expression(node->left);
+
+  		if(node->right && node->right->type == OPERATOR)
+  			node->right = evaluate_expression(node->right);
+
+  		/*Node* copy_node = node_construct(node->type, node->value, NULL, NULL);
+  		node_make_copy(node->left,  copy_node->left);
+  		node_make_copy(node->right, copy_node->right);*/
+
+  		substitute_variable_values(node);
+
+  		//printf("\n\n");
+
+  		return node;
   	}
 };
 

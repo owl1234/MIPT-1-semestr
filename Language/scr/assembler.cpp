@@ -45,8 +45,6 @@ int file_construct(File* file, char* name_file, const char* reading_mode) {
     assert(file);
     assert(name_file);
 
-    printf("File name: %s\n", name_file);
-
     file->name = name_file;
     stat(file->name, &(file->information));
 
